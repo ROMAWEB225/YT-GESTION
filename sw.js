@@ -1,4 +1,4 @@
-const CACHE_NAME = 'yt-transport-v10';
+const CACHE_NAME = 'yt-transport-v13';
 const urlsToCache = ['./', './index.html'];
 
 self.addEventListener('install', function(event) {
