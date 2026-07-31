@@ -3,10 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#1a7a3a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>YT Transport Pro</title>
+    <!-- Bibliothèques légères -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
+    </script>
     <style>
+        /* Styles simplifiés mais complets */
         * {
             margin: 0;
             padding: 0;
@@ -15,11 +21,11 @@
         }
         body {
             background: #f0f4f0;
-            padding: 12px;
+            padding: 10px;
             min-height: 100vh;
         }
         .container {
-            max-width: 1100px;
+            max-width: 1000px;
             margin: 0 auto;
         }
 
@@ -27,67 +33,66 @@
         .header {
             background: #1a5e3a;
             color: white;
-            padding: 14px 18px;
-            border-radius: 12px;
-            margin-bottom: 14px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 6px;
         }
         .header h1 {
-            font-size: 20px;
+            font-size: 18px;
         }
         .header .sub {
-            font-size: 11px;
+            font-size: 10px;
             opacity: 0.8;
         }
         .header-actions {
             display: flex;
-            gap: 6px;
+            gap: 4px;
             flex-wrap: wrap;
         }
         .header-actions button {
             background: rgba(255, 255, 255, 0.15);
             color: white;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 10px;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 9px;
             cursor: pointer;
-            transition: 0.2s;
         }
         .header-actions button:hover {
             background: rgba(255, 255, 255, 0.25);
         }
 
-        /* ADMIN LOCK */
+        /* ADMIN */
         .admin-lock {
             background: #e8f5ed;
             border: 2px solid #1a5e3a;
-            border-radius: 12px;
-            padding: 10px 14px;
-            margin-bottom: 14px;
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
         }
         .admin-lock input {
-            padding: 7px 12px;
+            padding: 5px 10px;
             border: 2px solid #ccc;
-            border-radius: 8px;
-            font-size: 13px;
+            border-radius: 6px;
+            font-size: 12px;
             flex: 1;
-            min-width: 130px;
+            min-width: 100px;
         }
         .admin-lock input:focus {
             border-color: #1a5e3a;
             outline: none;
         }
         .admin-lock .status {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 600;
             color: #555;
         }
@@ -96,13 +101,14 @@
         }
 
         .btn {
-            padding: 7px 16px;
+            padding: 5px 12px;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             font-weight: 600;
-            font-size: 12px;
+            font-size: 10px;
             cursor: pointer;
             transition: 0.2s;
+            min-height: 28px;
         }
         .btn-primary {
             background: #1a5e3a;
@@ -134,8 +140,9 @@
             background: #e8f5ed;
         }
         .btn-sm {
-            padding: 4px 10px;
-            font-size: 10px;
+            padding: 3px 8px;
+            font-size: 9px;
+            min-height: 22px;
         }
         .btn-block {
             width: 100%;
@@ -144,22 +151,22 @@
         /* ONGLETS */
         .tabs {
             display: flex;
-            gap: 4px;
+            gap: 3px;
             flex-wrap: wrap;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             background: white;
-            border-radius: 12px;
-            padding: 4px;
+            border-radius: 10px;
+            padding: 3px;
             border: 1px solid #dce8e2;
         }
         .tab-btn {
             flex: 1;
-            min-width: 50px;
-            padding: 8px 6px;
+            min-width: 40px;
+            padding: 6px 4px;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             background: transparent;
-            font-size: 10px;
+            font-size: 8px;
             font-weight: 600;
             color: #777;
             cursor: pointer;
@@ -184,25 +191,25 @@
         /* CARTES */
         .card {
             background: white;
-            border-radius: 12px;
-            padding: 14px 16px;
-            margin-bottom: 12px;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
             border: 1px solid #dce8e2;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
         }
         .card-title {
-            font-size: 15px;
+            font-size: 13px;
             font-weight: 600;
             color: #1a5e3a;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
         }
         .badge {
-            font-size: 9px;
-            padding: 2px 10px;
+            font-size: 8px;
+            padding: 2px 8px;
             border-radius: 30px;
             font-weight: 500;
         }
@@ -226,27 +233,26 @@
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 6px;
         }
         .form-group {
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         .form-group label {
             display: block;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 600;
             color: #666;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
         }
         .form-group input,
         .form-group select {
             width: 100%;
-            padding: 7px 10px;
+            padding: 5px 8px;
             border: 2px solid #dce8e2;
-            border-radius: 8px;
-            font-size: 13px;
+            border-radius: 5px;
+            font-size: 11px;
             transition: 0.2s;
         }
         .form-group input:focus,
@@ -263,26 +269,26 @@
 
         .table-wrapper {
             overflow-x: auto;
-            border-radius: 8px;
+            border-radius: 6px;
             border: 1px solid #dce8e2;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 11px;
+            font-size: 9px;
         }
         th {
             background: #e8f5ed;
             color: #1a5e3a;
-            padding: 6px 5px;
+            padding: 4px 3px;
             text-align: left;
             border-bottom: 2px solid #1a5e3a;
-            font-size: 9px;
+            font-size: 7px;
             text-transform: uppercase;
             white-space: nowrap;
         }
         td {
-            padding: 5px 5px;
+            padding: 3px 3px;
             border-bottom: 1px solid #dce8e2;
             vertical-align: middle;
         }
@@ -292,9 +298,9 @@
 
         .badge-status {
             display: inline-block;
-            padding: 2px 8px;
+            padding: 2px 6px;
             border-radius: 30px;
-            font-size: 9px;
+            font-size: 7px;
             font-weight: 600;
             text-transform: uppercase;
         }
@@ -325,23 +331,23 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
-            gap: 8px;
+            grid-template-columns: repeat(auto-fit, minmax(55px, 1fr));
+            gap: 5px;
         }
         .stat-item {
             background: #e8f5ed;
-            padding: 8px;
-            border-radius: 10px;
+            padding: 5px;
+            border-radius: 8px;
             text-align: center;
             border: 1px solid #d4e8dc;
         }
         .stat-number {
-            font-size: 20px;
+            font-size: 16px;
             font-weight: 700;
             color: #1a5e3a;
         }
         .stat-label {
-            font-size: 8px;
+            font-size: 6px;
             color: #666;
             text-transform: uppercase;
             font-weight: 500;
@@ -349,16 +355,16 @@
 
         .flex {
             display: flex;
-            gap: 6px;
+            gap: 4px;
             flex-wrap: wrap;
             align-items: center;
         }
-        .mt-8 {
-            margin-top: 8px;
+        .mt-6 {
+            margin-top: 6px;
         }
         .text-muted {
             color: #999;
-            font-size: 11px;
+            font-size: 10px;
         }
         .text-center {
             text-align: center;
@@ -367,122 +373,101 @@
             display: none !important;
         }
 
-        .depart-section {
-            background: #e8f5ed;
-            border-radius: 8px;
-            padding: 10px 12px;
-            border-left: 4px solid #1a5e3a;
-        }
-        .depart-section .header {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 4px;
-            margin-bottom: 4px;
-        }
-        .depart-section .header h3 {
-            font-size: 13px;
-            color: #1a5e3a;
-        }
-        .depart-section .header .count {
-            font-size: 11px;
-            color: #666;
-        }
-
-        .depart-group {
-            background: white;
-            padding: 4px 8px;
-            margin-bottom: 3px;
-            border-radius: 6px;
-            border: 1px solid #dce8e2;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 4px;
-        }
-        .depart-group .client-tag {
-            background: #e8f5ed;
-            padding: 2px 6px;
-            border-radius: 20px;
-            font-size: 10px;
-            border: 1px solid #d4e8dc;
-        }
-
-        .presence-check {
-            width: 14px;
-            height: 14px;
-            accent-color: #1a5e3a;
-        }
-
+        /* CARTE ABONNEMENT */
         .carte-abonnement {
-            max-width: 400px;
+            max-width: 350px;
             margin: 0 auto;
             background: white;
-            border-radius: 16px;
-            padding: 16px;
+            border-radius: 12px;
+            padding: 12px;
             border: 2px solid #1a5e3a;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
         .carte-abonnement .header-carte {
             display: flex;
             justify-content: space-between;
             border-bottom: 2px solid #1a5e3a;
-            padding-bottom: 8px;
-            margin-bottom: 10px;
+            padding-bottom: 6px;
+            margin-bottom: 8px;
         }
         .carte-abonnement .header-carte .logo {
-            font-size: 18px;
+            font-size: 15px;
             font-weight: 700;
             color: #1a5e3a;
         }
         .carte-abonnement .header-carte .mois {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 600;
             color: #666;
         }
-        .carte-abonnement .info-abonne .nom {
+        .carte-abonnement .info-abonne {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .carte-abonnement .info-abonne .photo {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 3px solid #1a5e3a;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+        .carte-abonnement .info-abonne .photo-placeholder {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 3px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 18px;
+            color: #ccc;
+            background: #fafbfc;
+        }
+        .carte-abonnement .info-abonne .details .nom {
+            font-size: 14px;
             font-weight: 700;
         }
-        .carte-abonnement .info-abonne .adresse {
-            font-size: 12px;
+        .carte-abonnement .info-abonne .details .adresse {
+            font-size: 9px;
             color: #666;
         }
-        .carte-abonnement .info-abonne .numero {
-            font-size: 12px;
+        .carte-abonnement .info-abonne .details .numero {
+            font-size: 9px;
             color: #666;
             font-family: monospace;
         }
         .carte-abonnement .qr-container {
             text-align: center;
-            margin: 8px 0;
+            margin: 5px 0;
         }
         .carte-abonnement .qr-container #qrcode {
             display: inline-block;
             border: 2px solid #1a5e3a;
-            border-radius: 8px;
-            padding: 6px;
+            border-radius: 6px;
+            padding: 4px;
             background: white;
         }
         .carte-abonnement .qr-container #qrcode img {
-            width: 100px;
-            height: 100px;
+            width: 80px;
+            height: 80px;
         }
         .carte-abonnement .jours-grid {
             display: grid;
             grid-template-columns: repeat(10, 1fr);
-            gap: 3px;
-            margin-top: 8px;
+            gap: 2px;
+            margin-top: 5px;
         }
         .carte-abonnement .jours-grid .jour {
             aspect-ratio: 1;
             border: 1px solid #dce8e2;
-            border-radius: 4px;
+            border-radius: 3px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 8px;
+            font-size: 7px;
             font-weight: 600;
             color: #999;
             background: #fafbfc;
@@ -490,67 +475,250 @@
         .carte-abonnement .jours-grid .jour.present {
             background: #1a5e3a;
             color: white;
-            border-color: #1a5e3a;
         }
         .carte-abonnement .footer-carte {
-            margin-top: 10px;
-            padding-top: 8px;
+            margin-top: 6px;
+            padding-top: 5px;
             border-top: 1px solid #dce8e2;
-            font-size: 9px;
+            font-size: 8px;
             color: #666;
             text-align: center;
         }
         .carte-abonnement .security-hash {
-            font-size: 8px;
+            font-size: 6px;
             color: #999;
             font-family: monospace;
             text-align: center;
-            margin-top: 4px;
-            padding: 4px;
+            margin-top: 3px;
+            padding: 3px;
             background: #f5f5f5;
-            border-radius: 4px;
+            border-radius: 3px;
         }
 
-        .photo {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: 3px solid #1a5e3a;
-            object-fit: cover;
+        .depart-section {
+            background: #e8f5ed;
+            border-radius: 6px;
+            padding: 8px 10px;
+            border-left: 3px solid #1a5e3a;
         }
-        .photo-placeholder {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: 3px dashed #ccc;
+        .depart-section .header {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 3px;
+            margin-bottom: 3px;
+        }
+        .depart-section .header h3 {
+            font-size: 11px;
+            color: #1a5e3a;
+        }
+        .depart-section .header .count {
+            font-size: 9px;
+            color: #666;
+        }
+        .depart-group {
+            background: white;
+            padding: 3px 6px;
+            margin-bottom: 2px;
+            border-radius: 4px;
+            border: 1px solid #dce8e2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2px;
+        }
+        .depart-group .client-tag {
+            background: #e8f5ed;
+            padding: 2px 6px;
+            border-radius: 15px;
+            font-size: 8px;
+        }
+        .presence-check {
+            width: 12px;
+            height: 12px;
+            accent-color: #1a5e3a;
+        }
+
+        .select-all-row {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: #ccc;
-            background: #fafbfc;
+            gap: 4px;
+            padding: 2px 0;
+            border-bottom: 1px solid #dce8e2;
+            margin-bottom: 3px;
+        }
+        .select-all-row label {
+            font-size: 8px;
+            font-weight: 500;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            cursor: pointer;
+        }
+        .select-all-row input[type="checkbox"] {
+            width: 12px;
+            height: 12px;
+            accent-color: #1a5e3a;
+        }
+
+        .alert {
+            padding: 4px 8px;
+            border-radius: 5px;
+            margin-bottom: 3px;
+            font-size: 9px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .alert-danger {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .alert-warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+        }
+        .alert-info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
         }
 
         .renew-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 4px 0;
+            padding: 2px 0;
             border-bottom: 1px solid #dce8e2;
-            font-size: 12px;
+            font-size: 10px;
             flex-wrap: wrap;
-            gap: 4px;
+            gap: 2px;
         }
         .renew-item .info {
             display: flex;
-            gap: 8px;
+            gap: 4px;
             align-items: center;
             flex-wrap: wrap;
         }
         .renew-item .info input[type="checkbox"] {
-            width: 14px;
-            height: 14px;
+            width: 12px;
+            height: 12px;
             accent-color: #1a5e3a;
+        }
+
+        .scanner-container {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+        .scanner-container video {
+            max-width: 100%;
+            border-radius: 5px;
+            background: #000;
+            max-height: 250px;
+        }
+        .scanner-container .scan-result {
+            margin-top: 5px;
+            padding: 5px;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 11px;
+        }
+        .scanner-container .scan-result.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .scanner-container .scan-result.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .scanner-container .scan-result.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .whatsapp-link {
+            background: #25D366;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 9px;
+            transition: 0.2s;
+        }
+        .whatsapp-link:hover {
+            background: #1da85a;
+        }
+
+        .sub-tabs {
+            display: flex;
+            gap: 3px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+        .sub-tab-btn {
+            padding: 3px 8px;
+            border: none;
+            border-radius: 4px;
+            background: #dce8e2;
+            font-size: 8px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .sub-tab-btn:hover {
+            background: #e8f5ed;
+        }
+        .sub-tab-btn.active {
+            background: #1a5e3a;
+            color: white;
+        }
+        .sub-tab-content {
+            display: none;
+        }
+        .sub-tab-content.active {
+            display: block;
+        }
+
+        .pointage-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2px 0;
+            border-bottom: 1px solid #dce8e2;
+            font-size: 9px;
+            flex-wrap: wrap;
+            gap: 2px;
+        }
+        .pointage-item .badge-type {
+            font-size: 6px;
+            padding: 2px 5px;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+        .pointage-item .badge-type.aller {
+            background: #d4a017;
+            color: white;
+        }
+        .pointage-item .badge-type.retour {
+            background: #2c3e50;
+            color: white;
         }
 
         @media (max-width: 768px) {
@@ -565,13 +733,13 @@
                 text-align: center;
             }
             .tabs .tab-btn {
-                font-size: 8px;
-                padding: 5px 3px;
-                min-width: 40px;
+                font-size: 7px;
+                padding: 4px 2px;
+                min-width: 32px;
             }
             .carte-abonnement .qr-container #qrcode img {
-                width: 80px;
-                height: 80px;
+                width: 70px;
+                height: 70px;
             }
         }
     </style>
@@ -583,20 +751,20 @@
         <!-- HEADER -->
         <div class="header">
             <div>
-                <h1>🚌 YT Transport Pro</h1>
+                <h1>🚌 YT Pro</h1>
                 <div class="sub">YAOU • Gestion des abonnements</div>
             </div>
             <div class="header-actions">
                 <button onclick="toggleAdmin()">🔐 Admin</button>
                 <button onclick="exportData()">📥 Export</button>
                 <button onclick="document.getElementById('fileInput').click()">📤 Import</button>
-                <button onclick="location.reload()">🔄 Rafraîchir</button>
+                <button onclick="location.reload()">🔄</button>
             </div>
         </div>
 
         <!-- ADMIN LOCK -->
         <div class="admin-lock" id="adminLock">
-            <span style="font-size:18px;">🔒</span>
+            <span style="font-size:14px;">🔒</span>
             <span style="font-weight:600;color:#1a5e3a;">Admin</span>
             <input type="password" id="adminPassword" placeholder="Code (YT2024)">
             <button class="btn btn-primary" onclick="unlockAdmin()">Déverrouiller</button>
@@ -607,9 +775,10 @@
         <div class="tabs">
             <button class="tab-btn active" onclick="showTab('tab1')">📊 Dashboard</button>
             <button class="tab-btn" onclick="showTab('tab2')">👥 Abonnés</button>
-            <button class="tab-btn" onclick="showTab('tab3')">🪪 Cartes</button>
-            <button class="tab-btn" onclick="showTab('tab4')">🚌 Départs</button>
-            <button class="tab-btn" onclick="showTab('tab5')">📈 Rapport</button>
+            <button class="tab-btn" onclick="showTab('tab3')">🪪 Carte</button>
+            <button class="tab-btn" onclick="showTab('tab4')">📱 Scan</button>
+            <button class="tab-btn" onclick="showTab('tab5')">🚌 Départs</button>
+            <button class="tab-btn" onclick="showTab('tab6')">📈 Rapport</button>
         </div>
 
         <!-- TAB 1: DASHBOARD -->
@@ -628,7 +797,7 @@
                 <div class="card-title">🔄 Renouvellement <span class="badge badge-info" id="renewMonthDisplay"></span></div>
                 <div id="renewSummary"><p class="text-muted">Chargement...</p></div>
                 <div id="renewSelectList"></div>
-                <div class="flex mt-8">
+                <div class="flex mt-6">
                     <button class="btn btn-success btn-sm" onclick="renewSelected()">✅ Renouveler</button>
                     <button class="btn btn-primary btn-sm" onclick="renewAll()">📅 Tout</button>
                     <button class="btn btn-outline btn-sm" onclick="renderAll()">🔄</button>
@@ -641,38 +810,38 @@
             <div class="card" id="addCard">
                 <div class="card-title">➕ Ajouter un abonné <span class="badge badge-admin">Admin</span></div>
                 <div class="form-row">
-                    <div class="form-group"><label>Nom complet</label><input type="text" id="clientName" placeholder="Jean Dupont"></div>
+                    <div class="form-group"><label>Nom</label><input type="text" id="clientName" placeholder="Jean Dupont"></div>
                     <div class="form-group"><label>Téléphone</label><input type="tel" id="clientPhone" placeholder="07 77 88 99 00"></div>
                 </div>
                 <div class="form-row">
                     <div class="form-group"><label>Adresse</label><input type="text" id="clientAdresse" placeholder="Abidjan, Cocody"></div>
-                    <div class="form-group"><label>Date début</label><input type="date" id="clientStartDate"></div>
+                    <div class="form-group"><label>Début</label><input type="date" id="clientStartDate"></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label>Date fin</label><input type="date" id="clientEndDate"></div>
+                    <div class="form-group"><label>Fin</label><input type="date" id="clientEndDate"></div>
                     <div class="form-group"><label>Montant (CFA)</label><input type="number" id="clientAmount" placeholder="25000"></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label>Statut paiement</label>
+                    <div class="form-group"><label>Paiement</label>
                         <select id="paymentStatus"><option value="paid">Payé</option><option value="pending" selected>En attente</option><option value="unpaid">Impayé</option></select>
                     </div>
-                    <div class="form-group"><label>Type trajet</label>
+                    <div class="form-group"><label>Trajet</label>
                         <select id="clientTripType"><option value="aller-simple">Aller simple</option><option value="aller-retour" selected>Aller-Retour</option><option value="retour-simple">Retour simple</option></select>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group"><label>Photo</label><input type="file" id="clientPhoto" accept="image/*"></div>
-                    <div class="form-group"><img id="photoPreview" style="width:60px;height:60px;border-radius:50%;border:2px solid #ccc;object-fit:cover;background:#f0f0f0;"></div>
+                    <div class="form-group"><img id="photoPreview" style="width:45px;height:45px;border-radius:50%;border:2px solid #ccc;object-fit:cover;background:#f0f0f0;"></div>
                 </div>
-                <div style="background:#fff8e1;padding:6px 10px;border-radius:8px;margin:4px 0;border-left:4px solid #d4a017;">
-                    <div style="font-weight:600;color:#d4a017;font-size:11px;">🌅 DÉPART MATIN</div>
+                <div style="background:#fff8e1;padding:4px 8px;border-radius:5px;margin:3px 0;border-left:3px solid #d4a017;">
+                    <div style="font-weight:600;color:#d4a017;font-size:9px;">🌅 DÉPART MATIN</div>
                     <div class="form-row">
                         <div class="form-group"><label>Heure</label><input type="time" id="clientDepartMatinTime" value="07:00"></div>
                         <div class="form-group"><label>Arrêt</label><input type="text" id="clientDepartMatinArret" placeholder="Gare centrale"></div>
                     </div>
                 </div>
-                <div style="background:#ecf0f1;padding:6px 10px;border-radius:8px;margin:4px 0;border-left:4px solid #2c3e50;">
-                    <div style="font-weight:600;color:#2c3e50;font-size:11px;">🌙 RETOUR SOIR</div>
+                <div style="background:#ecf0f1;padding:4px 8px;border-radius:5px;margin:3px 0;border-left:3px solid #2c3e50;">
+                    <div style="font-weight:600;color:#2c3e50;font-size:9px;">🌙 RETOUR SOIR</div>
                     <div class="form-row">
                         <div class="form-group"><label>Heure</label><input type="time" id="clientReturnSoirTime" value="18:00"></div>
                         <div class="form-group"><label>Arrêt</label><input type="text" id="clientReturnSoirArret" placeholder="Marché"></div>
@@ -683,9 +852,9 @@
 
             <div class="card">
                 <div class="card-title">👥 Liste des abonnés</div>
-                <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
-                    <select id="filterPayment" style="padding:3px 6px;border:2px solid #dce8e2;border-radius:6px;font-size:10px;"><option value="">Tous</option><option value="paid">Payé</option><option value="unpaid">Impayé</option><option value="pending">En attente</option></select>
-                    <select id="filterStatus" style="padding:3px 6px;border:2px solid #dce8e2;border-radius:6px;font-size:10px;"><option value="">Tous</option><option value="actif">Actif</option><option value="conge">Congé</option><option value="inactif">Inactif</option></select>
+                <div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:4px;">
+                    <select id="filterPayment" style="padding:2px 4px;border:2px solid #dce8e2;border-radius:4px;font-size:8px;"><option value="">Tous</option><option value="paid">Payé</option><option value="unpaid">Impayé</option><option value="pending">En attente</option></select>
+                    <select id="filterStatus" style="padding:2px 4px;border:2px solid #dce8e2;border-radius:4px;font-size:8px;"><option value="">Tous</option><option value="actif">Actif</option><option value="conge">Congé</option><option value="inactif">Inactif</option></select>
                     <button class="btn btn-outline btn-sm" onclick="filterClients()">Effacer</button>
                 </div>
                 <div class="table-wrapper">
@@ -697,55 +866,126 @@
             </div>
         </div>
 
-        <!-- TAB 3: CARTES -->
+        <!-- TAB 3: CARTE -->
         <div class="tab-content" id="tab3">
             <div class="card">
-                <div class="card-title">🪪 Générer la carte</div>
+                <div class="card-title">🪪 Ma carte</div>
                 <div class="form-group">
-                    <label>Sélectionner un abonné</label>
-                    <select id="carteSelect" style="width:100%;padding:6px 10px;border:2px solid #dce8e2;border-radius:8px;">
+                    <label>Sélectionner</label>
+                    <select id="carteSelect" style="width:100%;padding:4px 8px;border:2px solid #dce8e2;border-radius:5px;font-size:10px;">
                         <option value="">-- Choisir --</option>
                     </select>
                 </div>
                 <div class="flex">
-                    <button class="btn btn-primary" onclick="genererCarte()">📄 Générer</button>
-                    <button class="btn btn-success" onclick="exporterCartePDF()">📥 PDF</button>
+                    <button class="btn btn-primary btn-sm" onclick="genererCarte()">📄 Afficher</button>
+                    <button class="btn btn-success btn-sm" onclick="exporterCartePDF()">📥 PDF</button>
+                    <button class="btn btn-outline btn-sm" onclick="partagerCarte()">📤 Partager</button>
                 </div>
             </div>
             <div class="card">
-                <div class="card-title">🪪 Aperçu</div>
-                <div id="cartePreview"><p class="text-muted text-center">Sélectionnez un abonné</p></div>
+                <div class="card-title">🪪 Ma carte</div>
+                <div id="cartePreview"><p class="text-muted text-center">Sélectionnez votre nom</p></div>
+            </div>
+            <div class="card">
+                <div class="card-title">📋 Historique pointages</div>
+                <div id="pointageHistory"><p class="text-muted">Aucun pointage</p></div>
+            </div>
+            <div class="card">
+                <div class="card-title">💰 Historique paiements</div>
+                <div id="paiementHistory"><p class="text-muted">Aucun paiement</p></div>
             </div>
         </div>
 
-        <!-- TAB 4: DEPARTS -->
+        <!-- TAB 4: SCANNER -->
         <div class="tab-content" id="tab4">
             <div class="card">
-                <div class="card-title">🚌 Gestion des départs</div>
-                <div class="depart-section">
-                    <div class="header">
-                        <h3>Abonnés actifs</h3>
-                        <span class="count" id="activeCount">0</span>
+                <div class="card-title">📱 Scanner QR</div>
+                <div style="background:#e8f5ed;padding:4px 8px;border-radius:5px;margin-bottom:4px;">
+                    <p style="font-size:9px;color:#666;">📷 Scannez le QR code de l'abonné pour pointer</p>
+                </div>
+                <div class="scanner-container" id="scannerContainer">
+                    <div id="scannerPlaceholder" style="color:white;padding:15px;">
+                        <p style="font-size:13px;">📷 Prêt</p>
+                        <p style="font-size:9px;opacity:0.6;">Cliquez sur Scanner</p>
                     </div>
-                    <div id="presenceList"><p class="text-muted">Chargement...</p></div>
-                    <div class="flex mt-8">
-                        <button class="btn btn-success" onclick="validateDepart()">✅ Valider</button>
-                        <button class="btn btn-outline" onclick="resetPresence()">🔄 Réinitialiser</button>
-                        <button class="btn btn-danger" onclick="exportDepartPDF()">📄 PDF</button>
+                    <video id="video" style="display:none;width:100%;max-width:400px;border-radius:5px;"></video>
+                    <div class="flex mt-6" style="justify-content:center;">
+                        <button class="btn btn-primary" onclick="startScanner()">📷 Scanner</button>
+                        <button class="btn btn-danger" onclick="stopScanner()">⏹️ Arrêter</button>
                     </div>
+                    <div id="scanResult" class="scan-result hidden"></div>
+                </div>
+                <div class="flex mt-6">
+                    <button class="btn btn-success btn-sm" onclick="pointerAller()">🟢 Aller</button>
+                    <button class="btn btn-info btn-sm" onclick="pointerRetour()" style="background:#2c3e50;color:white;">🔵 Retour</button>
                 </div>
             </div>
             <div class="card">
-                <div class="card-title">📋 Liste validée <span class="badge badge-info" id="departCount">0</span></div>
-                <div id="departList"><p class="text-muted">Aucun départ validé</p></div>
+                <div class="card-title">📋 Derniers pointages</div>
+                <div id="scanHistory"><p class="text-muted">Aucun pointage</p></div>
             </div>
         </div>
 
-        <!-- TAB 5: RAPPORT -->
+        <!-- TAB 5: DEPARTS -->
         <div class="tab-content" id="tab5">
             <div class="card">
-                <div class="card-title">📈 Rapport complet <button class="btn btn-primary btn-sm" onclick="exportReport()">📊 Excel</button></div>
+                <div class="card-title">🚌 Départs <span class="badge badge-info" id="departDateDisplay"></span></div>
+                <div class="sub-tabs">
+                    <button class="sub-tab-btn active" onclick="showSubTab('subtab-matin')">🌅 MATIN</button>
+                    <button class="sub-tab-btn" onclick="showSubTab('subtab-soir')">🌙 SOIR</button>
+                </div>
+                <div class="sub-tab-content active" id="subtab-matin">
+                    <div class="depart-section" style="border-left-color:#d4a017;">
+                        <div class="header"><h3 style="color:#d4a017;">MATIN</h3><span class="count" id="activeCountMatin">0</span></div>
+                        <div class="select-all-row"><label><input type="checkbox" id="selectAllMatin"> Tout</label></div>
+                        <div id="presenceListMatin"><p class="text-muted">Chargement...</p></div>
+                        <div class="flex mt-6">
+                            <button class="btn btn-success" onclick="validateMatin()">✅ Valider</button>
+                            <button class="btn btn-outline" style="border-color:#d4a017;color:#d4a017;" onclick="resetMatin()">🔄</button>
+                            <button class="btn btn-danger" onclick="exportMatinPDF()">📄 PDF</button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">📋 Liste MATIN <span class="badge badge-warning" id="departMatinCount">0</span></div>
+                        <div id="departMatinList"><p class="text-muted">Aucun</p></div>
+                    </div>
+                </div>
+                <div class="sub-tab-content" id="subtab-soir">
+                    <div class="depart-section" style="border-left-color:#2c3e50;">
+                        <div class="header"><h3 style="color:#2c3e50;">SOIR</h3><span class="count" id="activeCountSoir">0</span></div>
+                        <div class="select-all-row"><label><input type="checkbox" id="selectAllSoir"> Tout</label></div>
+                        <div id="presenceListSoir"><p class="text-muted">Chargement...</p></div>
+                        <div class="flex mt-6">
+                            <button class="btn btn-success" onclick="validateSoir()">✅ Valider</button>
+                            <button class="btn btn-outline" style="border-color:#2c3e50;color:#2c3e50;" onclick="resetSoir()">🔄</button>
+                            <button class="btn btn-danger" onclick="exportSoirPDF()">📄 PDF</button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">📋 Liste SOIR <span class="badge badge-info" id="departSoirCount">0</span></div>
+                        <div id="departSoirList"><p class="text-muted">Aucun</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 6: RAPPORT -->
+        <div class="tab-content" id="tab6">
+            <div class="card">
+                <div class="card-title">📈 Rapport <button class="btn btn-primary btn-sm" onclick="exportReport()">📊 Excel</button></div>
                 <div id="reportContent"><p class="text-muted">Génération...</p></div>
+            </div>
+            <div class="card">
+                <div class="card-title">📍 Position du car</div>
+                <div style="background:#e8f5ed;padding:6px 8px;border-radius:5px;border-left:3px solid #1a5e3a;">
+                    <div><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#dc3545;" id="gpsDot"></span> <strong id="gpsStatus">En attente...</strong></div>
+                    <div style="font-family:monospace;font-size:11px;font-weight:600;color:#1a5e3a;margin-top:2px;" id="gpsCoords">Lat: -- • Lng: --</div>
+                    <div class="flex mt-6">
+                        <button class="btn btn-primary btn-sm" onclick="startGps()">▶️ Démarrer</button>
+                        <button class="btn btn-outline btn-sm" onclick="stopGps()">⏹️ Arrêter</button>
+                        <a href="#" id="whatsappShareBtn" class="whatsapp-link" target="_blank">📲 Partager</a>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -755,25 +995,31 @@
 
     <script>
         // ================================================================
-        // ===== APPLICATION 100% FONCTIONNELLE ===========================
+        // ===== APPLICATION COMPLETE - VERSION SIMPLIFIEE ================
         // ================================================================
 
         // ---- CONSTANTES ----
         const ADMIN_PASSWORD = 'YT2024';
-        const STORAGE_KEY = 'yt_transport_final';
+        const STORAGE_KEY = 'yt_transport_light';
 
         // ---- DONNEES ----
         let data = loadData();
         let isAdmin = false;
-        let departValide = [];
+        let departMatinValide = [];
+        let departSoirValide = [];
+        let currentCarteClientId = null;
+        let scanHistory = [];
 
         // ---- CHARGEMENT ----
         function getDefaultData() {
             return {
                 clients: [],
+                conges: [],
                 paiements: [],
                 renouvellements: [],
-                presence: {},
+                presenceMatin: {},
+                presenceSoir: {},
+                pointages: {},
                 lastCarteNum: 0
             };
         }
@@ -786,7 +1032,9 @@
                     if (parsed.clients) {
                         if (!parsed.paiements) parsed.paiements = [];
                         if (!parsed.renouvellements) parsed.renouvellements = [];
-                        if (!parsed.presence) parsed.presence = {};
+                        if (!parsed.presenceMatin) parsed.presenceMatin = {};
+                        if (!parsed.presenceSoir) parsed.presenceSoir = {};
+                        if (!parsed.pointages) parsed.pointages = {};
                         if (!parsed.lastCarteNum) parsed.lastCarteNum = 0;
                         return parsed;
                     }
@@ -813,14 +1061,26 @@
 
         function formatDate(d) { if (!d) return 'N/A'; return new Date(d).toLocaleDateString('fr-FR'); }
 
+        function formatDateFull(d) {
+            if (!d) return 'N/A';
+            return new Date(d).toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long',
+                day: 'numeric' });
+        }
+
         function formatTime(t) { if (!t) return 'N/A'; return t; }
 
         function getClientById(id) { return data.clients.find(c => c.id === id); }
+
+        function isClientInConge(clientId, dateStr) {
+            if (!dateStr) dateStr = todayStr();
+            return data.conges.some(c => c.clientId === clientId && dateStr >= c.start && dateStr <= c.end);
+        }
 
         function getClientStatus(client) {
             if (!client) return 'inactif';
             const today = todayStr();
             if (client.endDate < today) return 'inactif';
+            if (isClientInConge(client.id, today)) return 'conge';
             return 'actif';
         }
 
@@ -838,9 +1098,61 @@
             return 'unpaid';
         }
 
+        function getRetardMois(client) {
+            if (!client) return 0;
+            const paiements = data.paiements.filter(p => p.clientId === client.id).sort((a, b) => new Date(b.date) - new Date(
+                a.date));
+            if (paiements.length === 0) {
+                const today = new Date();
+                const start = new Date(client.startDate);
+                return Math.max(0, (today.getFullYear() - start.getFullYear()) * 12 + (today.getMonth() - start
+                .getMonth()));
+            }
+            const today = new Date();
+            const lastPayment = new Date(paiements[0].date);
+            return Math.max(0, (today.getFullYear() - lastPayment.getFullYear()) * 12 + (today.getMonth() - lastPayment
+                .getMonth()));
+        }
+
+        function isRenewedForMonth(clientId, mois, annee) {
+            if (!mois) mois = getCurrentMonth();
+            if (!annee) annee = getCurrentYear();
+            return data.renouvellements.some(r => r.clientId === clientId && r.mois === mois && r.annee === annee);
+        }
+
+        function getTotalEncaisse() {
+            const mois = getCurrentMonth(),
+                annee = getCurrentYear();
+            let total = 0;
+            data.renouvellements.filter(r => r.mois === mois && r.annee === annee).forEach(r => {
+                const client = getClientById(r.clientId);
+                if (client) total += client.amount || 0;
+            });
+            return total;
+        }
+
+        function getTotalTheorique() {
+            let total = 0;
+            data.clients.filter(c => getClientStatus(c) === 'actif').forEach(c => total += c.amount || 0);
+            return total;
+        }
+
+        function getTotalAnnee() {
+            const annee = getCurrentYear();
+            let total = 0;
+            data.renouvellements.filter(r => r.annee === annee).forEach(r => {
+                const client = getClientById(r.clientId);
+                if (client) total += client.amount || 0;
+            });
+            return total;
+        }
+
+        function getNbImpayes() { return data.clients.filter(c => getPaymentStatus(c) === 'unpaid').length; }
+
         function getStatusBadge(client) {
             const status = getClientStatus(client);
-            const map = { 'actif': '<span class="badge-status active">Actif</span>', 'inactif': '<span class="badge-status inactive">Inactif</span>' };
+            const map = { 'actif': '<span class="badge-status active">Actif</span>', 'conge': '<span class="badge-status conge">Congé</span>',
+                'inactif': '<span class="badge-status inactive">Inactif</span>' };
             return map[status] || map.inactif;
         }
 
@@ -857,26 +1169,35 @@
             return map[type] || type;
         }
 
-        function getTotalEncaisse() {
-            let total = 0;
-            data.clients.forEach(c => {
-                if (getPaymentStatus(c) === 'paid') total += c.amount || 0;
-            });
-            return total;
-        }
-
-        function isRenewedForMonth(clientId) {
-            const mois = getCurrentMonth(),
-                annee = getCurrentYear();
-            return data.renouvellements.some(r => r.clientId === clientId && r.mois === mois && r.annee === annee);
-        }
-
+        // ---- PHOTO ----
         function getPhotoHtml(clientId) {
             const client = getClientById(clientId);
             if (client && client.photo) {
-                return `<img src="${client.photo}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid #1a5e3a;">`;
+                return `<img src="${client.photo}" style="width:20px;height:20px;border-radius:50%;object-fit:cover;border:2px solid #1a5e3a;">`;
             }
-            return `<span style="display:inline-block;width:30px;height:30px;border-radius:50%;background:#f0f0f0;text-align:center;line-height:30px;font-size:14px;border:2px dashed #ccc;">👤</span>`;
+            return `<span style="display:inline-block;width:20px;height:20px;border-radius:50%;background:#f0f0f0;text-align:center;line-height:20px;font-size:10px;border:2px dashed #ccc;">👤</span>`;
+        }
+
+        // ---- QR CODE ----
+        function genererQR(elementId, data) {
+            const container = document.getElementById(elementId);
+            if (!container) return;
+            container.innerHTML = '';
+            if (typeof QRCode !== 'undefined') {
+                try {
+                    new QRCode(container, {
+                        text: data,
+                        width: 100,
+                        height: 100,
+                        colorDark: '#1a5e3a',
+                        colorLight: '#ffffff',
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                    return;
+                } catch (e) {}
+            }
+            container.innerHTML =
+                `<div style="font-size:8px;color:#666;word-break:break-all;max-width:150px;padding:5px;background:#f5f5f5;border-radius:3px;">QR: ${data.substring(0, 40)}...</div>`;
         }
 
         // ---- CARTE ----
@@ -912,17 +1233,28 @@
                 saveData();
             }
 
+            const pointages = data.pointages[clientId] || {};
             const jours = [];
             const nbJours = new Date(annee, mois, 0).getDate();
+
             for (let j = 1; j <= nbJours; j++) {
-                jours.push({ jour: j, present: false });
+                const dateStr = `${annee}-${String(mois).padStart(2, '0')}-${String(j).padStart(2, '0')}`;
+                const type = pointages[dateStr] || null;
+                jours.push({
+                    jour: j,
+                    present: type !== null,
+                    type: type,
+                    date: dateStr
+                });
             }
 
             const qrData = JSON.stringify({
                 clientId: clientId,
                 nom: client.name,
                 numero: client.numeroCarte,
-                hash: hash
+                hash: hash,
+                mois: mois,
+                annee: annee
             });
 
             return {
@@ -944,7 +1276,15 @@
 
             let joursHtml = '';
             jours.forEach(j => {
-                joursHtml += `<div class="jour">${j.jour}</div>`;
+                let classe = '';
+                let label = j.jour;
+                if (j.present) {
+                    classe = 'present';
+                    if (j.type === 'aller') label = '🟢';
+                    else if (j.type === 'retour') label = '🔵';
+                    else label = '✅';
+                }
+                joursHtml += `<div class="jour ${classe}">${label}</div>`;
             });
 
             const photoHtml = client.photo ?
@@ -957,18 +1297,16 @@
                             <div class="logo">🚌 YAOU TRANSPORT</div>
                             <div class="mois">${moisNom} ${annee}</div>
                         </div>
-                        <div class="info-abonne" style="display:flex;gap:12px;align-items:center;margin-bottom:10px;">
+                        <div class="info-abonne">
                             ${photoHtml}
-                            <div>
+                            <div class="details">
                                 <div class="nom">${client.name}</div>
                                 <div class="adresse">📍 ${client.adresse || 'Adresse non renseignée'}</div>
                                 <div class="numero">📞 ${client.phone || 'Non renseigné'}</div>
-                                <div class="numero" style="font-weight:600;color:#1a5e3a;">N° ${numeroCarte}</div>
+                                <div class="numero" style="margin-top:2px;font-weight:600;color:#1a5e3a;">N° ${numeroCarte}</div>
                             </div>
                         </div>
-                        <div class="qr-container">
-                            <div id="qrcode"></div>
-                        </div>
+                        <div class="qr-container"><div id="qrcode"></div></div>
                         <div class="jours-grid">${joursHtml}</div>
                         <div class="footer-carte">
                             ${getTripTypeLabel(client.tripType)} | Départ: ${formatTime(client.departMatinTime)} | Retour: ${formatTime(client.returnSoirTime)}
@@ -979,25 +1317,45 @@
                 `;
         }
 
-        function genererQR(elementId, data) {
-            const container = document.getElementById(elementId);
-            if (!container) return;
-            container.innerHTML = '';
-            if (typeof QRCode !== 'undefined') {
-                try {
-                    new QRCode(container, {
-                        text: data,
-                        width: 120,
-                        height: 120,
-                        colorDark: '#1a5e3a',
-                        colorLight: '#ffffff',
-                        correctLevel: QRCode.CorrectLevel.H
-                    });
-                    return;
-                } catch (e) {}
+        // ---- POINTAGE ----
+        function pointerParQR(clientId, type = 'aller') {
+            const client = getClientById(clientId);
+            if (!client) return { success: false, message: 'Client introuvable' };
+
+            const today = todayStr();
+            const status = getClientStatus(client);
+            if (status !== 'actif') {
+                return { success: false, message: `Client ${status === 'conge' ? 'en congé' : 'inactif'}` };
             }
-            container.innerHTML =
-                `<div style="padding:10px;background:#f5f5f5;border-radius:4px;font-size:10px;">QR: ${data.substring(0, 30)}...</div>`;
+
+            if (!data.pointages[clientId]) data.pointages[clientId] = {};
+
+            if (data.pointages[clientId][today]) {
+                const existing = data.pointages[clientId][today];
+                if (existing === type) {
+                    return { success: false, message: `${client.name} déjà pointé en ${type}` };
+                }
+                if (type === 'retour' && existing === 'aller') {
+                    data.pointages[clientId][today] = 'retour';
+                    saveData();
+                    return { success: true, message: `${client.name} - RETOUR enregistré !` };
+                }
+                return { success: false, message: `${client.name} déjà pointé aujourd'hui` };
+            }
+
+            data.pointages[clientId][today] = type;
+            saveData();
+
+            scanHistory.unshift({
+                clientId: clientId,
+                nom: client.name,
+                date: today,
+                heure: new Date().toLocaleTimeString('fr-FR'),
+                type: type
+            });
+            if (scanHistory.length > 50) scanHistory.pop();
+
+            return { success: true, message: `${client.name} - ${type === 'aller' ? 'ALLER' : 'RETOUR'} enregistré !` };
         }
 
         // ---- EXPORT PDF ----
@@ -1006,7 +1364,7 @@
             if (!element) { alert('Élément non trouvé'); return; }
 
             if (typeof html2pdf === 'undefined') {
-                alert('La bibliothèque html2pdf n\'est pas chargée. Vérifiez votre connexion internet.');
+                alert('La bibliothèque html2pdf n\'est pas chargée.');
                 return;
             }
 
@@ -1029,69 +1387,78 @@
                 });
         }
 
-        function exportDepartPDF() {
-            if (departValide.length === 0) { alert('Aucune liste à exporter'); return; }
+        function exportDepartPdf(dataList, type) {
+            if (dataList.length === 0) { alert('Aucune liste'); return; }
 
-            const dateStr = formatDate(todayStr());
-            let html = `
-                    <div id="pdf-depart" style="font-family:'Segoe UI',Arial,sans-serif;padding:20px;max-width:800px;margin:0 auto;">
-                        <div style="text-align:center;border-bottom:3px solid #1a5e3a;padding-bottom:12px;margin-bottom:16px;">
-                            <h1 style="color:#1a5e3a;font-size:24px;">🚌 YAOU TRANSPORT</h1>
-                            <div style="color:#666;font-size:14px;font-weight:600;">Liste des voyageurs</div>
-                            <div style="color:#999;font-size:13px;">${dateStr}</div>
-                        </div>
-                `;
+            const dateStr = formatDateFull(todayStr());
+            const label = type === 'matin' ? 'DÉPART MATIN' : 'RETOUR SOIR';
+            const color = type === 'matin' ? '#d4a017' : '#2c3e50';
+            const bgColor = type === 'matin' ? '#fff8e1' : '#ecf0f1';
+            const arretField = type === 'matin' ? 'departMatinArret' : 'returnSoirArret';
+            const timeField = type === 'matin' ? 'departMatinTime' : 'returnSoirTime';
 
             const groups = {};
-            departValide.forEach(c => {
-                const key = c.departMatinArret || 'Sans arrêt';
+            dataList.forEach(c => {
+                const key = c[arretField] || 'Sans arrêt';
                 if (!groups[key]) groups[key] = [];
                 groups[key].push(c);
             });
 
-            let total = 0;
-            Object.keys(groups).sort().forEach(arret => {
+            let pdfHtml = `
+                    <div id="pdf-depart" style="font-family:'Segoe UI',Arial,sans-serif;padding:15px;max-width:900px;margin:0 auto;">
+                        <div style="text-align:center;border-bottom:3px solid #1a5e3a;padding-bottom:8px;margin-bottom:10px;">
+                            <h1 style="color:#1a5e3a;font-size:20px;">🚌 YAOU TRANSPORT</h1>
+                            <div style="color:#666;font-size:12px;font-weight:600;">Liste - ${label}</div>
+                            <div style="color:#999;font-size:11px;">${dateStr}</div>
+                        </div>
+                `;
+
+            const sortedKeys = Object.keys(groups).sort();
+            let totalVoyageurs = 0;
+            sortedKeys.forEach(arret => {
                 const clients = groups[arret];
-                total += clients.length;
-                html += `
-                        <div style="margin-bottom:12px;page-break-inside:avoid;">
-                            <div style="background:#e8f5ed;padding:6px 12px;border-radius:6px;font-size:15px;font-weight:600;color:#1a5e3a;border-left:4px solid #1a5e3a;">
+                clients.sort((a, b) => (a[timeField] || '00:00').localeCompare(b[timeField] || '00:00'));
+                totalVoyageurs += clients.length;
+                pdfHtml += `
+                        <div style="margin-bottom:8px;page-break-inside:avoid;">
+                            <div style="background:#eaf5ef;padding:4px 8px;border-radius:4px;font-size:13px;font-weight:600;color:#1a5e3a;border-left:4px solid ${color};">
                                 📍 ${arret} (${clients.length})
                             </div>
-                            <div style="padding:4px 0;">
+                            <div>
                     `;
                 clients.forEach(c => {
-                    html +=
-                        `<span style="display:inline-block;background:#f6faf8;padding:3px 10px;border-radius:20px;font-size:12px;margin:2px 4px 2px 0;border:1px solid #dce8e2;">
-                                ${c.name} <span style="color:#999;font-size:10px;">⏰ ${formatTime(c.departMatinTime)}</span>
+                    const time = c[timeField] || '--:--';
+                    pdfHtml +=
+                        `<span style="display:inline-block;background:#f6faf8;padding:2px 6px;border-radius:15px;font-size:10px;margin:1px 2px 1px 0;border:1px solid ${color};">
+                                ${c.name} <span style="color:#999;font-size:8px;">⏰ ${time}</span>
                             </span>`;
                 });
-                html += `</div></div>`;
+                pdfHtml += `</div></div>`;
             });
 
-            html += `
-                        <div style="text-align:center;padding:10px;background:#e8f5ed;border-radius:8px;font-size:16px;font-weight:600;color:#1a5e3a;">
-                            Total: ${total} voyageurs
+            pdfHtml += `
+                        <div style="text-align:center;padding:6px;background:${bgColor};border-radius:5px;font-size:13px;font-weight:600;color:${color};">
+                            Total: ${totalVoyageurs} voyageurs
                         </div>
-                        <div style="text-align:center;font-size:10px;color:#999;border-top:1px solid #dce8e2;padding-top:10px;margin-top:14px;">
+                        <div style="text-align:center;font-size:8px;color:#999;border-top:1px solid #dce8e2;padding-top:6px;margin-top:8px;">
                             YT Transport Pro • ${dateStr}
                         </div>
                     </div>
                 `;
 
             const container = document.createElement('div');
-            container.innerHTML = html;
+            container.innerHTML = pdfHtml;
             container.style.position = 'fixed';
             container.style.left = '-9999px';
             container.style.top = '0';
-            container.style.width = '900px';
+            container.style.width = '800px';
             container.style.background = 'white';
             container.style.zIndex = '9999';
             document.body.appendChild(container);
 
             const opt = {
-                margin: 10,
-                filename: `liste_depart_${todayStr()}.pdf`,
+                margin: 8,
+                filename: `liste_${type}_${todayStr()}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -1106,12 +1473,29 @@
                     alert('Erreur PDF'); });
         }
 
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], { type: type + ';charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
         // ---- ONGLETS ----
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             document.querySelector(`.tab-btn[onclick="showTab('${tabId}')"]`).classList.add('active');
+        }
+
+        function showSubTab(tabId) {
+            document.querySelectorAll('.sub-tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.sub-tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector(`.sub-tab-btn[onclick="showSubTab('${tabId}')"]`).classList.add('active');
         }
 
         // ---- ADMIN ----
@@ -1240,16 +1624,84 @@
         function genererCarte() {
             const clientId = document.getElementById('carteSelect').value;
             if (!clientId) { alert('Sélectionnez un abonné'); return; }
+            currentCarteClientId = clientId;
 
             const carteData = genererCarteData(clientId);
-            if (!carteData) { alert('Erreur'); return; }
+            if (!carteData) { alert('Erreur génération'); return; }
 
-            const html = afficherCarteHtml(carteData);
-            document.getElementById('cartePreview').innerHTML = html;
+            const carteHtml = afficherCarteHtml(carteData);
+            if (carteHtml) {
+                document.getElementById('cartePreview').innerHTML = carteHtml;
+                setTimeout(() => genererQR('qrcode', carteData.qrData), 200);
+            }
 
-            setTimeout(() => {
-                genererQR('qrcode', carteData.qrData);
-            }, 100);
+            renderPointageHistory(clientId);
+            renderPaiementHistory(clientId);
+        }
+
+        function renderPointageHistory(clientId) {
+            const client = getClientById(clientId);
+            if (!client) {
+                document.getElementById('pointageHistory').innerHTML = '<p class="text-muted">Sélectionnez un abonné</p>';
+                return;
+            }
+
+            const pointages = data.pointages[clientId] || {};
+            const dates = Object.keys(pointages).sort().reverse();
+
+            if (dates.length === 0) {
+                document.getElementById('pointageHistory').innerHTML =
+                    `<p class="text-muted">Aucun pointage pour ${client.name}</p>`;
+                return;
+            }
+
+            let html = `<div style="font-weight:600;margin-bottom:3px;">📋 ${client.name}</div>`;
+            dates.slice(0, 20).forEach(date => {
+                const type = pointages[date];
+                const typeLabel = type === 'aller' ? '🟢 Aller' : type === 'retour' ? '🔵 Retour' : '✅';
+                html += `
+                        <div class="pointage-item">
+                            <div class="info">
+                                <span>${formatDate(date)}</span>
+                                <span class="badge-type ${type}">${typeLabel}</span>
+                            </div>
+                            <span class="text-muted">${type === 'aller' ? 'Départ' : 'Retour'}</span>
+                        </div>
+                    `;
+            });
+            document.getElementById('pointageHistory').innerHTML = html;
+        }
+
+        function renderPaiementHistory(clientId) {
+            const client = getClientById(clientId);
+            if (!client) {
+                document.getElementById('paiementHistory').innerHTML = '<p class="text-muted">Sélectionnez un abonné</p>';
+                return;
+            }
+
+            const paiements = data.paiements.filter(p => p.clientId === clientId).sort((a, b) => new Date(b.date) - new Date(
+                a.date));
+
+            if (paiements.length === 0) {
+                document.getElementById('paiementHistory').innerHTML =
+                    `<p class="text-muted">Aucun paiement pour ${client.name}</p>`;
+                return;
+            }
+
+            let total = 0;
+            let html = `<div style="font-weight:600;margin-bottom:3px;">💰 ${client.name}</div>`;
+            paiements.slice(0, 20).forEach(p => {
+                total += p.montant || 0;
+                html += `
+                        <div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #dce8e2;font-size:9px;">
+                            <span>${formatDate(p.date)}</span>
+                            <span style="font-weight:600;color:#1a5e3a;">${(p.montant || 0).toLocaleString()} CFA</span>
+                        </div>
+                    `;
+            });
+            html +=
+                `<div style="margin-top:3px;padding-top:3px;border-top:2px solid #dce8e2;font-weight:600;color:#1a5e3a;">Total: ${total.toLocaleString()} CFA</div>`;
+            document.getElementById('paiementHistory').innerHTML = html;
         }
 
         function exporterCartePDF() {
@@ -1259,162 +1711,414 @@
             const carteData = genererCarteData(clientId);
             if (!carteData) { alert('Erreur'); return; }
 
-            const html = afficherCarteHtml(carteData);
-            document.getElementById('cartePreview').innerHTML = html;
-
+            const carteHtml = afficherCarteHtml(carteData);
+            document.getElementById('cartePreview').innerHTML = carteHtml;
             setTimeout(() => {
                 genererQR('qrcode', carteData.qrData);
                 setTimeout(() => {
                     exportPdf('carteAImprimer', `carte_${todayStr()}.pdf`);
                 }, 300);
-            }, 100);
+            }, 200);
+        }
+
+        function partagerCarte() {
+            const clientId = document.getElementById('carteSelect').value;
+            if (!clientId) { alert('Sélectionnez un abonné'); return; }
+
+            const carteData = genererCarteData(clientId);
+            if (!carteData) { alert('Erreur'); return; }
+
+            const shareText =
+                `🚌 YAOU TRANSPORT\n📋 ${carteData.client.name}\n📱 N° ${carteData.numeroCarte}\n📅 ${carteData.moisNom} ${carteData.annee}\n🔑 ${carteData.hash}`;
+
+            if (navigator.share) {
+                navigator.share({ title: 'Ma carte YAOU', text: shareText }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(shareText).then(() => {
+                    alert('✅ Copié !');
+                }).catch(() => {
+                    prompt('Copiez :', shareText);
+                });
+            }
+        }
+
+        // ---- SCANNER ----
+        let scannerActive = false;
+        let scannerStream = null;
+
+        function startScanner() {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(function(stream) {
+                    scannerStream = stream;
+                    const video = document.getElementById('video');
+                    video.srcObject = stream;
+                    video.style.display = 'block';
+                    document.getElementById('scannerPlaceholder').style.display = 'none';
+                    scannerActive = true;
+
+                    if (!('BarcodeDetector' in window)) {
+                        document.getElementById('scanResult').className = 'scan-result error';
+                        document.getElementById('scanResult').innerHTML = '⚠️ Navigateur non supporté';
+                        document.getElementById('scanResult').classList.remove('hidden');
+                        return;
+                    }
+
+                    const detector = new BarcodeDetector({ formats: ['qr_code'] });
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+
+                    function scanLoop() {
+                        if (!scannerActive) return;
+                        if (!video.videoWidth) { setTimeout(scanLoop, 500); return; }
+
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                        detector.detect(canvas).then(function(barcodes) {
+                            if (barcodes.length > 0) {
+                                const qrData = barcodes[0].rawValue;
+                                traiterQR(qrData);
+                            }
+                        }).catch(function() {});
+
+                        setTimeout(scanLoop, 300);
+                    }
+                    scanLoop();
+
+                }).catch(function(err) {
+                    alert('Erreur caméra: ' + err.message);
+                });
+        }
+
+        function stopScanner() {
+            scannerActive = false;
+            if (scannerStream) {
+                scannerStream.getTracks().forEach(function(t) { t.stop(); });
+                scannerStream = null;
+            }
+            document.getElementById('video').style.display = 'none';
+            document.getElementById('scannerPlaceholder').style.display = 'block';
+            document.getElementById('scanResult').classList.add('hidden');
+        }
+
+        function traiterQR(qrData) {
+            try {
+                const data = JSON.parse(qrData);
+                if (!data.clientId) { throw new Error('QR invalide'); }
+
+                document.getElementById('scanResult').className = 'scan-result info';
+                document.getElementById('scanResult').innerHTML = `👤 ${data.nom || 'Inconnu'}`;
+                document.getElementById('scanResult').classList.remove('hidden');
+
+                if (navigator.vibrate) navigator.vibrate(100);
+
+                setTimeout(function() {
+                    const type = confirm(`Pointer ${data.nom || 'client'} ?\nOK = ALLER | Annuler = RETOUR`) ?
+                        'aller' : 'retour';
+                    const result = pointerParQR(data.clientId, type);
+                    document.getElementById('scanResult').className = `scan-result ${result.success ? 'success' : 'error'}`;
+                    document.getElementById('scanResult').innerHTML = result.success ? `✅ ${result.message}` :
+                        `❌ ${result.message}`;
+                    document.getElementById('scanResult').classList.remove('hidden');
+
+                    if (result.success) {
+                        renderAll();
+                        if (currentCarteClientId) {
+                            const carteData = genererCarteData(currentCarteClientId);
+                            if (carteData) {
+                                const carteHtml = afficherCarteHtml(carteData);
+                                if (carteHtml) {
+                                    document.getElementById('cartePreview').innerHTML = carteHtml;
+                                    setTimeout(function() { genererQR('qrcode', carteData.qrData); }, 200);
+                                }
+                            }
+                            renderPointageHistory(currentCarteClientId);
+                        }
+                    }
+                    setTimeout(function() { document.getElementById('scanResult').classList.add('hidden'); }, 3000);
+                }, 500);
+
+            } catch (e) {
+                document.getElementById('scanResult').className = 'scan-result error';
+                document.getElementById('scanResult').innerHTML = '❌ QR invalide';
+                document.getElementById('scanResult').classList.remove('hidden');
+                setTimeout(function() { document.getElementById('scanResult').classList.add('hidden'); }, 2000);
+            }
+        }
+
+        function pointerAller() {
+            const clientId = document.getElementById('carteSelect').value;
+            if (!clientId) { alert('Sélectionnez un abonné'); return; }
+            const result = pointerParQR(clientId, 'aller');
+            document.getElementById('scanResult').className = `scan-result ${result.success ? 'success' : 'error'}`;
+            document.getElementById('scanResult').innerHTML = result.success ? `✅ ${result.message}` :
+                `❌ ${result.message}`;
+            document.getElementById('scanResult').classList.remove('hidden');
+            if (result.success) renderAll();
+            setTimeout(function() { document.getElementById('scanResult').classList.add('hidden'); }, 3000);
+        }
+
+        function pointerRetour() {
+            const clientId = document.getElementById('carteSelect').value;
+            if (!clientId) { alert('Sélectionnez un abonné'); return; }
+            const result = pointerParQR(clientId, 'retour');
+            document.getElementById('scanResult').className = `scan-result ${result.success ? 'success' : 'error'}`;
+            document.getElementById('scanResult').innerHTML = result.success ? `✅ ${result.message}` :
+                `❌ ${result.message}`;
+            document.getElementById('scanResult').classList.remove('hidden');
+            if (result.success) renderAll();
+            setTimeout(function() { document.getElementById('scanResult').classList.add('hidden'); }, 3000);
         }
 
         // ---- DEPARTS ----
-        function renderPresence() {
-            const actifs = data.clients.filter(c => getClientStatus(c) === 'actif');
+        function renderPresenceMatin() {
+            const actifs = data.clients.filter(function(c) {
+                if (getClientStatus(c) !== 'actif') return false;
+                if (!c.departMatinTime) return false;
+                return parseInt(c.departMatinTime.split(':')[0]) < 12;
+            });
             if (actifs.length === 0) {
-                document.getElementById('presenceList').innerHTML = '<p class="text-muted">Aucun abonné actif</p>';
-                document.getElementById('activeCount').textContent = '0';
+                document.getElementById('presenceListMatin').innerHTML = '<p class="text-muted">Aucun</p>';
+                document.getElementById('activeCountMatin').textContent = '0';
                 return;
             }
-
-            actifs.forEach(c => {
-                if (!(c.id in data.presence)) data.presence[c.id] = false;
-            });
+            actifs.forEach(function(c) { if (!(c.id in data.presenceMatin)) data.presenceMatin[c.id] = false; });
+            actifs.sort(function(a, b) { return (a.departMatinTime || '00:00').localeCompare(b.departMatinTime || '00:00'); });
 
             let html = '';
-            actifs.forEach(c => {
-                const isPresent = data.presence[c.id] === true;
+            actifs.forEach(function(c) {
+                const isPresent = data.presenceMatin[c.id] === true;
                 const photo = getPhotoHtml(c.id);
-                html += `
-                        <div class="depart-group">
-                            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-                                <input type="checkbox" class="presence-check" data-id="${c.id}" ${isPresent ? 'checked' : ''} ${!isAdmin ? 'disabled' : ''}>
-                                ${photo}
-                                <span style="font-weight:500;font-size:12px;">${c.name}</span>
-                                <span style="font-size:10px;color:#666;">${formatTime(c.departMatinTime)}</span>
-                                <span class="client-tag">${c.departMatinArret || '-'}</span>
-                                <span class="badge-status ${isPresent ? 'paid' : 'inactive'}">${isPresent ? '✅' : '❌'}</span>
-                            </div>
+                html += `<div class="depart-group">
+                        <div style="display:flex;align-items:center;gap:3px;flex-wrap:wrap;">
+                            <input type="checkbox" class="presence-check matin-check" data-id="${c.id}" ${isPresent ? 'checked' : ''} ${!isAdmin ? 'disabled' : ''}>
+                            ${photo}
+                            <span style="font-weight:500;font-size:9px;">${c.name}</span>
+                            <span class="client-tag">🌅 ${formatTime(c.departMatinTime)}</span>
+                            <span class="client-tag">${c.departMatinArret || '-'}</span>
+                            <span class="badge-status ${isPresent ? 'present' : 'absent'}">${isPresent ? '✅' : '❌'}</span>
                         </div>
-                    `;
+                    </div>`;
             });
+            document.getElementById('presenceListMatin').innerHTML = html;
+            document.getElementById('activeCountMatin').textContent = actifs.length;
 
-            document.getElementById('presenceList').innerHTML = html;
-            document.getElementById('activeCount').textContent = `${actifs.length}`;
-
-            document.querySelectorAll('.presence-check').forEach(cb => {
+            document.querySelectorAll('.matin-check').forEach(function(cb) {
                 cb.addEventListener('change', function() {
-                    data.presence[this.dataset.id] = this.checked;
+                    data.presenceMatin[this.dataset.id] = this.checked;
                     saveData();
                 });
             });
+            document.getElementById('selectAllMatin').onchange = function() {
+                document.querySelectorAll('.matin-check').forEach(function(cb) {
+                    if (!cb.disabled) { cb.checked = this.checked;
+                        data.presenceMatin[cb.dataset.id] = this.checked; }
+                });
+                saveData();
+            };
         }
 
-        function validateDepart() {
+        function renderPresenceSoir() {
+            const actifs = data.clients.filter(function(c) {
+                if (getClientStatus(c) !== 'actif') return false;
+                if (!c.returnSoirTime) return false;
+                return parseInt(c.returnSoirTime.split(':')[0]) >= 12;
+            });
+            if (actifs.length === 0) {
+                document.getElementById('presenceListSoir').innerHTML = '<p class="text-muted">Aucun</p>';
+                document.getElementById('activeCountSoir').textContent = '0';
+                return;
+            }
+            actifs.forEach(function(c) { if (!(c.id in data.presenceSoir)) data.presenceSoir[c.id] = false; });
+            actifs.sort(function(a, b) { return (a.returnSoirTime || '00:00').localeCompare(b.returnSoirTime || '00:00'); });
+
+            let html = '';
+            actifs.forEach(function(c) {
+                const isPresent = data.presenceSoir[c.id] === true;
+                const photo = getPhotoHtml(c.id);
+                html += `<div class="depart-group">
+                        <div style="display:flex;align-items:center;gap:3px;flex-wrap:wrap;">
+                            <input type="checkbox" class="presence-check soir-check" data-id="${c.id}" ${isPresent ? 'checked' : ''} ${!isAdmin ? 'disabled' : ''}>
+                            ${photo}
+                            <span style="font-weight:500;font-size:9px;">${c.name}</span>
+                            <span class="client-tag">🌙 ${formatTime(c.returnSoirTime)}</span>
+                            <span class="client-tag">${c.returnSoirArret || '-'}</span>
+                            <span class="badge-status ${isPresent ? 'present' : 'absent'}">${isPresent ? '✅' : '❌'}</span>
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('presenceListSoir').innerHTML = html;
+            document.getElementById('activeCountSoir').textContent = actifs.length;
+
+            document.querySelectorAll('.soir-check').forEach(function(cb) {
+                cb.addEventListener('change', function() {
+                    data.presenceSoir[this.dataset.id] = this.checked;
+                    saveData();
+                });
+            });
+            document.getElementById('selectAllSoir').onchange = function() {
+                document.querySelectorAll('.soir-check').forEach(function(cb) {
+                    if (!cb.disabled) { cb.checked = this.checked;
+                        data.presenceSoir[cb.dataset.id] = this.checked; }
+                });
+                saveData();
+            };
+        }
+
+        function validateMatin() {
             if (!isAdmin) { alert('Mode admin requis'); return; }
-
-            const selected = data.clients.filter(c => data.presence[c.id] === true);
-            if (selected.length === 0) { alert('Aucun abonné signalé'); return; }
-
-            // Enregistrer les renouvellements
+            const selected = data.clients.filter(function(c) { return data.presenceMatin[c.id] === true; });
+            if (selected.length === 0) { alert('Aucun signalé'); return; }
+            departMatinValide = selected;
             const mois = getCurrentMonth(),
                 annee = getCurrentYear();
-            selected.forEach(c => {
+            selected.forEach(function(c) {
                 if (!isRenewedForMonth(c.id)) {
                     data.renouvellements.push({ clientId: c.id, dateRenouvellement: todayStr(), mois, annee,
                         montant: c.amount || 0 });
                 }
             });
-
-            departValide = selected;
             saveData();
-            renderDepartList();
-            alert(`✅ ${selected.length} voyageur(s) validé(s) !`);
+            renderDepartMatin();
+            alert('✅ ' + selected.length + ' voyageur(s) validé(s) !');
         }
 
-        function resetPresence() {
+        function validateSoir() {
             if (!isAdmin) { alert('Mode admin requis'); return; }
-            if (!confirm('Réinitialiser toutes les présences ?')) return;
-            data.presence = {};
-            departValide = [];
+            const selected = data.clients.filter(function(c) { return data.presenceSoir[c.id] === true; });
+            if (selected.length === 0) { alert('Aucun signalé'); return; }
+            departSoirValide = selected;
+            const mois = getCurrentMonth(),
+                annee = getCurrentYear();
+            selected.forEach(function(c) {
+                if (!isRenewedForMonth(c.id)) {
+                    data.renouvellements.push({ clientId: c.id, dateRenouvellement: todayStr(), mois, annee,
+                        montant: c.amount || 0 });
+                }
+            });
             saveData();
-            renderAll();
+            renderDepartSoir();
+            alert('✅ ' + selected.length + ' voyageur(s) validé(s) !');
         }
 
-        function renderDepartList() {
-            if (departValide.length === 0) {
-                document.getElementById('departList').innerHTML = '<p class="text-muted">Aucun départ validé</p>';
-                document.getElementById('departCount').textContent = '0';
+        function renderDepartMatin() {
+            if (departMatinValide.length === 0) {
+                document.getElementById('departMatinList').innerHTML = '<p class="text-muted">Aucun</p>';
+                document.getElementById('departMatinCount').textContent = '0';
                 return;
             }
-
             const groups = {};
-            departValide.forEach(c => {
+            departMatinValide.forEach(function(c) {
                 const key = c.departMatinArret || 'Sans arrêt';
                 if (!groups[key]) groups[key] = [];
                 groups[key].push(c);
             });
-
-            let html = `<div style="margin-bottom:6px;">Total: <strong>${departValide.length}</strong> voyageurs</div>`;
-            Object.keys(groups).sort().forEach(arret => {
+            let html =
+                `<div style="margin-bottom:3px;">Total: <strong style="color:#d4a017;">${departMatinValide.length}</strong></div>`;
+            Object.keys(groups).sort().forEach(function(arret) {
                 const clients = groups[arret];
-                html += `
-                        <div class="depart-section" style="margin-top:4px;">
-                            <div class="header">
-                                <h3>📍 ${arret}</h3>
-                                <span class="count">${clients.length}</span>
-                            </div>
-                            <div style="display:flex;flex-wrap:wrap;gap:4px;">
-                                ${clients.map(c => `<span class="client-tag">${c.name} <span style="color:#999;font-size:9px;">${formatTime(c.departMatinTime)}</span></span>`).join('')}
-                            </div>
-                        </div>
-                    `;
+                clients.sort(function(a, b) { return (a.departMatinTime || '00:00').localeCompare(b.departMatinTime ||
+                        '00:00'); });
+                html +=
+                    `<div class="depart-section" style="border-left-color:#d4a017;margin-top:3px;"><div class="header"><h3 style="color:#d4a017;">📍 ${arret}</h3><span class="count">${clients.length}</span></div><div>`;
+                clients.forEach(function(c) {
+                    html +=
+                        `<span class="client-tag" style="border-color:#d4a017;background:#fff8e1;">${c.name} <span style="color:#999;font-size:7px;">🌅 ${formatTime(c.departMatinTime)}</span></span>`;
+                });
+                html += `</div></div>`;
             });
-
-            document.getElementById('departList').innerHTML = html;
-            document.getElementById('departCount').textContent = `${departValide.length}`;
+            document.getElementById('departMatinList').innerHTML = html;
+            document.getElementById('departMatinCount').textContent = departMatinValide.length;
         }
+
+        function renderDepartSoir() {
+            if (departSoirValide.length === 0) {
+                document.getElementById('departSoirList').innerHTML = '<p class="text-muted">Aucun</p>';
+                document.getElementById('departSoirCount').textContent = '0';
+                return;
+            }
+            const groups = {};
+            departSoirValide.forEach(function(c) {
+                const key = c.returnSoirArret || 'Sans arrêt';
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(c);
+            });
+            let html =
+                `<div style="margin-bottom:3px;">Total: <strong style="color:#2c3e50;">${departSoirValide.length}</strong></div>`;
+            Object.keys(groups).sort().forEach(function(arret) {
+                const clients = groups[arret];
+                clients.sort(function(a, b) { return (a.returnSoirTime || '00:00').localeCompare(b.returnSoirTime ||
+                        '00:00'); });
+                html +=
+                    `<div class="depart-section" style="border-left-color:#2c3e50;margin-top:3px;"><div class="header"><h3 style="color:#2c3e50;">📍 ${arret}</h3><span class="count">${clients.length}</span></div><div>`;
+                clients.forEach(function(c) {
+                    html +=
+                        `<span class="client-tag" style="border-color:#2c3e50;background:#ecf0f1;">${c.name} <span style="color:#999;font-size:7px;">🌙 ${formatTime(c.returnSoirTime)}</span></span>`;
+                });
+                html += `</div></div>`;
+            });
+            document.getElementById('departSoirList').innerHTML = html;
+            document.getElementById('departSoirCount').textContent = departSoirValide.length;
+        }
+
+        function resetMatin() {
+            if (!isAdmin) { alert('Mode admin requis'); return; }
+            if (!confirm('Réinitialiser ?')) return;
+            data.presenceMatin = {};
+            departMatinValide = [];
+            saveData();
+        }
+
+        function resetSoir() {
+            if (!isAdmin) { alert('Mode admin requis'); return; }
+            if (!confirm('Réinitialiser ?')) return;
+            data.presenceSoir = {};
+            departSoirValide = [];
+            saveData();
+        }
+
+        function exportMatinPDF() { exportDepartPdf(departMatinValide, 'matin'); }
+
+        function exportSoirPDF() { exportDepartPdf(departSoirValide, 'soir'); }
 
         // ---- RENOUVELLEMENT ----
         function renderRenewSelect() {
-            const actifs = data.clients.filter(c => getClientStatus(c) === 'actif');
-            const aRenouveler = actifs.filter(c => !isRenewedForMonth(c.id));
+            const actifs = data.clients.filter(function(c) { return getClientStatus(c) === 'actif'; });
+            const aRenouveler = actifs.filter(function(c) { return !isRenewedForMonth(c.id); });
 
             let html = '';
             if (aRenouveler.length === 0) {
-                html = '<p class="text-muted">Tous les abonnés sont renouvelés</p>';
+                html = '<p class="text-muted">Tous renouvelés</p>';
                 document.getElementById('renewSummary').innerHTML = '✅ Tous renouvelés';
             } else {
                 document.getElementById('renewSummary').innerHTML =
                     `<span class="badge badge-warning">⏳ ${aRenouveler.length} à renouveler</span>`;
-                aRenouveler.forEach(c => {
+                aRenouveler.forEach(function(c) {
                     html += `
                             <div class="renew-item">
                                 <div class="info">
                                     <input type="checkbox" class="renew-check" data-id="${c.id}" checked>
                                     <span style="font-weight:500;">${c.name}</span>
-                                    <span style="color:#999;font-size:10px;">${c.amount || 0} CFA</span>
+                                    <span style="color:#999;font-size:9px;">${c.amount || 0} CFA</span>
                                 </div>
-                                <span style="font-size:10px;color:#999;">${formatDate(c.startDate)} → ${formatDate(c.endDate)}</span>
                             </div>
                         `;
                 });
             }
             document.getElementById('renewSelectList').innerHTML = html;
-            document.getElementById('renewMonthDisplay').textContent = `${getCurrentMonth()}/${getCurrentYear()}`;
+            document.getElementById('renewMonthDisplay').textContent = getCurrentMonth() + '/' + getCurrentYear();
         }
 
         function renewSelected() {
             if (!isAdmin) { alert('Mode admin requis'); return; }
             const checks = document.querySelectorAll('.renew-check:checked');
-            if (checks.length === 0) { alert('Sélectionnez au moins un abonné'); return; }
+            if (checks.length === 0) { alert('Sélectionnez'); return; }
 
             const mois = getCurrentMonth(),
                 annee = getCurrentYear();
             let count = 0;
-            checks.forEach(cb => {
+            checks.forEach(function(cb) {
                 const clientId = cb.dataset.id;
                 const client = getClientById(clientId);
                 if (client && !isRenewedForMonth(clientId)) {
@@ -1425,27 +2129,25 @@
                 }
             });
             saveData();
-            alert(`${count} abonné(s) renouvelé(s) !`);
-            renderAll();
+            alert(count + ' renouvelé(s) !');
         }
 
         function renewAll() {
             if (!isAdmin) { alert('Mode admin requis'); return; }
-            const actifs = data.clients.filter(c => getClientStatus(c) === 'actif');
-            const aRenouveler = actifs.filter(c => !isRenewedForMonth(c.id));
+            const actifs = data.clients.filter(function(c) { return getClientStatus(c) === 'actif'; });
+            const aRenouveler = actifs.filter(function(c) { return !isRenewedForMonth(c.id); });
             if (aRenouveler.length === 0) { alert('Tous renouvelés'); return; }
-            if (!confirm(`Renouveler ${aRenouveler.length} abonnés ?`)) return;
+            if (!confirm('Renouveler ' + aRenouveler.length + ' abonnés ?')) return;
 
             const mois = getCurrentMonth(),
                 annee = getCurrentYear();
-            aRenouveler.forEach(c => {
+            aRenouveler.forEach(function(c) {
                 data.renouvellements.push({ clientId: c.id, dateRenouvellement: todayStr(), mois, annee,
                     montant: c.amount || 0 });
                 data.paiements.push({ clientId: c.id, date: todayStr(), montant: c.amount || 0 });
             });
             saveData();
-            alert(`${aRenouveler.length} abonné(s) renouvelé(s) !`);
-            renderAll();
+            alert(aRenouveler.length + ' renouvelé(s) !');
         }
 
         // ---- RENDU CLIENTS ----
@@ -1459,25 +2161,25 @@
             const filterPayment = document.getElementById('filterPayment').value;
             const filterStatus = document.getElementById('filterStatus').value;
 
-            let filtered = [...data.clients];
-            if (filterPayment) filtered = filtered.filter(c => getPaymentStatus(c) === filterPayment);
-            if (filterStatus) filtered = filtered.filter(c => getClientStatus(c) === filterStatus);
+            let filtered = data.clients;
+            if (filterPayment) filtered = filtered.filter(function(c) { return getPaymentStatus(c) === filterPayment; });
+            if (filterStatus) filtered = filtered.filter(function(c) { return getClientStatus(c) === filterStatus; });
 
             if (filtered.length === 0) {
                 document.getElementById('clientTable').innerHTML =
-                    '<tr><td colspan="8" class="text-center text-muted">Aucun abonné</td></tr>';
+                    '<tr><td colspan="8" class="text-center text-muted">Aucun</td></tr>';
                 return;
             }
 
             let html = '';
-            filtered.forEach(c => {
+            filtered.forEach(function(c) {
                 const photo = getPhotoHtml(c.id);
                 html += `
                         <tr>
                             <td>${photo}</td>
                             <td><strong>${c.name}</strong></td>
                             <td>${c.phone || '-'}</td>
-                            <td><span style="font-size:10px;font-family:monospace;">${c.numeroCarte || '-'}</span></td>
+                            <td><span style="font-size:8px;font-family:monospace;">${c.numeroCarte || '-'}</span></td>
                             <td>${c.amount ? c.amount + ' CFA' : '-'}</td>
                             <td>${getPaymentBadge(c)}</td>
                             <td>${getStatusBadge(c)}</td>
@@ -1491,31 +2193,32 @@
             const select = document.getElementById('carteSelect');
             const currentVal = select.value;
             select.innerHTML = '<option value="">-- Choisir --</option>';
-            data.clients.forEach(c => {
+            data.clients.forEach(function(c) {
                 const opt = document.createElement('option');
                 opt.value = c.id;
-                opt.textContent = `${c.name} - ${c.numeroCarte || 'Sans carte'}`;
+                opt.textContent = c.name + ' - ' + (c.numeroCarte || 'Sans carte');
                 select.appendChild(opt);
             });
             if (currentVal && getClientById(currentVal)) select.value = currentVal;
         }
 
-        // ---- SUPPRESSION ----
         function deleteClient(id) {
             if (!isAdmin) { alert('Mode admin requis'); return; }
-            if (!confirm('Supprimer cet abonné ?')) return;
-            data.clients = data.clients.filter(c => c.id !== id);
-            data.paiements = data.paiements.filter(p => p.clientId !== id);
-            data.renouvellements = data.renouvellements.filter(r => r.clientId !== id);
-            delete data.presence[id];
+            if (!confirm('Supprimer ?')) return;
+            data.clients = data.clients.filter(function(c) { return c.id !== id; });
+            data.paiements = data.paiements.filter(function(p) { return p.clientId !== id; });
+            data.renouvellements = data.renouvellements.filter(function(r) { return r.clientId !== id; });
+            delete data.presenceMatin[id];
+            delete data.presenceSoir[id];
+            delete data.pointages[id];
             saveData();
         }
 
         // ---- STATS ----
         function renderStats() {
             const total = data.clients.length;
-            const actifs = data.clients.filter(c => getClientStatus(c) === 'actif').length;
-            const impayes = data.clients.filter(c => getPaymentStatus(c) === 'unpaid').length;
+            const actifs = data.clients.filter(function(c) { return getClientStatus(c) === 'actif'; }).length;
+            const impayes = getNbImpayes();
             const encaisse = getTotalEncaisse();
 
             document.getElementById('nbClients').textContent = total;
@@ -1527,12 +2230,9 @@
         // ---- ALERTES ----
         function renderAlerts() {
             let html = '';
-            const impayes = data.clients.filter(c => getPaymentStatus(c) === 'unpaid');
+            const impayes = data.clients.filter(function(c) { return getPaymentStatus(c) === 'unpaid'; });
             if (impayes.length > 0) {
-                html += `<div style="background:#f8d7da;padding:6px 10px;border-radius:8px;margin-bottom:4px;border:1px solid #f5c6cb;color:#721c24;">
-                        <span><strong>⚠️ ${impayes.length} abonné(s) en impayé</strong></span>
-                        <span style="font-size:11px;">${impayes.map(c => c.name).join(', ')}</span>
-                    </div>`;
+                html += `<div class="alert alert-danger"><span><strong>⚠️ ${impayes.length} impayé(s)</strong></span><span style="font-size:8px;">${impayes.map(function(c){return c.name}).join(', ')}</span></div>`;
             }
             document.getElementById('alerts').innerHTML = html;
         }
@@ -1540,30 +2240,30 @@
         // ---- RAPPORT ----
         function renderReport() {
             const total = data.clients.length;
-            const actifs = data.clients.filter(c => getClientStatus(c) === 'actif').length;
-            const inactifs = data.clients.filter(c => getClientStatus(c) === 'inactif').length;
-            const impayes = data.clients.filter(c => getPaymentStatus(c) === 'unpaid').length;
+            const actifs = data.clients.filter(function(c) { return getClientStatus(c) === 'actif'; }).length;
+            const inactifs = data.clients.filter(function(c) { return getClientStatus(c) === 'inactif'; }).length;
+            const impayes = getNbImpayes();
             const encaisse = getTotalEncaisse();
 
             let html = `
-                    <div style="background:#e8f5ed;border-radius:8px;padding:12px;border:1px solid #d4e8dc;">
-                        <div style="font-weight:600;color:#1a5e3a;margin-bottom:6px;">📊 Résumé</div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;font-size:13px;">
+                    <div style="background:#e8f5ed;border-radius:6px;padding:8px;border:1px solid #d4e8dc;">
+                        <div style="font-weight:600;color:#1a5e3a;margin-bottom:4px;">📊 Résumé</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;font-size:11px;">
                             <div><span style="color:#666;">Total:</span> <strong>${total}</strong></div>
                             <div><span style="color:#666;">Actifs:</span> <strong>${actifs}</strong></div>
                             <div><span style="color:#666;">Inactifs:</span> <strong>${inactifs}</strong></div>
                             <div><span style="color:#666;">Impayés:</span> <strong style="color:#c0392b;">${impayes}</strong></div>
-                            <div style="grid-column:span 2;"><span style="color:#666;">Total encaissé:</span> <strong style="color:#1a7e3a;">${encaisse.toLocaleString()} CFA</strong></div>
+                            <div style="grid-column:span 2;"><span style="color:#666;">Encaissé:</span> <strong style="color:#1a7e3a;">${encaisse.toLocaleString()} CFA</strong></div>
                         </div>
                     </div>
                 `;
 
-            const listImpayes = data.clients.filter(c => getPaymentStatus(c) === 'unpaid');
+            const listImpayes = data.clients.filter(function(c) { return getPaymentStatus(c) === 'unpaid'; });
             if (listImpayes.length > 0) {
                 html += `
-                        <div style="background:#f8d7da;border-radius:8px;padding:10px;margin-top:6px;border:1px solid #f5c6cb;">
-                            <div style="font-weight:600;color:#c0392b;margin-bottom:4px;">🔴 Abonnés en impayé</div>
-                            ${listImpayes.map(c => `<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #f5c6cb;font-size:12px;"><span>${c.name}</span><strong style="color:#c0392b;">${c.amount || 0} CFA</strong></div>`).join('')}
+                        <div style="background:#f8d7da;border-radius:6px;padding:6px;margin-top:4px;border:1px solid #f5c6cb;">
+                            <div style="font-weight:600;color:#c0392b;margin-bottom:3px;">🔴 Impayés</div>
+                            ${listImpayes.map(function(c){return '<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #f5c6cb;font-size:10px;"><span>'+c.name+'</span><strong style="color:#c0392b;">'+(c.amount||0)+' CFA</strong></div>'}).join('')}
                         </div>
                     `;
             }
@@ -1578,7 +2278,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `yt_sauvegarde_${todayStr()}.json`;
+            a.download = 'yt_sauvegarde_' + todayStr() + '.json';
             a.click();
             URL.revokeObjectURL(url);
         }
@@ -1595,7 +2295,9 @@
                             data = imported;
                             if (!data.paiements) data.paiements = [];
                             if (!data.renouvellements) data.renouvellements = [];
-                            if (!data.presence) data.presence = {};
+                            if (!data.presenceMatin) data.presenceMatin = {};
+                            if (!data.presenceSoir) data.presenceSoir = {};
+                            if (!data.pointages) data.pointages = {};
                             if (!data.lastCarteNum) data.lastCarteNum = 0;
                             saveData();
                             alert('✅ Import réussi');
@@ -1615,18 +2317,49 @@
             if (data.clients.length === 0) { alert('Aucun abonné'); return; }
 
             let csv = 'Nom,Téléphone,Adresse,N° Carte,Début,Fin,Montant,Paiement,Statut\n';
-            data.clients.forEach(c => {
-                csv +=
-                    `${c.name},${c.phone || ''},${c.adresse || ''},${c.numeroCarte || ''},${c.startDate},${c.endDate},${c.amount || 0},${getPaymentStatus(c)},${getClientStatus(c)}\n`;
+            data.clients.forEach(function(c) {
+                csv += c.name + ',' + (c.phone || '') + ',' + (c.adresse || '') + ',' + (c.numeroCarte || '') + ',' + c
+                    .startDate + ',' + c.endDate + ',' + (c.amount || 0) + ',' + getPaymentStatus(c) + ',' +
+                    getClientStatus(c) + '\n';
             });
 
             const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `rapport_${todayStr()}.csv`;
+            a.download = 'rapport_' + todayStr() + '.csv';
             a.click();
             URL.revokeObjectURL(url);
+        }
+
+        // ---- GPS ----
+        let gpsWatchId = null;
+
+        function startGps() {
+            if (!navigator.geolocation) { alert('GPS non supporté'); return; }
+            if (gpsWatchId) return;
+            gpsWatchId = navigator.geolocation.watchPosition(
+                function(pos) {
+                    document.getElementById('gpsCoords').textContent = 'Lat: ' + pos.coords.latitude.toFixed(6) +
+                        ' • Lng: ' + pos.coords.longitude.toFixed(6);
+                    document.getElementById('gpsStatus').textContent = '📡 En direct';
+                    document.getElementById('gpsDot').style.background = '#1e7e34';
+                    document.getElementById('whatsappShareBtn').href =
+                        'https://wa.me/?text=🚌 Le car YAOU est à : https://www.google.com/maps?q=' + pos.coords
+                        .latitude + ',' + pos.coords.longitude;
+                },
+                function(err) {
+                    document.getElementById('gpsStatus').textContent = '⚠️ ' + err.message;
+                    document.getElementById('gpsDot').style.background = '#dc3545';
+                }, { enableHighAccuracy: true, timeout: 15000 }
+            );
+        }
+
+        function stopGps() {
+            if (gpsWatchId) { navigator.geolocation.clearWatch(gpsWatchId);
+                gpsWatchId = null; }
+            document.getElementById('gpsStatus').textContent = '⏹️ Arrêté';
+            document.getElementById('gpsDot').style.background = '#dc3545';
         }
 
         // ---- RENDU GLOBAL ----
@@ -1634,11 +2367,62 @@
             renderStats();
             renderAlerts();
             renderRenewSelect();
-            renderPresence();
-            renderDepartList();
+            renderPresenceMatin();
+            renderPresenceSoir();
+            renderDepartMatin();
+            renderDepartSoir();
             renderClients();
             renderReport();
+            renderScanHistory();
             updateAdminUI();
+            document.getElementById('departDateDisplay').textContent = formatDate(todayStr());
+
+            if (document.getElementById('carteSelect').value && currentCarteClientId) {
+                const carteData = genererCarteData(document.getElementById('carteSelect').value);
+                if (carteData) {
+                    const carteHtml = afficherCarteHtml(carteData);
+                    if (carteHtml) {
+                        document.getElementById('cartePreview').innerHTML = carteHtml;
+                        setTimeout(function() { genererQR('qrcode', carteData.qrData); }, 200);
+                    }
+                    renderPointageHistory(document.getElementById('carteSelect').value);
+                    renderPaiementHistory(document.getElementById('carteSelect').value);
+                }
+            }
+        }
+
+        function renderScanHistory() {
+            const pointages = [];
+            Object.keys(data.pointages).forEach(function(clientId) {
+                const client = getClientById(clientId);
+                if (client) {
+                    Object.keys(data.pointages[clientId]).forEach(function(date) {
+                        const type = data.pointages[clientId][date];
+                        pointages.push({ nom: client.name, date: date, type: type });
+                    });
+                }
+            });
+            pointages.sort(function(a, b) { return b.date.localeCompare(a.date); });
+
+            if (pointages.length === 0) {
+                document.getElementById('scanHistory').innerHTML = '<p class="text-muted">Aucun pointage</p>';
+                return;
+            }
+
+            let html = '';
+            pointages.slice(0, 20).forEach(function(p) {
+                const typeLabel = p.type === 'aller' ? '🟢 Aller' : p.type === 'retour' ? '🔵 Retour' : '✅';
+                html += `
+                        <div class="pointage-item">
+                            <div class="info">
+                                <span><strong>${p.nom}</strong></span>
+                                <span class="text-muted">${formatDate(p.date)}</span>
+                                <span class="badge-type ${p.type}">${typeLabel}</span>
+                            </div>
+                        </div>
+                    `;
+            });
+            document.getElementById('scanHistory').innerHTML = html;
         }
 
         // ---- INIT ----
@@ -1652,10 +2436,22 @@
 
         renderAll();
 
+        // Démarrer le GPS automatiquement si disponible
+        if (navigator.geolocation) {
+            setTimeout(startGps, 1000);
+        }
+
         console.log('🚀 YT Transport Pro démarrée');
         console.log('🔑 Code admin: YT2024');
-        console.log('📦 Données stockées dans localStorage');
+        console.log('📦 Données: localStorage');
         console.log('✅ Application 100% fonctionnelle');
+
+        // Rafraîchissement automatique toutes les 30s
+        setInterval(function() {
+            renderStats();
+            renderAlerts();
+        }, 30000);
     </script>
+
 </body>
 </html>
