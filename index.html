@@ -3,17 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>YT Transport Pro</title>
+    <meta name="theme-color" content="#1a7a3a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Bibliothèques -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
+    </script>
+    
+    <link rel="manifest" href="data:application/json,{
+        &quot;name&quot;: &quot;YT Transport Pro&quot;,
+        &quot;short_name&quot;: &quot;YT Pro&quot;,
+        &quot;description&quot;: &quot;Gestion professionnelle YAOU Transport&quot;,
+        &quot;start_url&quot;: &quot;.&quot;,
+        &quot;display&quot;: &quot;standalone&quot;,
+        &quot;background_color&quot;: &quot;#ffffff&quot;,
+        &quot;theme_color&quot;: &quot;#1a7a3a&quot;,
+        &quot;icons&quot;: [
+            {&quot;src&quot;: &quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='50' fill='%231a7a3a'/%3E%3Ctext x='256' y='340' text-anchor='middle' font-size='300' fill='white' font-weight='bold'%3E🚌%3C/text%3E%3C/svg%3E&quot;, &quot;sizes&quot;: &quot;512x512&quot;, &quot;type&quot;: &quot;image/svg+xml&quot;, &quot;purpose&quot;: &quot;any maskable&quot;}
+        ]
+    }">
+    <title>YT Transport Pro - YAOU</title>
     <style>
+        /* ===== STYLES COMPLETS ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', -apple-system, Roboto, system-ui, sans-serif;
+        }
+        :root {
+            --yt-green-dark: #1a6e3a;
+            --yt-green: #2a8c52;
+            --yt-green-light: #eaf5ef;
+            --yt-bg: #f6faf8;
+            --yt-white: #ffffff;
+            --yt-text: #1e2a2a;
+            --yt-text-muted: #5a6e6e;
+            --yt-border: #dce8e2;
+            --yt-shadow: rgba(26, 110, 58, 0.10);
+            --yt-danger: #c0392b;
+            --yt-warning: #d4a017;
+            --yt-success: #1e7e34;
+            --yt-info: #2c7a9e;
+            --yt-radius: 12px;
+            --yt-transition: 0.25s ease;
         }
         body {
-            background: #f0f4f0;
-            padding: 15px;
+            background: var(--yt-bg);
+            color: var(--yt-text);
+            padding: 12px;
+            padding-bottom: 80px;
             min-height: 100vh;
         }
         .container {
@@ -22,283 +64,300 @@
         }
 
         /* HEADER */
-        .header {
-            background: #1a5e3a;
+        .app-header {
+            background: linear-gradient(145deg, var(--yt-green-dark), var(--yt-green));
             color: white;
-            padding: 15px 20px;
-            border-radius: 12px;
-            margin-bottom: 15px;
+            padding: 16px 20px;
+            border-radius: var(--yt-radius);
+            margin-bottom: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
         }
-        .header h1 {
-            font-size: 22px;
+        .app-header h1 {
+            font-size: 20px;
+            font-weight: 600;
         }
-        .header .sub {
-            font-size: 12px;
-            opacity: 0.8;
+        .app-header .sub {
+            font-size: 11px;
+            opacity: 0.85;
         }
         .header-actions {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
         }
-        .header-actions button {
-            background: rgba(255, 255, 255, 0.15);
+        .header-actions .btn {
+            background: rgba(255, 255, 255, 0.10);
             color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 4px 12px;
             border-radius: 20px;
-            font-size: 11px;
+            font-size: 10px;
+            font-weight: 500;
             cursor: pointer;
-            transition: 0.2s;
+            transition: var(--yt-transition);
         }
-        .header-actions button:hover {
-            background: rgba(255, 255, 255, 0.25);
-        }
-
-        /* ADMIN LOCK */
-        .admin-lock {
-            background: #e8f5ed;
-            border: 2px solid #1a5e3a;
-            border-radius: 12px;
-            padding: 12px 16px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .admin-lock input {
-            padding: 8px 14px;
-            border: 2px solid #ccc;
-            border-radius: 8px;
-            font-size: 14px;
-            flex: 1;
-            min-width: 150px;
-        }
-        .admin-lock input:focus {
-            border-color: #1a5e3a;
-            outline: none;
-        }
-        .admin-lock .status {
-            font-size: 14px;
-            font-weight: 600;
-            color: #555;
-        }
-        .admin-lock .status.unlocked {
-            color: #1a7e3a;
-        }
-
-        .btn {
-            padding: 8px 18px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .btn-primary {
-            background: #1a5e3a;
-            color: white;
-        }
-        .btn-primary:hover {
-            background: #0f4a2c;
-        }
-        .btn-success {
-            background: #1e7e34;
-            color: white;
-        }
-        .btn-success:hover {
-            background: #15632a;
-        }
-        .btn-danger {
-            background: #c0392b;
-            color: white;
-        }
-        .btn-danger:hover {
-            background: #a93226;
-        }
-        .btn-outline {
-            background: transparent;
-            border: 2px solid #1a5e3a;
-            color: #1a5e3a;
-        }
-        .btn-outline:hover {
-            background: #e8f5ed;
-        }
-        .btn-sm {
-            padding: 4px 10px;
-            font-size: 11px;
-        }
-        .btn-block {
-            width: 100%;
+        .header-actions .btn:hover {
+            background: rgba(255, 255, 255, 0.20);
         }
 
         /* ONGLETS */
         .tabs {
             display: flex;
             gap: 4px;
+            margin-bottom: 16px;
             flex-wrap: wrap;
-            margin-bottom: 15px;
-            background: white;
-            border-radius: 12px;
+            background: var(--yt-white);
+            border-radius: var(--yt-radius);
             padding: 4px;
-            border: 1px solid #dce8e2;
+            border: 1px solid var(--yt-border);
         }
         .tab-btn {
             flex: 1;
-            min-width: 60px;
-            padding: 10px 8px;
+            min-width: 55px;
+            padding: 10px 6px;
             border: none;
             border-radius: 8px;
             background: transparent;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
-            color: #777;
+            color: var(--yt-text-muted);
             cursor: pointer;
-            transition: 0.2s;
+            transition: var(--yt-transition);
             text-align: center;
         }
         .tab-btn:hover {
-            background: #e8f5ed;
-            color: #1a5e3a;
+            background: var(--yt-green-light);
+            color: var(--yt-green-dark);
         }
         .tab-btn.active {
-            background: #1a5e3a;
+            background: var(--yt-green);
             color: white;
+            box-shadow: 0 2px 8px rgba(42, 140, 82, 0.25);
         }
         .tab-content {
             display: none;
+            animation: fadeIn 0.3s ease;
         }
         .tab-content.active {
             display: block;
         }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
         /* CARTES */
         .card {
-            background: white;
-            border-radius: 12px;
-            padding: 16px 18px;
+            background: var(--yt-white);
+            border-radius: var(--yt-radius);
+            padding: 14px 16px;
             margin-bottom: 14px;
-            border: 1px solid #dce8e2;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            border: 1px solid var(--yt-border);
         }
         .card-title {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
-            color: #1a5e3a;
-            margin-bottom: 12px;
+            color: var(--yt-green-dark);
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
         }
         .badge {
-            font-size: 10px;
-            padding: 2px 12px;
+            font-size: 9px;
+            padding: 2px 10px;
             border-radius: 30px;
             font-weight: 500;
         }
         .badge-admin {
-            background: #1a5e3a;
+            background: var(--yt-green);
             color: white;
-        }
-        .badge-info {
-            background: #d1ecf1;
-            color: #0c5460;
         }
         .badge-warning {
             background: #fff3cd;
             color: #856404;
         }
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
         .badge-success {
             background: #d4edda;
             color: #155724;
         }
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
 
+        /* FORMULAIRES */
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 10px;
         }
         .form-group {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         .form-group label {
             display: block;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
-            color: #666;
-            margin-bottom: 4px;
+            color: var(--yt-text-muted);
+            margin-bottom: 3px;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.2px;
         }
         .form-group input,
         .form-group select {
             width: 100%;
-            padding: 8px 12px;
-            border: 2px solid #dce8e2;
+            padding: 7px 10px;
+            border: 2px solid var(--yt-border);
             border-radius: 8px;
-            font-size: 14px;
-            transition: 0.2s;
+            font-size: 13px;
+            background: var(--yt-white);
+            transition: var(--yt-transition);
+            color: var(--yt-text);
         }
         .form-group input:focus,
         .form-group select:focus {
-            border-color: #1a5e3a;
             outline: none;
+            border-color: var(--yt-green);
+            box-shadow: 0 0 0 3px rgba(42, 140, 82, 0.10);
         }
-        .form-group input:disabled,
-        .form-group select:disabled {
-            background: #f5f5f5;
-            opacity: 0.7;
-            cursor: not-allowed;
+        .form-group input[type="file"] {
+            padding: 4px;
+            border: 2px dashed var(--yt-border);
+            cursor: pointer;
         }
 
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 11px;
+            cursor: pointer;
+            transition: var(--yt-transition);
+            text-decoration: none;
+            min-height: 36px;
+        }
+        .btn-primary {
+            background: var(--yt-green);
+            color: white;
+            box-shadow: 0 2px 8px rgba(42, 140, 82, 0.20);
+        }
+        .btn-primary:hover {
+            background: var(--yt-green-dark);
+            transform: translateY(-1px);
+        }
+        .btn-success {
+            background: var(--yt-success);
+            color: white;
+        }
+        .btn-success:hover {
+            background: #15632a;
+            transform: translateY(-1px);
+        }
+        .btn-danger {
+            background: var(--yt-danger);
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #a93226;
+            transform: translateY(-1px);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--yt-green);
+            color: var(--yt-green);
+        }
+        .btn-outline:hover {
+            background: var(--yt-green-light);
+        }
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 10px;
+            min-height: 28px;
+        }
+        .btn-block {
+            width: 100%;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* TABLEAU */
         .table-wrapper {
             overflow-x: auto;
             border-radius: 8px;
-            border: 1px solid #dce8e2;
+            border: 1px solid var(--yt-border);
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 12px;
+            font-size: 10px;
         }
         th {
-            background: #e8f5ed;
-            color: #1a5e3a;
-            padding: 8px 6px;
+            background: var(--yt-green-light);
+            color: var(--yt-green-dark);
+            font-weight: 600;
+            padding: 4px 3px;
             text-align: left;
-            border-bottom: 2px solid #1a5e3a;
-            font-size: 10px;
+            border-bottom: 2px solid var(--yt-green);
+            font-size: 8px;
             text-transform: uppercase;
+            letter-spacing: 0.2px;
             white-space: nowrap;
         }
         td {
-            padding: 6px 6px;
-            border-bottom: 1px solid #dce8e2;
+            padding: 3px 3px;
+            border-bottom: 1px solid var(--yt-border);
             vertical-align: middle;
+            font-size: 10px;
         }
         tr:hover {
-            background: #f6faf8;
+            background: var(--yt-green-light);
         }
 
         .badge-status {
             display: inline-block;
-            padding: 2px 10px;
+            padding: 2px 8px;
             border-radius: 30px;
-            font-size: 10px;
+            font-size: 8px;
             font-weight: 600;
             text-transform: uppercase;
+            letter-spacing: 0.2px;
         }
         .badge-status.active {
             background: #d4edda;
             color: #155724;
+        }
+        .badge-status.conge {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .badge-status.inactive {
+            background: #f8d7da;
+            color: #721c24;
         }
         .badge-status.paid {
             background: #d4edda;
@@ -312,57 +371,72 @@
             background: #fff3cd;
             color: #856404;
         }
-        .badge-status.conge {
-            background: #fff3cd;
-            color: #856404;
+        .badge-status.present {
+            background: #cce5ff;
+            color: #004085;
         }
-        .badge-status.inactive {
-            background: #f8d7da;
+        .badge-status.absent {
+            background: #f5c6cb;
             color: #721c24;
+        }
+        .badge-status.renewed {
+            background: #d1ecf1;
+            color: #0c5460;
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+            gap: 6px;
         }
         .stat-item {
-            background: #e8f5ed;
-            padding: 10px;
-            border-radius: 10px;
+            background: var(--yt-green-light);
+            padding: 6px 8px;
+            border-radius: var(--yt-radius);
             text-align: center;
             border: 1px solid #d4e8dc;
         }
         .stat-number {
-            font-size: 22px;
+            font-size: 16px;
             font-weight: 700;
-            color: #1a5e3a;
+            color: var(--yt-green-dark);
+            line-height: 1.2;
         }
         .stat-label {
-            font-size: 9px;
-            color: #666;
-            text-transform: uppercase;
+            font-size: 7px;
+            color: var(--yt-text-muted);
             font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.2px;
         }
 
-        .flex {
+        .admin-lock {
+            background: var(--yt-green-light);
+            border: 2px solid var(--yt-green);
+            border-radius: var(--yt-radius);
+            padding: 10px 14px;
+            margin-bottom: 14px;
             display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
             align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
         }
-        .mt-8 {
-            margin-top: 8px;
+        .admin-lock input {
+            padding: 6px 10px;
+            border: 2px solid var(--yt-border);
+            border-radius: 8px;
+            font-size: 13px;
+            flex: 1;
+            min-width: 120px;
         }
-        .text-muted {
-            color: #999;
+        .admin-lock input:focus {
+            border-color: var(--yt-green);
+            outline: none;
+        }
+        .admin-lock .status {
             font-size: 12px;
-        }
-        .text-center {
-            text-align: center;
-        }
-        .hidden {
-            display: none !important;
+            color: var(--yt-text-muted);
+            font-weight: 500;
         }
 
         /* CARTE ABONNEMENT */
@@ -371,47 +445,83 @@
             margin: 0 auto;
             background: white;
             border-radius: 16px;
-            padding: 18px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            border: 2px solid #1a5e3a;
+            padding: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            border: 2px solid var(--yt-green);
+            position: relative;
         }
         .carte-abonnement .header-carte {
             display: flex;
             justify-content: space-between;
-            border-bottom: 2px solid #1a5e3a;
+            align-items: center;
+            border-bottom: 2px solid var(--yt-green);
             padding-bottom: 8px;
             margin-bottom: 10px;
         }
         .carte-abonnement .header-carte .logo {
             font-size: 18px;
             font-weight: 700;
-            color: #1a5e3a;
+            color: var(--yt-green-dark);
         }
         .carte-abonnement .header-carte .mois {
             font-size: 13px;
             font-weight: 600;
-            color: #666;
+            color: var(--yt-text-muted);
         }
-        .carte-abonnement .info-abonne .nom {
-            font-size: 18px;
+
+        .carte-abonnement .info-abonne {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .carte-abonnement .info-abonne .photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid var(--yt-green);
+            object-fit: cover;
+            background: #f0f0f0;
+            flex-shrink: 0;
+        }
+        .carte-abonnement .info-abonne .photo-placeholder {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px dashed var(--yt-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--yt-text-muted);
+            background: #fafbfc;
+            flex-shrink: 0;
+        }
+        .carte-abonnement .info-abonne .details {
+            flex: 1;
+        }
+        .carte-abonnement .info-abonne .details .nom {
+            font-size: 16px;
             font-weight: 700;
+            color: var(--yt-text);
         }
-        .carte-abonnement .info-abonne .adresse {
-            font-size: 12px;
-            color: #666;
+        .carte-abonnement .info-abonne .details .adresse {
+            font-size: 11px;
+            color: var(--yt-text-muted);
         }
-        .carte-abonnement .info-abonne .numero {
-            font-size: 12px;
-            color: #666;
+        .carte-abonnement .info-abonne .details .numero {
+            font-size: 11px;
+            color: var(--yt-text-muted);
             font-family: monospace;
         }
+
         .carte-abonnement .qr-container {
-            text-align: center;
+            display: flex;
+            justify-content: center;
             margin: 8px 0;
         }
         .carte-abonnement .qr-container #qrcode {
-            display: inline-block;
-            border: 2px solid #1a5e3a;
+            border: 2px solid var(--yt-green);
             border-radius: 8px;
             padding: 6px;
             background: white;
@@ -420,6 +530,7 @@
             width: 100px;
             height: 100px;
         }
+
         .carte-abonnement .jours-grid {
             display: grid;
             grid-template-columns: repeat(10, 1fr);
@@ -428,32 +539,39 @@
         }
         .carte-abonnement .jours-grid .jour {
             aspect-ratio: 1;
-            border: 1px solid #dce8e2;
+            border: 1px solid var(--yt-border);
             border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 9px;
             font-weight: 600;
-            color: #999;
+            color: var(--yt-text-muted);
             background: #fafbfc;
+            transition: 0.2s;
         }
         .carte-abonnement .jours-grid .jour.present {
-            background: #1a5e3a;
+            background: var(--yt-green);
             color: white;
-            border-color: #1a5e3a;
+            border-color: var(--yt-green);
+        }
+        .carte-abonnement .jours-grid .jour.absent {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
         }
         .carte-abonnement .footer-carte {
             margin-top: 10px;
             padding-top: 8px;
-            border-top: 1px solid #dce8e2;
+            border-top: 1px solid var(--yt-border);
             font-size: 9px;
-            color: #666;
+            color: var(--yt-text-muted);
             text-align: center;
         }
         .carte-abonnement .security-hash {
-            font-size: 8px;
-            color: #999;
+            font-size: 7px;
+            color: var(--yt-text-muted);
+            word-break: break-all;
             font-family: monospace;
             text-align: center;
             margin-top: 4px;
@@ -462,24 +580,334 @@
             border-radius: 4px;
         }
 
-        .photo-placeholder {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: 3px dashed #ccc;
+        /* SCANNER */
+        .scanner-container {
+            background: #1a1a1a;
+            border-radius: var(--yt-radius);
+            padding: 16px;
+            text-align: center;
+        }
+        .scanner-container video {
+            max-width: 100%;
+            border-radius: 8px;
+            background: #000;
+        }
+        .scanner-container .scan-result {
+            margin-top: 8px;
+            padding: 8px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .scanner-container .scan-result.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .scanner-container .scan-result.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .scanner-container .scan-result.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .flex {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .mt-8 {
+            margin-top: 8px;
+        }
+        .mb-8 {
+            margin-bottom: 8px;
+        }
+        .text-muted {
+            color: var(--yt-text-muted);
+            font-size: 11px;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .text-matin {
+            color: #d4a017;
+        }
+        .text-soir {
+            color: #2c3e50;
+        }
+
+        .sub-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .sub-tab-btn {
+            padding: 4px 12px;
+            border: none;
+            border-radius: 6px;
+            background: var(--yt-border);
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--yt-text-muted);
+            cursor: pointer;
+            transition: var(--yt-transition);
+        }
+        .sub-tab-btn:hover {
+            background: var(--yt-green-light);
+        }
+        .sub-tab-btn.active {
+            background: var(--yt-green);
+            color: white;
+        }
+        .sub-tab-content {
+            display: none;
+        }
+        .sub-tab-content.active {
+            display: block;
+        }
+
+        .depart-group {
+            background: var(--yt-white);
+            border-radius: 8px;
+            padding: 4px 8px;
+            margin-bottom: 3px;
+            border: 1px solid var(--yt-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 3px;
+        }
+        .depart-group .client-tag {
+            background: var(--yt-green-light);
+            padding: 2px 6px;
+            border-radius: 20px;
+            font-size: 9px;
+            border: 1px solid #d4e8dc;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .client-tag .time {
+            color: var(--yt-text-muted);
+            font-size: 8px;
+            font-weight: 500;
+        }
+        .depart-section {
+            background: var(--yt-green-light);
+            border-radius: var(--yt-radius);
+            padding: 10px 12px;
+            margin-top: 6px;
+            border-left: 4px solid var(--yt-green);
+        }
+        .depart-section .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+        .depart-section .header h3 {
+            font-size: 12px;
+            color: var(--yt-green-dark);
+            font-weight: 600;
+        }
+        .depart-section .header .count {
+            font-size: 10px;
+            color: var(--yt-text-muted);
+            font-weight: 500;
+        }
+
+        .presence-check {
+            width: 14px;
+            height: 14px;
+            accent-color: var(--yt-green);
+            cursor: pointer;
+        }
+        .presence-check:disabled {
+            cursor: not-allowed;
+            opacity: 0.4;
+        }
+        .select-all-row {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: #ccc;
-            background: #fafbfc;
+            gap: 6px;
+            padding: 3px 0;
+            border-bottom: 1px solid var(--yt-border);
+            margin-bottom: 4px;
         }
-        .photo {
-            width: 60px;
-            height: 60px;
+        .select-all-row label {
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--yt-text-muted);
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+        }
+        .select-all-row input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            accent-color: var(--yt-green);
+        }
+
+        .alert {
+            padding: 6px 10px;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .alert-danger {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .alert-warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+        }
+        .alert-info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .renew-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 3px 0;
+            border-bottom: 1px solid var(--yt-border);
+            font-size: 11px;
+            flex-wrap: wrap;
+            gap: 3px;
+        }
+        .renew-item .info {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .renew-item .info input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            accent-color: var(--yt-green);
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.show {
+            display: flex;
+        }
+        .modal {
+            background: var(--yt-white);
+            border-radius: var(--yt-radius);
+            padding: 20px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+        }
+        .modal .modal-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--yt-green-dark);
+            margin-bottom: 14px;
+        }
+        .modal .form-row {
+            grid-template-columns: 1fr 1fr;
+        }
+        .modal .btn-close {
+            background: var(--yt-border);
+            color: var(--yt-text);
+        }
+        .modal .btn-close:hover {
+            background: #d4d4d4;
+        }
+        .modal .photo-preview {
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
-            border: 3px solid #1a5e3a;
             object-fit: cover;
+            border: 3px solid var(--yt-green);
+        }
+
+        .pointage-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            border-bottom: 1px solid var(--yt-border);
+            font-size: 11px;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .pointage-item .info {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .pointage-item .badge-type {
+            font-size: 8px;
+            padding: 2px 8px;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+        .pointage-item .badge-type.aller {
+            background: #d4a017;
+            color: white;
+        }
+        .pointage-item .badge-type.retour {
+            background: #2c3e50;
+            color: white;
+        }
+
+        .whatsapp-link {
+            background: #25D366;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 11px;
+            transition: var(--yt-transition);
+        }
+        .whatsapp-link:hover {
+            background: #1da85a;
+            transform: scale(1.02);
         }
 
         @media (max-width: 768px) {
@@ -489,18 +917,64 @@
             .admin-lock {
                 flex-direction: column;
             }
-            .header {
+            .app-header {
                 flex-direction: column;
                 text-align: center;
             }
-            .tabs .tab-btn {
-                font-size: 9px;
-                padding: 6px 4px;
-                min-width: 45px;
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            table {
+                font-size: 8px;
+            }
+            th,
+            td {
+                padding: 2px 2px;
+            }
+            .tab-btn {
+                font-size: 8px;
+                padding: 6px 3px;
+                min-width: 40px;
+            }
+            .carte-abonnement {
+                padding: 12px;
+            }
+            .carte-abonnement .jours-grid {
+                gap: 2px;
+            }
+            .carte-abonnement .jours-grid .jour {
+                font-size: 7px;
+            }
+            .carte-abonnement .info-abonne .photo {
+                width: 40px;
+                height: 40px;
+            }
+            .carte-abonnement .info-abonne .photo-placeholder {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+            .modal .form-row {
+                grid-template-columns: 1fr;
             }
             .carte-abonnement .qr-container #qrcode img {
                 width: 80px;
                 height: 80px;
+            }
+        }
+        @media (max-width: 480px) {
+            body {
+                padding: 6px;
+            }
+            .card {
+                padding: 8px 10px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 3px;
+            }
+            .stat-number {
+                font-size: 14px;
             }
         }
     </style>
@@ -509,54 +983,67 @@
 
     <div class="container">
 
-        <!-- HEADER -->
-        <div class="header">
+        <!-- ===== HEADER ===== -->
+        <header class="app-header">
             <div>
-                <h1>🚌 YT Transport Pro</h1>
-                <div class="sub">YAOU • Gestion des abonnements</div>
+                <h1>🚌 YT Pro</h1>
+                <div class="sub">YAOU • Carte & QR Code</div>
             </div>
             <div class="header-actions">
-                <button onclick="toggleAdmin()">🔐 Admin</button>
-                <button onclick="exportData()">📥 Export</button>
-                <button onclick="document.getElementById('fileInput').click()">📤 Import</button>
+                <button class="btn" id="toggleAdminBtn">🔐 Admin</button>
+                <button class="btn" id="exportBtn">📥 Export</button>
+                <button class="btn" id="importBtn">📤 Import</button>
             </div>
-        </div>
+        </header>
 
-        <!-- ADMIN LOCK -->
+        <!-- ===== ADMIN LOCK ===== -->
         <div class="admin-lock" id="adminLock">
-            <span style="font-size:20px;">🔒</span>
-            <span style="font-weight:600;color:#1a5e3a;">Admin</span>
-            <input type="password" id="adminPassword" placeholder="Code (YT2024)">
-            <button class="btn btn-primary" onclick="unlockAdmin()">Déverrouiller</button>
+            <span style="font-size:16px;">🔒</span>
+            <span style="font-weight:600;color:var(--yt-green-dark);">Admin</span>
+            <input type="password" id="adminPasswordInput" placeholder="Code (YT2024)">
+            <button class="btn btn-primary btn-sm" id="unlockBtn">Déverrouiller</button>
             <span class="status" id="adminStatus">🔒 Verrouillé</span>
         </div>
 
-        <!-- ONGLETS -->
-        <div class="tabs">
-            <button class="tab-btn active" onclick="showTab('tab1')">📊 Dashboard</button>
-            <button class="tab-btn" onclick="showTab('tab2')">👥 Abonnés</button>
-            <button class="tab-btn" onclick="showTab('tab3')">🪪 Cartes</button>
-            <button class="tab-btn" onclick="showTab('tab4')">🚌 Départs</button>
-            <button class="tab-btn" onclick="showTab('tab5')">📈 Rapport</button>
+        <!-- ===== ONGLETS ===== -->
+        <div class="tabs" id="tabsContainer">
+            <button class="tab-btn active" data-tab="tab1">📊 Dashboard</button>
+            <button class="tab-btn" data-tab="tab2">👥 Abonnés</button>
+            <button class="tab-btn" data-tab="tab3">🪪 Cartes</button>
+            <button class="tab-btn" data-tab="tab4">📱 Scanner</button>
+            <button class="tab-btn" data-tab="tab5">🚌 Départs</button>
+            <button class="tab-btn" data-tab="tab6">📈 Rapport</button>
         </div>
 
-        <!-- TAB 1: DASHBOARD -->
+        <!-- ===== TAB 1: TABLEAU DE BORD ===== -->
         <div class="tab-content active" id="tab1">
             <div class="card">
                 <div class="card-title">📊 Tableau de bord</div>
                 <div class="stats-grid" id="statsGrid">
                     <div class="stat-item"><div class="stat-number" id="nbClients">0</div><div class="stat-label">Abonnés</div></div>
                     <div class="stat-item"><div class="stat-number" id="nbActifs">0</div><div class="stat-label">Actifs</div></div>
+                    <div class="stat-item"><div class="stat-number" id="nbConges">0</div><div class="stat-label">Congé</div></div>
                     <div class="stat-item"><div class="stat-number" id="nbImpayes">0</div><div class="stat-label">Impayés</div></div>
-                    <div class="stat-item"><div class="stat-number" id="totalMois">0</div><div class="stat-label">Total</div></div>
+                    <div class="stat-item"><div class="stat-number" id="totalMois">0</div><div class="stat-label">Encaissé</div></div>
+                    <div class="stat-item"><div class="stat-number" id="nbRenouveler">0</div><div class="stat-label">À renouveler</div></div>
                 </div>
             </div>
-            <div id="alerts"></div>
+            <div id="alertsContainer"></div>
+            <div class="card">
+                <div class="card-title">🔄 Renouvellement <span class="badge badge-info" id="renewMonthDisplay"></span></div>
+                <div id="renewSummary"><p class="text-muted">Chargement...</p></div>
+                <div id="renewSelectList" style="margin-top:6px;"></div>
+                <div class="flex mt-8">
+                    <button class="btn btn-success btn-sm" id="renewSelectedBtn">✅ Renouveler</button>
+                    <button class="btn btn-primary btn-sm" id="renewAllBtn">📅 Tout</button>
+                    <button class="btn btn-outline btn-sm" id="refreshRenewBtn">🔄</button>
+                </div>
+            </div>
         </div>
 
-        <!-- TAB 2: ABONNÉS -->
+        <!-- ===== TAB 2: ABONNÉS ===== -->
         <div class="tab-content" id="tab2">
-            <div class="card" id="addCard">
+            <div class="card" id="addClientCard">
                 <div class="card-title">➕ Ajouter un abonné <span class="badge badge-admin">Admin</span></div>
                 <div class="form-row">
                     <div class="form-group"><label>Nom complet</label><input type="text" id="clientName" placeholder="Jean Dupont"></div>
@@ -579,802 +1066,2161 @@
                     </div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label>Photo</label><input type="file" id="clientPhoto" accept="image/*"></div>
-                    <div class="form-group"><img id="photoPreview" style="width:60px;height:60px;border-radius:50%;border:2px solid #ccc;object-fit:cover;background:#f0f0f0;"></div>
-                </div>
-                <div style="background:#fff8e1;padding:8px 12px;border-radius:8px;margin:6px 0;border-left:4px solid #d4a017;">
-                    <div style="font-weight:600;color:#d4a017;font-size:12px;">🌅 DÉPART MATIN</div>
-                    <div class="form-row">
-                        <div class="form-group"><label>Heure</label><input type="time" id="clientDepartMatinTime" value="07:00"></div>
-                        <div class="form-group"><label>Arrêt</label><input type="text" id="clientDepartMatinArret" placeholder="Gare centrale"></div>
+                    <div class="form-group"><label>Photo de l'abonné</label>
+                        <input type="file" id="clientPhoto" accept="image/*">
+                    </div>
+                    <div class="form-group" style="display:flex;align-items:center;">
+                        <img id="photoPreview" class="photo-preview" style="width:60px;height:60px;border-radius:50%;border:2px solid var(--yt-border);object-fit:cover;background:#f0f0f0;" src="">
+                        <span style="font-size:10px;color:var(--yt-text-muted);margin-left:8px;">Aucune</span>
                     </div>
                 </div>
-                <div style="background:#ecf0f1;padding:8px 12px;border-radius:8px;margin:6px 0;border-left:4px solid #2c3e50;">
-                    <div style="font-weight:600;color:#2c3e50;font-size:12px;">🌙 RETOUR SOIR</div>
+                <div style="background:#fff8e1;padding:6px 10px;border-radius:8px;margin:4px 0;border-left:4px solid #d4a017;">
+                    <div style="font-weight:600;color:#d4a017;font-size:11px;">🌅 DÉPART MATIN</div>
                     <div class="form-row">
-                        <div class="form-group"><label>Heure</label><input type="time" id="clientReturnSoirTime" value="18:00"></div>
-                        <div class="form-group"><label>Arrêt</label><input type="text" id="clientReturnSoirArret" placeholder="Marché"></div>
+                        <div class="form-group"><label class="text-matin">Heure</label><input type="time" id="clientDepartMatinTime" value="07:00"></div>
+                        <div class="form-group"><label class="text-matin">Arrêt</label><input type="text" id="clientDepartMatinArret" placeholder="Gare centrale"></div>
                     </div>
                 </div>
-                <button class="btn btn-primary btn-block" id="addBtn" onclick="addClient()">➕ Ajouter & Générer la carte</button>
+                <div style="background:#ecf0f1;padding:6px 10px;border-radius:8px;margin:4px 0;border-left:4px solid #2c3e50;">
+                    <div style="font-weight:600;color:#2c3e50;font-size:11px;">🌙 RETOUR SOIR</div>
+                    <div class="form-row">
+                        <div class="form-group"><label class="text-soir">Heure</label><input type="time" id="clientReturnSoirTime" value="18:00"></div>
+                        <div class="form-group"><label class="text-soir">Arrêt</label><input type="text" id="clientReturnSoirArret" placeholder="Marché"></div>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-block" id="addClientBtn">➕ Ajouter & Générer la carte</button>
             </div>
 
             <div class="card">
-                <div class="card-title">👥 Liste des abonnés</div>
+                <div class="card-title">👥 Liste des abonnés
+                    <button class="btn btn-outline btn-sm" id="exportExcelBtn">📊 Excel</button>
+                </div>
+                <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
+                    <select id="filterPayment" style="padding:3px 6px;border:2px solid var(--yt-border);border-radius:6px;font-size:10px;"><option value="">Tous</option><option value="paid">Payé</option><option value="unpaid">Impayé</option><option value="pending">En attente</option></select>
+                    <select id="filterStatus" style="padding:3px 6px;border:2px solid var(--yt-border);border-radius:6px;font-size:10px;"><option value="">Tous</option><option value="actif">Actif</option><option value="conge">Congé</option><option value="inactif">Inactif</option></select>
+                    <button class="btn btn-outline btn-sm" id="clearFiltersBtn">Effacer</button>
+                </div>
                 <div class="table-wrapper">
                     <table>
-                        <thead><tr><th>Photo</th><th>Nom</th><th>Tél</th><th>N° carte</th><th>Montant</th><th>Paiement</th><th>Statut</th><th>Actions</th></tr></thead>
-                        <tbody id="clientTable"><tr><td colspan="8" class="text-center text-muted">Aucun abonné</td></tr></tbody>
+                        <thead><tr>
+                            <th>Photo</th><th>Nom</th><th>Tél</th><th>N° carte</th><th>Début</th><th>Fin</th><th>Montant</th>
+                            <th>Paiement</th><th>Statut</th><th>Actions</th>
+                        </tr></thead>
+                        <tbody id="clientTableBody"><tr><td colspan="10" class="text-muted text-center">Aucun abonné</td></tr></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- TAB 3: CARTES -->
+        <!-- ===== TAB 3: CARTES ===== -->
         <div class="tab-content" id="tab3">
             <div class="card">
-                <div class="card-title">🪪 Générer la carte</div>
+                <div class="card-title">🪪 Générer / Voir la carte</div>
                 <div class="form-group">
                     <label>Sélectionner un abonné</label>
-                    <select id="carteSelect" style="width:100%;padding:8px 12px;border:2px solid #dce8e2;border-radius:8px;">
+                    <select id="carteClientSelect" style="width:100%;padding:6px 10px;border:2px solid var(--yt-border);border-radius:8px;font-size:12px;">
                         <option value="">-- Choisir --</option>
                     </select>
                 </div>
                 <div class="flex">
-                    <button class="btn btn-primary" onclick="genererCarte()">📄 Générer</button>
-                    <button class="btn btn-success" onclick="imprimerCarte()">🖨️ Imprimer</button>
+                    <button class="btn btn-primary btn-sm" id="genererCarteBtn">📄 Générer</button>
+                    <button class="btn btn-success btn-sm" id="imprimerCarteBtn">📥 Télécharger PDF</button>
                 </div>
             </div>
+
             <div class="card">
                 <div class="card-title">🪪 Aperçu de la carte</div>
-                <div id="cartePreview"><p class="text-muted text-center">Sélectionnez un abonné</p></div>
+                <div id="cartePreview">
+                    <p class="text-muted text-center">Sélectionnez un abonné</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📋 Historique des pointages</div>
+                <div id="pointageHistory">
+                    <p class="text-muted">Aucun pointage</p>
+                </div>
             </div>
         </div>
 
-        <!-- TAB 4: DEPARTS -->
+        <!-- ===== TAB 4: SCANNER QR ===== -->
         <div class="tab-content" id="tab4">
             <div class="card">
-                <div class="card-title">🚌 Gestion des départs</div>
-                <div class="depart-section" style="background:#e8f5ed;border-radius:8px;padding:12px 14px;border-left:4px solid #1a5e3a;">
-                    <div class="header" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;">
-                        <h3 style="font-size:14px;color:#1a5e3a;">Abonnés actifs</h3>
-                        <span class="count" id="activeCount">0</span>
+                <div class="card-title">📱 Scanner QR Code</div>
+                <div style="background:var(--yt-green-light);padding:8px 12px;border-radius:8px;margin-bottom:8px;">
+                    <p style="font-size:12px;color:var(--yt-text-muted);">📷 Scannez le QR code pour pointer</p>
+                </div>
+                <div class="scanner-container" id="scannerContainer">
+                    <div id="scannerPlaceholder" style="color:white;padding:30px;">
+                        <p style="font-size:16px;">📷 Prêt</p>
+                        <p style="font-size:12px;opacity:0.6;">Cliquez sur Scanner</p>
                     </div>
-                    <div id="presenceList"><p class="text-muted">Chargement...</p></div>
-                    <div class="flex mt-8">
-                        <button class="btn btn-success" onclick="validateDepart()">✅ Valider</button>
-                        <button class="btn btn-outline" onclick="resetPresence()">🔄 Réinitialiser</button>
+                    <video id="video" style="display:none;width:100%;max-width:500px;border-radius:8px;"></video>
+                    <div class="flex mt-8" style="justify-content:center;">
+                        <button class="btn btn-primary" id="startScanBtn">📷 Scanner</button>
+                        <button class="btn btn-danger" id="stopScanBtn">⏹️ Arrêter</button>
+                    </div>
+                    <div id="scanResult" class="scan-result hidden"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📋 Derniers pointages</div>
+                <div id="scanHistory">
+                    <p class="text-muted">Aucun pointage</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TAB 5: DEPARTS ===== -->
+        <div class="tab-content" id="tab5">
+            <div class="card">
+                <div class="card-title">🚌 Gestion des départs <span class="badge badge-info" id="departDateDisplay"></span></div>
+                <div class="sub-tabs">
+                    <button class="sub-tab-btn active" data-subtab="subtab-matin">🌅 MATIN</button>
+                    <button class="sub-tab-btn" data-subtab="subtab-soir">🌙 SOIR</button>
+                </div>
+                <div class="sub-tab-content active" id="subtab-matin">
+                    <div class="depart-section" style="border-left-color:#d4a017;">
+                        <div class="header"><h3 style="color:#d4a017;">Abonnés actifs - MATIN</h3><span class="count" id="activeCountMatin">0</span></div>
+                        <div class="select-all-row"><label><input type="checkbox" id="selectAllMatin"> Tout</label></div>
+                        <div id="presenceListMatin"><p class="text-muted">Chargement...</p></div>
+                        <div class="flex mt-8">
+                            <button class="btn btn-success" id="validateMatinBtn">✅ Valider</button>
+                            <button class="btn btn-outline" style="border-color:#d4a017;color:#d4a017;" id="resetMatinBtn">🔄</button>
+                            <button class="btn btn-primary" id="exportMatinBtn">📊</button>
+                            <button class="btn btn-danger" id="exportMatinPdfBtn">📄 PDF</button>
+                        </div>
+                    </div>
+                    <div class="card" id="departMatinListCard">
+                        <div class="card-title">📋 Liste MATIN <span class="badge badge-warning" id="departMatinCount">0</span>
+                            <button class="btn btn-danger btn-sm" id="exportMatinPdfListBtn">📄 PDF</button>
+                        </div>
+                        <div id="departMatinListContent"><p class="text-muted">Aucun</p></div>
+                    </div>
+                </div>
+                <div class="sub-tab-content" id="subtab-soir">
+                    <div class="depart-section" style="border-left-color:#2c3e50;">
+                        <div class="header"><h3 style="color:#2c3e50;">Abonnés actifs - SOIR</h3><span class="count" id="activeCountSoir">0</span></div>
+                        <div class="select-all-row"><label><input type="checkbox" id="selectAllSoir"> Tout</label></div>
+                        <div id="presenceListSoir"><p class="text-muted">Chargement...</p></div>
+                        <div class="flex mt-8">
+                            <button class="btn btn-success" id="validateSoirBtn">✅ Valider</button>
+                            <button class="btn btn-outline" style="border-color:#2c3e50;color:#2c3e50;" id="resetSoirBtn">🔄</button>
+                            <button class="btn btn-primary" id="exportSoirBtn">📊</button>
+                            <button class="btn btn-danger" id="exportSoirPdfBtn">📄 PDF</button>
+                        </div>
+                    </div>
+                    <div class="card" id="departSoirListCard">
+                        <div class="card-title">📋 Liste SOIR <span class="badge badge-info" id="departSoirCount">0</span>
+                            <button class="btn btn-danger btn-sm" id="exportSoirPdfListBtn">📄 PDF</button>
+                        </div>
+                        <div id="departSoirListContent"><p class="text-muted">Aucun</p></div>
                     </div>
                 </div>
             </div>
-            <div class="card">
-                <div class="card-title">📋 Liste validée <span class="badge badge-info" id="departCount">0</span></div>
-                <div id="departList"><p class="text-muted">Aucun départ validé</p></div>
-            </div>
         </div>
 
-        <!-- TAB 5: RAPPORT -->
-        <div class="tab-content" id="tab5">
+        <!-- ===== TAB 6: RAPPORT ===== -->
+        <div class="tab-content" id="tab6">
             <div class="card">
-                <div class="card-title">📈 Rapport complet</div>
+                <div class="card-title">📈 Rapport complet <button class="btn btn-primary btn-sm" id="exportReportBtn">📊</button></div>
                 <div id="reportContent"><p class="text-muted">Génération...</p></div>
             </div>
         </div>
 
-        <input type="file" id="fileInput" accept=".json" style="display:none;" onchange="importData(event)">
+        <!-- ===== MODAL EDITION ===== -->
+        <div class="modal-overlay" id="editModal">
+            <div class="modal">
+                <div class="modal-title">✏️ Modifier l'abonné</div>
+                <input type="hidden" id="editClientId">
+                <div class="form-row">
+                    <div class="form-group"><label>Nom</label><input type="text" id="editName"></div>
+                    <div class="form-group"><label>Téléphone</label><input type="tel" id="editPhone"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Adresse</label><input type="text" id="editAdresse"></div>
+                    <div class="form-group"><label>Début</label><input type="date" id="editStartDate"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Fin</label><input type="date" id="editEndDate"></div>
+                    <div class="form-group"><label>Montant</label><input type="number" id="editAmount"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Paiement</label>
+                        <select id="editPaymentStatus"><option value="paid">Payé</option><option value="pending">En attente</option><option value="unpaid">Impayé</option></select>
+                    </div>
+                    <div class="form-group"><label>Trajet</label>
+                        <select id="editTripType"><option value="aller-simple">Aller simple</option><option value="aller-retour">Aller-Retour</option><option value="retour-simple">Retour simple</option></select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Photo</label><input type="file" id="editPhoto" accept="image/*"></div>
+                    <div class="form-group"><img id="editPhotoPreview" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid var(--yt-border);background:#f0f0f0;"></div>
+                </div>
+                <div style="background:#fff8e1;padding:6px 10px;border-radius:8px;margin:4px 0;border-left:4px solid #d4a017;">
+                    <div style="font-weight:600;color:#d4a017;font-size:11px;">🌅 MATIN</div>
+                    <div class="form-row">
+                        <div class="form-group"><label class="text-matin">Heure</label><input type="time" id="editDepartMatinTime"></div>
+                        <div class="form-group"><label class="text-matin">Arrêt</label><input type="text" id="editDepartMatinArret"></div>
+                    </div>
+                </div>
+                <div style="background:#ecf0f1;padding:6px 10px;border-radius:8px;margin:4px 0;border-left:4px solid #2c3e50;">
+                    <div style="font-weight:600;color:#2c3e50;font-size:11px;">🌙 SOIR</div>
+                    <div class="form-row">
+                        <div class="form-group"><label class="text-soir">Heure</label><input type="time" id="editReturnSoirTime"></div>
+                        <div class="form-group"><label class="text-soir">Arrêt</label><input type="text" id="editReturnSoirArret"></div>
+                    </div>
+                </div>
+                <div class="flex mt-8">
+                    <button class="btn btn-success" id="saveEditBtn">💾 Enregistrer</button>
+                    <button class="btn btn-close" id="closeEditBtn">❌ Annuler</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== MODAL CARTE ===== -->
+        <div class="modal-overlay" id="carteModal">
+            <div class="modal" style="max-width:500px;">
+                <div class="modal-title">🪪 Carte d'abonnement</div>
+                <div id="carteModalContent"></div>
+                <div class="flex mt-8">
+                    <button class="btn btn-success" id="imprimerCarteModalBtn">📥 Télécharger PDF</button>
+                    <button class="btn btn-close" id="closeCarteModalBtn">❌ Fermer</button>
+                </div>
+            </div>
+        </div>
+
+        <input type="file" id="fileInput" accept=".json" style="display:none;">
 
     </div>
 
     <script>
         // ================================================================
-        // ===== APPLICATION COMPLETE - SANS SERVICE WORKER ===============
+        // ===== APPLICATION COMPLETE - VERSION FINALE =====================
         // ================================================================
 
-        // ---- CONSTANTES ----
-        const ADMIN_PASSWORD = 'YT2024';
-        const STORAGE_KEY = 'yt_transport_simple';
+        (function() {
+            'use strict';
 
-        // ---- DONNEES ----
-        let data = loadData();
-        let isAdmin = false;
-        let departValide = [];
+            // ---- CONSTANTES ----
+            const ADMIN_PASSWORD = 'YT2024';
+            const STORAGE_KEY = 'yt_transport_final';
 
-        // ---- CHARGEMENT ----
-        function getDefaultData() {
-            return {
-                clients: [],
-                paiements: [],
-                presence: {},
-                lastCarteNum: 0
-            };
-        }
+            // ---- DONNEES ----
+            let data = loadData();
+            let isAdmin = false;
+            let departMatinValide = [];
+            let departSoirValide = [];
+            let currentCarteClientId = null;
+            let scanHistory = [];
 
-        function loadData() {
-            try {
-                const raw = localStorage.getItem(STORAGE_KEY);
-                if (raw) {
-                    const parsed = JSON.parse(raw);
-                    if (parsed.clients) {
-                        if (!parsed.paiements) parsed.paiements = [];
-                        if (!parsed.presence) parsed.presence = {};
-                        if (!parsed.lastCarteNum) parsed.lastCarteNum = 0;
-                        return parsed;
+            function getDefaultData() {
+                return {
+                    clients: [],
+                    conges: [],
+                    paiements: [],
+                    renouvellements: [],
+                    presenceMatin: {},
+                    presenceSoir: {},
+                    pointages: {}, // { clientId: { '2026-07-31': 'aller' ou 'retour' } }
+                    arrets: ['Départ'],
+                    lastCarteNum: 0
+                };
+            }
+
+            function loadData() {
+                try {
+                    const raw = localStorage.getItem(STORAGE_KEY);
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (parsed.clients) {
+                            if (!parsed.paiements) parsed.paiements = [];
+                            if (!parsed.renouvellements) parsed.renouvellements = [];
+                            if (!parsed.presenceMatin) parsed.presenceMatin = {};
+                            if (!parsed.presenceSoir) parsed.presenceSoir = {};
+                            if (!parsed.pointages) parsed.pointages = {};
+                            if (!parsed.arrets) parsed.arrets = ['Départ'];
+                            if (!parsed.lastCarteNum) parsed.lastCarteNum = 0;
+                            return parsed;
+                        }
                     }
-                }
-            } catch (e) { console.warn('Erreur:', e); }
-            return getDefaultData();
-        }
-
-        function saveData() {
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-            } catch (e) { console.warn('Erreur:', e); }
-            renderAll();
-        }
-
-        // ---- UTILITAIRES ----
-        function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
-
-        function todayStr() { return new Date().toISOString().split('T')[0]; }
-
-        function getCurrentMonth() { return new Date().getMonth() + 1; }
-
-        function getCurrentYear() { return new Date().getFullYear(); }
-
-        function formatDate(d) { if (!d) return 'N/A'; return new Date(d).toLocaleDateString('fr-FR'); }
-
-        function formatTime(t) { if (!t) return 'N/A'; return t; }
-
-        function getClientById(id) { return data.clients.find(c => c.id === id); }
-
-        function getClientStatus(client) {
-            if (!client) return 'inactif';
-            const today = todayStr();
-            if (client.endDate < today) return 'inactif';
-            return 'actif';
-        }
-
-        function getPaymentStatus(client) {
-            if (!client) return 'unpaid';
-            const paiements = data.paiements.filter(p => p.clientId === client.id).sort((a, b) => new Date(b.date) - new Date(
-                a.date));
-            if (paiements.length === 0) return 'unpaid';
-            const today = new Date();
-            const lastPayment = new Date(paiements[0].date);
-            const monthDiff = (today.getFullYear() - lastPayment.getFullYear()) * 12 + (today.getMonth() - lastPayment
-                .getMonth());
-            if (monthDiff === 0) return 'paid';
-            if (monthDiff === 1 && today.getDate() <= 10) return 'pending';
-            return 'unpaid';
-        }
-
-        function getStatusBadge(client) {
-            const status = getClientStatus(client);
-            const map = { 'actif': '<span class="badge-status active">Actif</span>', 'inactif': '<span class="badge-status inactive">Inactif</span>' };
-            return map[status] || map.inactif;
-        }
-
-        function getPaymentBadge(client) {
-            const status = getPaymentStatus(client);
-            const map = { 'paid': '<span class="badge-status paid">Payé</span>', 'unpaid': '<span class="badge-status unpaid">Impayé</span>',
-                'pending': '<span class="badge-status pending">En attente</span>' };
-            return map[status] || map.pending;
-        }
-
-        function getTripTypeLabel(type) {
-            const map = { 'aller-simple': 'Aller simple', 'aller-retour': 'Aller-Retour',
-                'retour-simple': 'Retour simple' };
-            return map[type] || type;
-        }
-
-        function getTotalEncaisse() {
-            let total = 0;
-            data.clients.forEach(c => {
-                if (getPaymentStatus(c) === 'paid') total += c.amount || 0;
-            });
-            return total;
-        }
-
-        function getPhotoHtml(clientId) {
-            const client = getClientById(clientId);
-            if (client && client.photo) {
-                return `<img src="${client.photo}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid #1a5e3a;">`;
-            }
-            return `<span style="display:inline-block;width:30px;height:30px;border-radius:50%;background:#f0f0f0;text-align:center;line-height:30px;font-size:14px;border:2px dashed #ccc;">👤</span>`;
-        }
-
-        // ---- CARTE ----
-        function genererNumeroCarte() {
-            data.lastCarteNum = (data.lastCarteNum || 0) + 1;
-            const year = getCurrentYear().toString().slice(-2);
-            const month = String(getCurrentMonth()).padStart(2, '0');
-            const num = String(data.lastCarteNum).padStart(4, '0');
-            return `YT-${year}${month}-${num}`;
-        }
-
-        function genererHash(clientId) {
-            const str = `${clientId}-${ADMIN_PASSWORD}`;
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                hash = ((hash << 5) - hash) + str.charCodeAt(i);
-                hash = hash & hash;
-            }
-            return Math.abs(hash).toString(16).padStart(8, '0').toUpperCase();
-        }
-
-        function genererCarteData(clientId) {
-            const client = getClientById(clientId);
-            if (!client) { alert('Client introuvable'); return null; }
-
-            const mois = getCurrentMonth();
-            const annee = getCurrentYear();
-            const moisNom = new Date(annee, mois - 1).toLocaleString('fr-FR', { month: 'long' });
-            const hash = genererHash(clientId);
-
-            if (!client.numeroCarte) {
-                client.numeroCarte = genererNumeroCarte();
-                saveData();
+                } catch (e) { console.warn('Erreur chargement:', e); }
+                return getDefaultData();
             }
 
-            const jours = [];
-            const nbJours = new Date(annee, mois, 0).getDate();
-            for (let j = 1; j <= nbJours; j++) {
-                jours.push({ jour: j, present: false });
-            }
-
-            const qrData = JSON.stringify({
-                clientId: clientId,
-                nom: client.name,
-                numero: client.numeroCarte,
-                hash: hash
-            });
-
-            return {
-                client: client,
-                numeroCarte: client.numeroCarte,
-                hash: hash,
-                mois: mois,
-                annee: annee,
-                moisNom: moisNom,
-                jours: jours,
-                qrData: qrData
-            };
-        }
-
-        function afficherCarteHtml(carteData) {
-            if (!carteData) return;
-
-            const { client, numeroCarte, hash, mois, annee, moisNom, jours, qrData } = carteData;
-
-            let joursHtml = '';
-            jours.forEach(j => {
-                joursHtml += `<div class="jour">${j.jour}</div>`;
-            });
-
-            const photoHtml = client.photo ?
-                `<img src="${client.photo}" class="photo">` :
-                `<div class="photo-placeholder">📷</div>`;
-
-            return `
-                    <div class="carte-abonnement" id="carteAImprimer">
-                        <div class="header-carte">
-                            <div class="logo">🚌 YAOU TRANSPORT</div>
-                            <div class="mois">${moisNom} ${annee}</div>
-                        </div>
-                        <div class="info-abonne" style="display:flex;gap:12px;align-items:center;margin-bottom:10px;">
-                            ${photoHtml}
-                            <div>
-                                <div class="nom">${client.name}</div>
-                                <div class="adresse">📍 ${client.adresse || 'Adresse non renseignée'}</div>
-                                <div class="numero">📞 ${client.phone || 'Non renseigné'}</div>
-                                <div class="numero" style="font-weight:600;color:#1a5e3a;">N° ${numeroCarte}</div>
-                            </div>
-                        </div>
-                        <div class="qr-container">
-                            <div id="qrcode"></div>
-                        </div>
-                        <div class="jours-grid">${joursHtml}</div>
-                        <div class="footer-carte">
-                            ${getTripTypeLabel(client.tripType)} | Départ: ${formatTime(client.departMatinTime)} | Retour: ${formatTime(client.returnSoirTime)}
-                            <br>${client.departMatinArret ? 'Départ: ' + client.departMatinArret : ''} ${client.returnSoirArret ? '| Retour: ' + client.returnSoirArret : ''}
-                        </div>
-                        <div class="security-hash">🔒 ${hash} • ${numeroCarte}</div>
-                    </div>
-                `;
-        }
-
-        function genererQR(elementId, data) {
-            const container = document.getElementById(elementId);
-            if (!container) return;
-            container.innerHTML = '';
-            try {
-                if (typeof QRCode !== 'undefined') {
-                    new QRCode(container, {
-                        text: data,
-                        width: 120,
-                        height: 120,
-                        colorDark: '#1a5e3a',
-                        colorLight: '#ffffff',
-                        correctLevel: QRCode.CorrectLevel.H
-                    });
-                } else {
-                    container.innerHTML = `<div style="padding:10px;background:#f5f5f5;border-radius:4px;font-size:10px;">QR: ${data.substring(0, 30)}...</div>`;
-                }
-            } catch (e) {
-                container.innerHTML = `<div style="padding:10px;background:#f5f5f5;border-radius:4px;font-size:10px;">QR: ${data.substring(0, 30)}...</div>`;
-            }
-        }
-
-        // ---- ONGLETS ----
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            document.querySelector(`.tab-btn[onclick="showTab('${tabId}')"]`).classList.add('active');
-        }
-
-        // ---- ADMIN ----
-        function unlockAdmin() {
-            const pwd = document.getElementById('adminPassword').value;
-            if (pwd === ADMIN_PASSWORD) {
-                isAdmin = true;
-                document.getElementById('adminStatus').textContent = '✅ Déverrouillé';
-                document.getElementById('adminStatus').className = 'status unlocked';
-                document.getElementById('adminPassword').style.borderColor = '#1a7e3a';
-                updateAdminUI();
-                alert('✅ Mode admin déverrouillé !');
-            } else {
-                alert('❌ Code incorrect. Le code par défaut est YT2024');
-                document.getElementById('adminPassword').style.borderColor = 'red';
-                setTimeout(() => document.getElementById('adminPassword').style.borderColor = '', 2000);
-            }
-        }
-
-        function toggleAdmin() {
-            if (isAdmin) {
-                isAdmin = false;
-                document.getElementById('adminStatus').textContent = '🔒 Verrouillé';
-                document.getElementById('adminStatus').className = 'status';
-                updateAdminUI();
-            } else {
-                document.getElementById('adminPassword').focus();
-            }
-        }
-
-        function updateAdminUI() {
-            const inputs = [
-                'clientName', 'clientPhone', 'clientAdresse', 'clientStartDate', 'clientEndDate',
-                'clientAmount', 'paymentStatus', 'clientTripType',
-                'clientDepartMatinTime', 'clientDepartMatinArret',
-                'clientReturnSoirTime', 'clientReturnSoirArret',
-                'clientPhoto', 'addBtn'
-            ];
-            inputs.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.disabled = !isAdmin;
-            });
-            document.getElementById('addCard').style.opacity = isAdmin ? '1' : '0.6';
-        }
-
-        // ---- AJOUT CLIENT ----
-        function addClient() {
-            if (!isAdmin) { alert('🔒 Mode admin requis'); return; }
-
-            const name = document.getElementById('clientName').value.trim();
-            const phone = document.getElementById('clientPhone').value.trim();
-            const adresse = document.getElementById('clientAdresse').value.trim();
-            const startDate = document.getElementById('clientStartDate').value;
-            const endDate = document.getElementById('clientEndDate').value;
-            const amount = document.getElementById('clientAmount').value ? parseInt(document.getElementById('clientAmount')
-                .value) : null;
-            const payStatus = document.getElementById('paymentStatus').value;
-            const tripType = document.getElementById('clientTripType').value;
-            const departMatinTime = document.getElementById('clientDepartMatinTime').value;
-            const departMatinArret = document.getElementById('clientDepartMatinArret').value.trim();
-            const returnSoirTime = document.getElementById('clientReturnSoirTime').value;
-            const returnSoirArret = document.getElementById('clientReturnSoirArret').value.trim();
-
-            if (!name) { alert('Nom requis'); return; }
-            if (!startDate) { alert('Date début requise'); return; }
-            if (!endDate) { alert('Date fin requise'); return; }
-            if (startDate > endDate) { alert('La date de début doit être avant la date de fin'); return; }
-            if (!amount) { alert('Montant requis'); return; }
-
-            const numeroCarte = genererNumeroCarte();
-
-            const photoFile = document.getElementById('clientPhoto').files[0];
-            const sauvegarder = function(photoData) {
-                const newClient = {
-                    id: generateId(),
-                    name,
-                    phone,
-                    adresse,
-                    startDate,
-                    endDate,
-                    amount,
-                    tripType,
-                    departMatinTime,
-                    departMatinArret,
-                    returnSoirTime,
-                    returnSoirArret,
-                    numeroCarte: numeroCarte,
-                    photo: photoData || ''
-                };
-                data.clients.push(newClient);
-                if (payStatus === 'paid') {
-                    data.paiements.push({ clientId: newClient.id, date: todayStr(), montant: amount });
-                }
-                saveData();
-
-                document.getElementById('clientName').value = '';
-                document.getElementById('clientPhone').value = '';
-                document.getElementById('clientAdresse').value = '';
-                document.getElementById('clientAmount').value = '';
-                document.getElementById('clientDepartMatinArret').value = '';
-                document.getElementById('clientReturnSoirArret').value = '';
-                document.getElementById('clientPhoto').value = '';
-                document.getElementById('photoPreview').src = '';
-
-                alert(`✅ Abonné ajouté ! Carte N° ${numeroCarte}`);
+            function saveData() {
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                } catch (e) { console.warn('Erreur sauvegarde:', e); }
                 renderAll();
-            };
-
-            if (photoFile) {
-                const reader = new FileReader();
-                reader.onload = function(e) { sauvegarder(e.target.result); };
-                reader.readAsDataURL(photoFile);
-            } else {
-                sauvegarder(null);
             }
-        }
 
-        // ---- PHOTO PREVIEW ----
-        document.getElementById('clientPhoto').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('photoPreview').src = e.target.result;
+            function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
+
+            function todayStr() { return new Date().toISOString().split('T')[0]; }
+
+            function getCurrentMonth() { return new Date().getMonth() + 1; }
+
+            function getCurrentYear() { return new Date().getFullYear(); }
+
+            function formatDate(d) { if (!d) return 'N/A'; return new Date(d).toLocaleDateString('fr-FR'); }
+
+            function formatDateFull(d) {
+                if (!d) return 'N/A';
+                return new Date(d).toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long',
+                    day: 'numeric' });
+            }
+
+            function formatTime(t) { if (!t) return 'N/A'; return t; }
+
+            function getClientById(id) { return data.clients.find(c => c.id === id); }
+
+            function isClientInConge(clientId, dateStr) {
+                if (!dateStr) dateStr = todayStr();
+                return data.conges.some(c => c.clientId === clientId && dateStr >= c.start && dateStr <= c.end);
+            }
+
+            function getClientStatus(client) {
+                if (!client) return 'inactif';
+                const today = todayStr();
+                if (client.endDate < today) return 'inactif';
+                if (isClientInConge(client.id, today)) return 'conge';
+                return 'actif';
+            }
+
+            function getPaymentStatus(client) {
+                if (!client) return 'unpaid';
+                const paiements = data.paiements.filter(p => p.clientId === client.id).sort((a, b) => new Date(b.date) - new Date(
+                    a.date));
+                if (paiements.length === 0) return 'unpaid';
+                const today = new Date();
+                const lastPayment = new Date(paiements[0].date);
+                const monthDiff = (today.getFullYear() - lastPayment.getFullYear()) * 12 + (today.getMonth() - lastPayment
+                .getMonth());
+                if (monthDiff === 0) return 'paid';
+                if (monthDiff === 1 && today.getDate() <= 10) return 'pending';
+                return 'unpaid';
+            }
+
+            function getRetardMois(client) {
+                if (!client) return 0;
+                const paiements = data.paiements.filter(p => p.clientId === client.id).sort((a, b) => new Date(b.date) - new Date(
+                    a.date));
+                if (paiements.length === 0) {
+                    const today = new Date();
+                    const start = new Date(client.startDate);
+                    return Math.max(0, (today.getFullYear() - start.getFullYear()) * 12 + (today.getMonth() - start
+                    .getMonth()));
+                }
+                const today = new Date();
+                const lastPayment = new Date(paiements[0].date);
+                return Math.max(0, (today.getFullYear() - lastPayment.getFullYear()) * 12 + (today.getMonth() - lastPayment
+                    .getMonth()));
+            }
+
+            function isRenewedForMonth(clientId, mois, annee) {
+                if (!mois) mois = getCurrentMonth();
+                if (!annee) annee = getCurrentYear();
+                return data.renouvellements.some(r => r.clientId === clientId && r.mois === mois && r.annee === annee);
+            }
+
+            function getTotalEncaisse() {
+                const mois = getCurrentMonth(),
+                    annee = getCurrentYear();
+                let total = 0;
+                data.renouvellements.filter(r => r.mois === mois && r.annee === annee).forEach(r => {
+                    const client = getClientById(r.clientId);
+                    if (client) total += client.amount || 0;
+                });
+                return total;
+            }
+
+            function getTotalTheorique() {
+                let total = 0;
+                data.clients.filter(c => getClientStatus(c) === 'actif').forEach(c => total += c.amount || 0);
+                return total;
+            }
+
+            function getTotalAnnee() {
+                const annee = getCurrentYear();
+                let total = 0;
+                data.renouvellements.filter(r => r.annee === annee).forEach(r => {
+                    const client = getClientById(r.clientId);
+                    if (client) total += client.amount || 0;
+                });
+                return total;
+            }
+
+            function getNbImpayes() { return data.clients.filter(c => getPaymentStatus(c) === 'unpaid').length; }
+
+            function getStatusBadge(client) {
+                const status = getClientStatus(client);
+                const map = { 'actif': '<span class="badge-status active">Actif</span>', 'conge': '<span class="badge-status conge">Congé</span>',
+                    'inactif': '<span class="badge-status inactive">Inactif</span>' };
+                return map[status] || map.inactif;
+            }
+
+            function getPaymentBadge(client) {
+                const status = getPaymentStatus(client);
+                const map = { 'paid': '<span class="badge-status paid">Payé</span>', 'unpaid': '<span class="badge-status unpaid">Impayé</span>',
+                    'pending': '<span class="badge-status pending">En attente</span>' };
+                return map[status] || map.pending;
+            }
+
+            function getTripTypeLabel(type) {
+                const map = { 'aller-simple': 'Aller simple', 'aller-retour': 'Aller-Retour',
+                    'retour-simple': 'Retour simple' };
+                return map[type] || type;
+            }
+
+            // ---- PHOTO ----
+            function getPhotoHtml(clientId) {
+                const client = getClientById(clientId);
+                if (client && client.photo) {
+                    return `<img src="${client.photo}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid var(--yt-green);">`;
+                }
+                return `<span style="display:inline-block;width:30px;height:30px;border-radius:50%;background:#f0f0f0;text-align:center;line-height:30px;font-size:14px;border:2px dashed var(--yt-border);">👤</span>`;
+            }
+
+            // ---- QR CODE ----
+            function genererQR(elementId, data) {
+                const container = document.getElementById(elementId);
+                if (!container) return;
+                container.innerHTML = '';
+                if (typeof QRCode !== 'undefined') {
+                    try {
+                        new QRCode(container, {
+                            text: data,
+                            width: 120,
+                            height: 120,
+                            colorDark: '#1a6e3a',
+                            colorLight: '#ffffff',
+                            correctLevel: QRCode.CorrectLevel.H
+                        });
+                        return;
+                    } catch (e) {}
+                }
+                container.innerHTML =
+                    `<div style="font-size:10px;color:#666;word-break:break-all;max-width:200px;padding:8px;background:#f5f5f5;border-radius:4px;">QR: ${data.substring(0, 50)}...</div>`;
+            }
+
+            // ---- CARTE ----
+            function genererNumeroCarte() {
+                data.lastCarteNum = (data.lastCarteNum || 0) + 1;
+                const year = getCurrentYear().toString().slice(-2);
+                const month = String(getCurrentMonth()).padStart(2, '0');
+                const num = String(data.lastCarteNum).padStart(4, '0');
+                return `YT-${year}${month}-${num}`;
+            }
+
+            function genererHashSecurite(clientId, mois, annee) {
+                const dataStr = `${clientId}-${mois}-${annee}-${ADMIN_PASSWORD}`;
+                let hash = 0;
+                for (let i = 0; i < dataStr.length; i++) {
+                    const char = dataStr.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash;
+                }
+                return Math.abs(hash).toString(16).padStart(8, '0').toUpperCase();
+            }
+
+            function genererCarte(clientId) {
+                const client = getClientById(clientId);
+                if (!client) { alert('Client introuvable'); return null; }
+
+                const mois = getCurrentMonth();
+                const annee = getCurrentYear();
+                const moisNom = new Date(annee, mois - 1).toLocaleString('fr-FR', { month: 'long' });
+                const hash = genererHashSecurite(clientId, mois, annee);
+                const numeroCarte = client.numeroCarte || genererNumeroCarte();
+
+                if (!client.numeroCarte) {
+                    client.numeroCarte = numeroCarte;
+                    saveData();
+                }
+
+                const pointages = data.pointages[clientId] || {};
+                const jours = [];
+                const nbJours = new Date(annee, mois, 0).getDate();
+
+                for (let j = 1; j <= nbJours; j++) {
+                    const dateStr = `${annee}-${String(mois).padStart(2, '0')}-${String(j).padStart(2, '0')}`;
+                    const type = pointages[dateStr] || null;
+                    jours.push({
+                        jour: j,
+                        present: type !== null,
+                        type: type,
+                        date: dateStr
+                    });
+                }
+
+                const qrData = JSON.stringify({
+                    clientId: clientId,
+                    nom: client.name,
+                    numero: client.numeroCarte,
+                    hash: hash,
+                    mois: mois,
+                    annee: annee
+                });
+
+                return {
+                    client: client,
+                    numeroCarte: client.numeroCarte,
+                    hash: hash,
+                    mois: mois,
+                    annee: annee,
+                    moisNom: moisNom,
+                    jours: jours,
+                    qrData: qrData
                 };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // ---- CARTES ----
-        function genererCarte() {
-            const clientId = document.getElementById('carteSelect').value;
-            if (!clientId) { alert('Sélectionnez un abonné'); return; }
-
-            const carteData = genererCarteData(clientId);
-            if (!carteData) { alert('Erreur'); return; }
-
-            const html = afficherCarteHtml(carteData);
-            document.getElementById('cartePreview').innerHTML = html;
-
-            setTimeout(() => {
-                genererQR('qrcode', carteData.qrData);
-            }, 100);
-        }
-
-        function imprimerCarte() {
-            const clientId = document.getElementById('carteSelect').value;
-            if (!clientId) { alert('Sélectionnez un abonné'); return; }
-
-            const carteData = genererCarteData(clientId);
-            if (!carteData) { alert('Erreur'); return; }
-
-            const html = afficherCarteHtml(carteData);
-            const win = window.open('', '_blank');
-            win.document.write(`
-                    <html><head><title>Carte abonnement</title>
-                    <style>
-                        body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; }
-                        .carte-abonnement { max-width: 400px; margin: 0 auto; background: white; border-radius: 16px; padding: 18px; border: 2px solid #1a5e3a; }
-                        .header-carte { display: flex; justify-content: space-between; border-bottom: 2px solid #1a5e3a; padding-bottom: 8px; margin-bottom: 10px; }
-                        .header-carte .logo { font-size: 18px; font-weight: 700; color: #1a5e3a; }
-                        .header-carte .mois { font-size: 13px; font-weight: 600; color: #666; }
-                        .info-abonne { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
-                        .info-abonne .nom { font-size: 18px; font-weight: 700; }
-                        .info-abonne .adresse { font-size: 12px; color: #666; }
-                        .info-abonne .numero { font-size: 12px; color: #666; font-family: monospace; }
-                        .qr-container { text-align: center; margin: 8px 0; }
-                        .jours-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; margin-top: 8px; }
-                        .jours-grid .jour { aspect-ratio: 1; border: 1px solid #dce8e2; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: #999; background: #fafbfc; }
-                        .footer-carte { margin-top: 10px; padding-top: 8px; border-top: 1px solid #dce8e2; font-size: 9px; color: #666; text-align: center; }
-                        .security-hash { font-size: 8px; color: #999; font-family: monospace; text-align: center; margin-top: 4px; padding: 4px; background: #f5f5f5; border-radius: 4px; }
-                        .photo { width: 60px; height: 60px; border-radius: 50%; border: 3px solid #1a5e3a; object-fit: cover; }
-                        .photo-placeholder { width: 60px; height: 60px; border-radius: 50%; border: 3px dashed #ccc; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #ccc; background: #fafbfc; }
-                        @media print { body { padding: 10px; } .no-print { display: none; } }
-                    </style>
-                    </head>
-                    <body>
-                        ${html}
-                        <div style="text-align:center;margin-top:10px;">
-                            <button onclick="window.print()" class="no-print" style="padding:10px 30px;background:#1a5e3a;color:white;border:none;border-radius:8px;font-size:16px;cursor:pointer;">🖨️ Imprimer</button>
-                        </div>
-                    </body>
-                    </html>
-                `);
-            win.document.close();
-        }
-
-        // ---- DEPARTS ----
-        function renderPresence() {
-            const actifs = data.clients.filter(c => getClientStatus(c) === 'actif');
-            if (actifs.length === 0) {
-                document.getElementById('presenceList').innerHTML = '<p class="text-muted">Aucun abonné actif</p>';
-                document.getElementById('activeCount').textContent = '0';
-                return;
             }
 
-            actifs.forEach(c => {
-                if (!(c.id in data.presence)) data.presence[c.id] = false;
-            });
+            function afficherCarte(carteData) {
+                if (!carteData) return;
 
-            let html = '';
-            actifs.forEach(c => {
-                const isPresent = data.presence[c.id] === true;
-                const photo = getPhotoHtml(c.id);
-                html += `
-                        <div style="background:white;padding:6px 10px;margin-bottom:4px;border-radius:6px;border:1px solid #dce8e2;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px;">
-                            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                                <input type="checkbox" class="presence-check" data-id="${c.id}" ${isPresent ? 'checked' : ''} ${!isAdmin ? 'disabled' : ''} style="width:16px;height:16px;accent-color:#1a5e3a;">
-                                ${photo}
-                                <span style="font-weight:500;font-size:13px;">${c.name}</span>
-                                <span style="font-size:11px;color:#666;">${formatTime(c.departMatinTime)}</span>
-                                <span style="font-size:11px;color:#666;">${c.departMatinArret || '-'}</span>
-                                <span class="badge-status ${isPresent ? 'paid' : 'inactive'}">${isPresent ? '✅' : '❌'}</span>
+                const { client, numeroCarte, hash, mois, annee, moisNom, jours, qrData } = carteData;
+
+                let joursHtml = '';
+                jours.forEach(j => {
+                    let classe = '';
+                    let label = j.jour;
+                    if (j.present) {
+                        classe = 'present';
+                        if (j.type === 'aller') label = '🟢';
+                        else if (j.type === 'retour') label = '🔵';
+                        else label = '✅';
+                    }
+                    joursHtml += `<div class="jour ${classe}" title="${j.date} ${j.type || ''}">${label}</div>`;
+                });
+
+                const photoHtml = client.photo ?
+                    `<img src="${client.photo}" class="photo">` :
+                    `<div class="photo-placeholder">📷</div>`;
+
+                return `
+                        <div class="carte-abonnement" id="carteAImprimer">
+                            <div class="header-carte">
+                                <div class="logo">🚌 YAOU TRANSPORT</div>
+                                <div class="mois">${moisNom} ${annee}</div>
+                            </div>
+                            <div class="info-abonne">
+                                ${photoHtml}
+                                <div class="details">
+                                    <div class="nom">${client.name}</div>
+                                    <div class="adresse">📍 ${client.adresse || 'Adresse non renseignée'}</div>
+                                    <div class="numero">📞 ${client.phone || 'Non renseigné'}</div>
+                                    <div class="numero" style="margin-top:2px;font-weight:600;color:var(--yt-green-dark);">
+                                        N° ${numeroCarte}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="qr-container">
+                                <div id="qrcode"></div>
+                            </div>
+                            <div class="jours-grid">${joursHtml}</div>
+                            <div class="footer-carte">
+                                ${getTripTypeLabel(client.tripType)} | Départ: ${formatTime(client.departMatinTime)} | Retour: ${formatTime(client.returnSoirTime)}
+                                <br>${client.departMatinArret ? 'Départ: ' + client.departMatinArret : ''} ${client.returnSoirArret ? '| Retour: ' + client.returnSoirArret : ''}
+                            </div>
+                            <div class="security-hash">
+                                🔒 ${hash} • ${numeroCarte}
                             </div>
                         </div>
                     `;
-            });
+            }
 
-            document.getElementById('presenceList').innerHTML = html;
-            document.getElementById('activeCount').textContent = `${actifs.length}`;
+            // ---- POINTAGE ----
+            function pointerParQR(clientId, type = 'aller') {
+                const client = getClientById(clientId);
+                if (!client) return { success: false, message: 'Client introuvable' };
 
-            document.querySelectorAll('.presence-check').forEach(cb => {
-                cb.addEventListener('change', function() {
-                    data.presence[this.dataset.id] = this.checked;
-                    saveData();
+                const today = todayStr();
+                const status = getClientStatus(client);
+                if (status !== 'actif') {
+                    return { success: false, message: `Client ${status === 'conge' ? 'en congé' : 'inactif'}` };
+                }
+
+                if (!data.pointages[clientId]) data.pointages[clientId] = {};
+
+                if (data.pointages[clientId][today]) {
+                    const existing = data.pointages[clientId][today];
+                    if (existing === type) {
+                        return { success: false, message: `${client.name} déjà pointé en ${type}` };
+                    }
+                    if (type === 'retour' && existing === 'aller') {
+                        data.pointages[clientId][today] = 'retour';
+                        saveData();
+                        return { success: true, message: `${client.name} - RETOUR enregistré !` };
+                    }
+                    return { success: false, message: `${client.name} déjà pointé aujourd'hui` };
+                }
+
+                data.pointages[clientId][today] = type;
+                saveData();
+
+                scanHistory.unshift({
+                    clientId: clientId,
+                    nom: client.name,
+                    date: today,
+                    heure: new Date().toLocaleTimeString('fr-FR'),
+                    type: type
+                });
+                if (scanHistory.length > 50) scanHistory.pop();
+
+                return { success: true, message: `${client.name} - ${type === 'aller' ? 'ALLER' : 'RETOUR'} enregistré !` };
+            }
+
+            // ---- EXPORT PDF (TÉLÉCHARGEABLE) ----
+            function exportPdf(elementId, filename) {
+                const element = document.getElementById(elementId);
+                if (!element) { alert('Élément non trouvé'); return; }
+
+                if (typeof html2pdf === 'undefined') {
+                    alert('La bibliothèque html2pdf n\'est pas chargée. Veuillez vérifier votre connexion internet.');
+                    return;
+                }
+
+                const opt = {
+                    margin: 10,
+                    filename: filename || 'document.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                };
+
+                html2pdf()
+                    .set(opt)
+                    .from(element)
+                    .save()
+                    .then(() => {
+                        console.log('✅ PDF téléchargé');
+                    })
+                    .catch((err) => {
+                        console.error('❌ Erreur PDF:', err);
+                        alert('Erreur lors de la génération du PDF. Veuillez réessayer.');
+                    });
+            }
+
+            // ---- EXPORT DEPART PDF ----
+            function exportDepartPdf(dataList, type) {
+                if (dataList.length === 0) { alert('Aucune liste à exporter'); return; }
+
+                const dateStr = formatDateFull(todayStr());
+                const label = type === 'matin' ? 'DÉPART MATIN' : 'RETOUR SOIR';
+                const color = type === 'matin' ? '#d4a017' : '#2c3e50';
+                const bgColor = type === 'matin' ? '#fff8e1' : '#ecf0f1';
+                const arretField = type === 'matin' ? 'departMatinArret' : 'returnSoirArret';
+                const timeField = type === 'matin' ? 'departMatinTime' : 'returnSoirTime';
+
+                const groups = {};
+                dataList.forEach(c => {
+                    const key = c[arretField] || 'Sans arrêt';
+                    if (!groups[key]) groups[key] = [];
+                    groups[key].push(c);
+                });
+
+                let pdfHtml = `
+                        <div id="pdf-depart-content" style="font-family:'Segoe UI',Arial,sans-serif;padding:20px;max-width:1000px;margin:0 auto;">
+                            <div style="text-align:center;border-bottom:3px solid #1a6e3a;padding-bottom:12px;margin-bottom:16px;">
+                                <h1 style="color:#1a6e3a;font-size:24px;">🚌 YAOU TRANSPORT</h1>
+                                <div style="color:#5a6e6e;font-size:14px;font-weight:600;">Liste - ${label}</div>
+                                <div style="color:#5a6e6e;font-size:13px;">${dateStr}</div>
+                            </div>
+                    `;
+
+                const sortedKeys = Object.keys(groups).sort();
+                let totalVoyageurs = 0;
+                sortedKeys.forEach(arret => {
+                    const clients = groups[arret];
+                    clients.sort((a, b) => (a[timeField] || '00:00').localeCompare(b[timeField] || '00:00'));
+                    totalVoyageurs += clients.length;
+                    pdfHtml += `
+                            <div style="margin-bottom:16px;page-break-inside:avoid;">
+                                <div style="background:#eaf5ef;padding:6px 12px;border-radius:6px;font-size:15px;font-weight:600;color:#1a6e3a;border-left:4px solid ${color};">
+                                    📍 ${arret} (${clients.length})
+                                </div>
+                                <div>
+                        `;
+                    clients.forEach(c => {
+                        const time = c[timeField] || '--:--';
+                        const photo = c.photo ?
+                            `<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:4px;">` :
+                            '';
+                        pdfHtml +=
+                            `<span style="display:inline-block;background:#f6faf8;padding:3px 10px;border-radius:20px;font-size:12px;margin:2px 3px 2px 0;border:1px solid ${color};">
+                                    ${photo} ${c.name} <span style="color:#5a6e6e;font-size:10px;">⏰ ${time}</span>
+                                </span>`;
+                    });
+                    pdfHtml += `</div></div>`;
+                });
+
+                pdfHtml += `
+                            <div style="text-align:center;padding:10px;background:${bgColor};border-radius:8px;font-size:15px;font-weight:600;color:${color};">
+                                Total: ${totalVoyageurs} voyageurs
+                            </div>
+                            <div style="text-align:center;font-size:10px;color:#5a6e6e;border-top:1px solid #dce8e2;padding-top:10px;margin-top:14px;">
+                                YT Transport Pro • ${dateStr}
+                            </div>
+                        </div>
+                    `;
+
+                // Créer un conteneur temporaire
+                const container = document.createElement('div');
+                container.innerHTML = pdfHtml;
+                container.style.position = 'fixed';
+                container.style.left = '-9999px';
+                container.style.top = '0';
+                container.style.width = '1000px';
+                container.style.background = '#ffffff';
+                container.style.zIndex = '9999';
+                document.body.appendChild(container);
+
+                const element = container.querySelector('#pdf-depart-content');
+
+                const opt = {
+                    margin: 10,
+                    filename: `liste_${type}_${todayStr()}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                };
+
+                html2pdf()
+                    .set(opt)
+                    .from(element)
+                    .save()
+                    .then(() => {
+                        document.body.removeChild(container);
+                        console.log('✅ PDF téléchargé');
+                    })
+                    .catch((err) => {
+                        document.body.removeChild(container);
+                        console.error('❌ Erreur PDF:', err);
+                        alert('Erreur lors de la génération du PDF. Veuillez réessayer.');
+                    });
+            }
+
+            // ---- EXPORT DEPART EXCEL ----
+            function exportDepartList(dataList, filename, type) {
+                if (dataList.length === 0) { alert('Aucune liste'); return; }
+                let csv = 'Nom,Téléphone,Arrêt,Heure\n';
+                dataList.forEach(c => {
+                    const time = type === 'matin' ? c.departMatinTime : c.returnSoirTime;
+                    const arret = type === 'matin' ? c.departMatinArret : c.returnSoirArret;
+                    csv += `${c.name},${c.phone || ''},${arret || ''},${time || ''}\n`;
+                });
+                downloadFile(csv, `${filename}_${todayStr()}.csv`, 'text/csv');
+            }
+
+            function downloadFile(content, filename, type) {
+                const blob = new Blob([content], { type: type + ';charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+
+            // ---- ONGLETS ----
+            const tabs = document.querySelectorAll('.tab-btn');
+            const contents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    document.getElementById(this.dataset.tab).classList.add('active');
                 });
             });
-        }
 
-        function validateDepart() {
-            if (!isAdmin) { alert('Mode admin requis'); return; }
+            const subTabs = document.querySelectorAll('.sub-tab-btn');
+            const subContents = document.querySelectorAll('.sub-tab-content');
 
-            const selected = data.clients.filter(c => data.presence[c.id] === true);
-            if (selected.length === 0) { alert('Aucun abonné signalé'); return; }
-
-            departValide = selected;
-            renderDepartList();
-            alert(`✅ ${selected.length} voyageur(s) validé(s) !`);
-        }
-
-        function resetPresence() {
-            if (!isAdmin) { alert('Mode admin requis'); return; }
-            if (!confirm('Réinitialiser toutes les présences ?')) return;
-            data.presence = {};
-            departValide = [];
-            saveData();
-            renderAll();
-        }
-
-        function renderDepartList() {
-            if (departValide.length === 0) {
-                document.getElementById('departList').innerHTML = '<p class="text-muted">Aucun départ validé</p>';
-                document.getElementById('departCount').textContent = '0';
-                return;
-            }
-
-            const groups = {};
-            departValide.forEach(c => {
-                const key = c.departMatinArret || 'Sans arrêt';
-                if (!groups[key]) groups[key] = [];
-                groups[key].push(c);
+            subTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    subTabs.forEach(t => t.classList.remove('active'));
+                    subContents.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    document.getElementById(this.dataset.subtab).classList.add('active');
+                });
             });
 
-            let html = `<div style="margin-bottom:8px;">Total: <strong>${departValide.length}</strong> voyageurs</div>`;
-            Object.keys(groups).sort().forEach(arret => {
-                const clients = groups[arret];
-                html += `
-                        <div style="background:#e8f5ed;border-radius:8px;padding:10px 12px;margin-top:6px;border-left:4px solid #1a5e3a;">
-                            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;">
-                                <h4 style="font-size:13px;color:#1a5e3a;">📍 ${arret}</h4>
-                                <span style="font-size:11px;color:#666;">${clients.length} voyageurs</span>
-                            </div>
-                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">
-                                ${clients.map(c => `<span style="background:white;padding:2px 10px;border-radius:20px;font-size:11px;border:1px solid #d4e8dc;">${c.name} <span style="color:#999;font-size:10px;">${formatTime(c.departMatinTime)}</span></span>`).join('')}
-                            </div>
-                        </div>
-                    `;
+            // ---- DOM REFS ----
+            const $ = id => document.getElementById(id);
+
+            // Admin
+            const adminLock = $('adminLock');
+            const adminPasswordInput = $('adminPasswordInput');
+            const unlockBtn = $('unlockBtn');
+            const adminStatus = $('adminStatus');
+            const toggleAdminBtn = $('toggleAdminBtn');
+
+            // Clients
+            const clientName = $('clientName');
+            const clientPhone = $('clientPhone');
+            const clientAdresse = $('clientAdresse');
+            const clientStartDate = $('clientStartDate');
+            const clientEndDate = $('clientEndDate');
+            const clientAmount = $('clientAmount');
+            const paymentStatus = $('paymentStatus');
+            const clientTripType = $('clientTripType');
+            const clientDepartMatinTime = $('clientDepartMatinTime');
+            const clientDepartMatinArret = $('clientDepartMatinArret');
+            const clientReturnSoirTime = $('clientReturnSoirTime');
+            const clientReturnSoirArret = $('clientReturnSoirArret');
+            const clientPhoto = $('clientPhoto');
+            const photoPreview = $('photoPreview');
+            const addClientBtn = $('addClientBtn');
+            const clientTableBody = $('clientTableBody');
+            const addClientCard = $('addClientCard');
+
+            const filterPayment = $('filterPayment');
+            const filterStatus = $('filterStatus');
+            const clearFiltersBtn = $('clearFiltersBtn');
+
+            const congeClientSelect = $('congeClientSelect');
+            const congeStart = $('congeStart');
+            const congeEnd = $('congeEnd');
+            const addCongeBtn = $('addCongeBtn');
+            const congeList = $('congeList');
+
+            // Stats
+            const nbClients = $('nbClients');
+            const nbActifs = $('nbActifs');
+            const nbConges = $('nbConges');
+            const nbImpayes = $('nbImpayes');
+            const totalMois = $('totalMois');
+            const nbRenouveler = $('nbRenouveler');
+            const renewMonthDisplay = $('renewMonthDisplay');
+            const renewSummary = $('renewSummary');
+            const renewSelectList = $('renewSelectList');
+            const renewSelectedBtn = $('renewSelectedBtn');
+            const renewAllBtn = $('renewAllBtn');
+            const refreshRenewBtn = $('refreshRenewBtn');
+
+            // Cartes
+            const carteClientSelect = $('carteClientSelect');
+            const genererCarteBtn = $('genererCarteBtn');
+            const imprimerCarteBtn = $('imprimerCarteBtn');
+            const cartePreview = $('cartePreview');
+            const carteModal = $('carteModal');
+            const carteModalContent = $('carteModalContent');
+            const imprimerCarteModalBtn = $('imprimerCarteModalBtn');
+            const closeCarteModalBtn = $('closeCarteModalBtn');
+            const pointageHistory = $('pointageHistory');
+
+            // Scanner
+            const startScanBtn = $('startScanBtn');
+            const stopScanBtn = $('stopScanBtn');
+            const scannerPlaceholder = $('scannerPlaceholder');
+            const video = $('video');
+            const scanResult = $('scanResult');
+            const scanHistoryEl = $('scanHistory');
+
+            // Départs MATIN
+            const presenceListMatin = $('presenceListMatin');
+            const selectAllMatin = $('selectAllMatin');
+            const validateMatinBtn = $('validateMatinBtn');
+            const resetMatinBtn = $('resetMatinBtn');
+            const exportMatinBtn = $('exportMatinBtn');
+            const exportMatinPdfBtn = $('exportMatinPdfBtn');
+            const exportMatinPdfListBtn = $('exportMatinPdfListBtn');
+            const departMatinListContent = $('departMatinListContent');
+            const departMatinCount = $('departMatinCount');
+            const activeCountMatin = $('activeCountMatin');
+
+            // Départs SOIR
+            const presenceListSoir = $('presenceListSoir');
+            const selectAllSoir = $('selectAllSoir');
+            const validateSoirBtn = $('validateSoirBtn');
+            const resetSoirBtn = $('resetSoirBtn');
+            const exportSoirBtn = $('exportSoirBtn');
+            const exportSoirPdfBtn = $('exportSoirPdfBtn');
+            const exportSoirPdfListBtn = $('exportSoirPdfListBtn');
+            const departSoirListContent = $('departSoirListContent');
+            const departSoirCount = $('departSoirCount');
+            const activeCountSoir = $('activeCountSoir');
+            const departDateDisplay = $('departDateDisplay');
+
+            const alertsContainer = $('alertsContainer');
+
+            const exportBtn = $('exportBtn');
+            const importBtn = $('importBtn');
+            const fileInput = $('fileInput');
+            const exportExcelBtn = $('exportExcelBtn');
+            const exportReportBtn = $('exportReportBtn');
+            const reportContent = $('reportContent');
+
+            // GPS
+            const startTrackingBtn = $('startTrackingBtn');
+            const stopTrackingBtn = $('stopTrackingBtn');
+            const gpsCoords = $('gpsCoords');
+            const gpsStatus = $('gpsStatus');
+            const gpsDot = $('gpsDot');
+            const whatsappShareBtn = $('whatsappShareBtn');
+            const arretInput = $('arretInput');
+            const addArretBtn = $('addArretBtn');
+            const arretList = $('arretList');
+
+            // MODAL EDITION
+            const editModal = $('editModal');
+            const editClientId = $('editClientId');
+            const editName = $('editName');
+            const editPhone = $('editPhone');
+            const editAdresse = $('editAdresse');
+            const editStartDate = $('editStartDate');
+            const editEndDate = $('editEndDate');
+            const editAmount = $('editAmount');
+            const editPaymentStatus = $('editPaymentStatus');
+            const editTripType = $('editTripType');
+            const editDepartMatinTime = $('editDepartMatinTime');
+            const editDepartMatinArret = $('editDepartMatinArret');
+            const editReturnSoirTime = $('editReturnSoirTime');
+            const editReturnSoirArret = $('editReturnSoirArret');
+            const editPhoto = $('editPhoto');
+            const editPhotoPreview = $('editPhotoPreview');
+            const saveEditBtn = $('saveEditBtn');
+            const closeEditBtn = $('closeEditBtn');
+
+            // ---- PHOTO PREVIEW ----
+            clientPhoto.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        photoPreview.src = ev.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
             });
 
-            document.getElementById('departList').innerHTML = html;
-            document.getElementById('departCount').textContent = `${departValide.length}`;
-        }
+            editPhoto.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        editPhotoPreview.src = ev.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
 
-        // ---- RENDU CLIENTS ----
-        function renderClients() {
-            if (data.clients.length === 0) {
-                document.getElementById('clientTable').innerHTML =
-                    '<tr><td colspan="8" class="text-center text-muted">Aucun abonné</td></tr>';
-                return;
+            // ---- RENDU STATS ----
+            function renderStats() {
+                const total = data.clients.length;
+                const actifs = data.clients.filter(c => getClientStatus(c) === 'actif').length;
+                const conges = data.clients.filter(c => getClientStatus(c) === 'conge').length;
+                const impayes = getNbImpayes();
+                const encaisse = getTotalEncaisse();
+                const aRenouveler = data.clients.filter(c => getClientStatus(c) === 'actif' && !isRenewedForMonth(c.id))
+                .length;
+
+                nbClients.textContent = total;
+                nbActifs.textContent = actifs;
+                nbConges.textContent = conges;
+                nbImpayes.textContent = impayes;
+                totalMois.textContent = encaisse.toLocaleString() + ' CFA';
+                nbRenouveler.textContent = aRenouveler;
+                renewMonthDisplay.textContent = `${getCurrentMonth()}/${getCurrentYear()}`;
             }
 
-            let html = '';
-            data.clients.forEach(c => {
-                const photo = getPhotoHtml(c.id);
-                html += `
-                        <tr>
+            // ---- RENDU ALERTES ----
+            function renderAlerts() {
+                let html = '';
+                const impayes = data.clients.filter(c => getPaymentStatus(c) === 'unpaid');
+                if (impayes.length > 0) {
+                    html +=
+                        `<div class="alert alert-danger"><span><strong>⚠️ ${impayes.length} impayé(s)</strong></span><span style="font-size:10px;">${impayes.map(c => c.name).join(', ')}</span></div>`;
+                }
+                const aRenouveler = data.clients.filter(c => getClientStatus(c) === 'actif' && !isRenewedForMonth(c.id));
+                if (aRenouveler.length > 0) {
+                    html +=
+                        `<div class="alert alert-warning"><span><strong>🔄 ${aRenouveler.length} à renouveler</strong></span></div>`;
+                }
+                const conges = data.clients.filter(c => getClientStatus(c) === 'conge');
+                if (conges.length > 0) {
+                    html += `<div class="alert alert-info"><span><strong>🏖️ ${conges.length} en congé</strong></span></div>`;
+                }
+                const encaisse = getTotalEncaisse();
+                const theorique = getTotalTheorique();
+                const ecart = theorique - encaisse;
+                html +=
+                    `<div class="alert alert-success"><span><strong>💰 Encaissé: ${encaisse.toLocaleString()} CFA</strong> | Écart: ${ecart > 0 ? '⚠️ ' + ecart.toLocaleString() + ' CFA' : '✅'}</span></div>`;
+                alertsContainer.innerHTML = html;
+            }
+
+            // ---- RENDU RENOUVELLEMENT ----
+            function renderRenewSelect() {
+                const actifs = data.clients.filter(c => getClientStatus(c) === 'actif');
+                const aRenouveler = actifs.filter(c => !isRenewedForMonth(c.id));
+                const renouveles = actifs.filter(c => isRenewedForMonth(c.id));
+
+                let html = '';
+                if (aRenouveler.length === 0 && renouveles.length === 0) {
+                    html = '<p class="text-muted">Aucun abonné actif</p>';
+                } else {
+                    if (aRenouveler.length > 0) {
+                        html +=
+                            `<div style="font-weight:600;color:var(--yt-warning);margin-bottom:3px;">⏳ À renouveler (${aRenouveler.length})</div>`;
+                        aRenouveler.forEach(c => {
+                            html +=
+                                `<div class="renew-item"><div class="info"><input type="checkbox" class="renew-check" data-id="${c.id}" checked><span class="font-bold">${c.name}</span><span class="client-tag">${c.amount || 0} CFA</span></div></div>`;
+                        });
+                    }
+                    if (renouveles.length > 0) {
+                        html +=
+                            `<div style="font-weight:600;color:var(--yt-success);margin-top:6px;">✅ Renouvelés (${renouveles.length})</div>`;
+                        renouveles.forEach(c => {
+                            html +=
+                                `<div class="renew-item" style="opacity:0.7;"><div class="info"><span class="font-bold">${c.name}</span><span class="badge-status renewed">✅</span></div></div>`;
+                        });
+                    }
+                }
+                renewSelectList.innerHTML = html;
+
+                let summaryHtml = '';
+                if (aRenouveler.length === 0 && renouveles.length === 0) {
+                    summaryHtml = '<p class="text-muted">Aucun abonné actif</p>';
+                } else {
+                    summaryHtml =
+                        `<div style="display:flex;gap:8px;flex-wrap:wrap;"><span class="badge badge-success">✅ ${renouveles.length}</span><span class="badge badge-warning">⏳ ${aRenouveler.length}</span></div>`;
+                }
+                renewSummary.innerHTML = summaryHtml;
+            }
+
+            // ---- RENOUVELER ----
+            renewSelectedBtn.addEventListener('click', function() {
+                if (!isAdmin) { alert('Mode admin requis'); return; }
+                const checks = renewSelectList.querySelectorAll('.renew-check:checked');
+                if (checks.length === 0) { alert('Sélectionnez'); return; }
+                const mois = getCurrentMonth(),
+                    annee = getCurrentYear();
+                let count = 0;
+                checks.forEach(cb => {
+                    const clientId = cb.dataset.id;
+                    const client = getClientById(clientId);
+                    if (client && !isRenewedForMonth(clientId)) {
+                        data.renouvellements.push({ clientId, dateRenouvellement: todayStr(), mois, annee,
+                            montant: client.amount || 0 });
+                        data.paiements.push({ clientId, date: todayStr(), montant: client.amount || 0,
+                            type: 'abonnement' });
+                        count++;
+                    }
+                });
+                saveData();
+                alert(`${count} renouvelé(s) !`);
+            });
+
+            renewAllBtn.addEventListener('click', function() {
+                if (!isAdmin) { alert('Mode admin requis'); return; }
+                const aRenouveler = data.clients.filter(c => getClientStatus(c) === 'actif' && !isRenewedForMonth(c.id));
+                if (aRenouveler.length === 0) { alert('Tous renouvelés'); return; }
+                if (!confirm(`Renouveler ${aRenouveler.length} ?`)) return;
+                const mois = getCurrentMonth(),
+                    annee = getCurrentYear();
+                aRenouveler.forEach(c => {
+                    data.renouvellements.push({ clientId: c.id, dateRenouvellement: todayStr(), mois, annee,
+                        montant: c.amount || 0 });
+                    data.paiements.push({ clientId: c.id, date: todayStr(), montant: c.amount || 0,
+                        type: 'abonnement' });
+                });
+                saveData();
+                alert(`${aRenouveler.length} renouvelé(s) !`);
+            });
+
+            refreshRenewBtn.addEventListener('click', renderAll);
+
+            // ---- PRESENCE MATIN ----
+            function renderPresenceMatin() {
+                const actifs = data.clients.filter(c => {
+                    if (getClientStatus(c) !== 'actif') return false;
+                    if (!c.departMatinTime) return false;
+                    return parseInt(c.departMatinTime.split(':')[0]) < 12;
+                });
+                if (actifs.length === 0) {
+                    presenceListMatin.innerHTML = '<p class="text-muted">Aucun</p>';
+                    activeCountMatin.textContent = '0';
+                    return;
+                }
+                actifs.forEach(c => { if (!(c.id in data.presenceMatin)) data.presenceMatin[c.id] = false; });
+                actifs.sort((a, b) => (a.departMatinTime || '00:00').localeCompare(b.departMatinTime || '00:00'));
+
+                let html = '';
+                actifs.forEach(c => {
+                    const isPresent = data.presenceMatin[c.id] === true;
+                    const photo = getPhotoHtml(c.id);
+                    html += `<div class="depart-group">
+                            <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+                                <input type="checkbox" class="presence-check matin-check" data-id="${c.id}" ${isPresent ? 'checked' : ''} ${!isAdmin ? 'disabled' : ''}>
+                                ${photo}
+                                <span style="font-weight:500;font-size:11px;">${c.name}</span>
+                                <span class="client-tag" style="border-color:#d4a017;">🌅 ${formatTime(c.departMatinTime)}</span>
+                                <span class="client-tag">${c.departMatinArret || '-'}</span>
+                                <span class="badge-status ${isPresent ? 'present' : 'absent'}">${isPresent ? '✅' : '❌'}</span>
+                            </div>
+                        </div>`;
+                });
+                presenceListMatin.innerHTML = html;
+                activeCountMatin.textContent = `${actifs.length}`;
+
+                const checks = presenceListMatin.querySelectorAll('.matin-check');
+                const checked = presenceListMatin.querySelectorAll('.matin-check:checked');
+                selectAllMatin.checked = checks.length > 0 && checks.length === checked.length;
+
+                presenceListMatin.querySelectorAll('.matin-check').forEach(cb => {
+                    cb.addEventListener('change', function() {
+                        data.presenceMatin[this.dataset.id] = this.checked;
+                        saveData();
+                    });
+                });
+                selectAllMatin.onchange = function() {
+                    presenceListMatin.querySelectorAll('.matin-check').forEach(cb => {
+                        if (!cb.disabled) { cb.checked = this.checked;
+                            data.presenceMatin[cb.dataset.id] = this.checked; }
+                    });
+                    saveData();
+                };
+            }
+
+            // ---- PRESENCE SOIR ----
+            function renderPresenceSoir() {
+                const actifs = data.clients.filter(c => {
+                    if (getClientStatus(c) !== 'actif') return false;
+                    if (!c.returnSoirTime) return false;
+                    return parseInt(c.returnSoirTime.split(':')[0]) >= 12;
+                });
+                if (actifs.length === 0) {
+                    presenceListSoir.innerHTML = '<p class="text-muted">Aucun</p>';
+                    activeCountSoir.textContent = '0';
+                    return;
+                }
+                actifs.forEach(c => { if (!(c.id in data.presenceSoir)) data.presenceSoir[c.id] = false; });
+                actifs.sort((a, b) => (a.returnSoirTime || '00:00').localeCompare(b.returnSoirTime || '00:00'));
+
+                let html = '';
+                actifs.forEach(c => {
+                    const isPresent = data.presenceSoir[c.id] === true;
+                    const photo = getPhotoHtml(c.id);
+                    html += `<div class="depart-group">
+                            <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+                                <input type="checkbox" class="presence-check soir-check" data-id="${c.id}" ${isPresent ? 'checked' : ''} ${!isAdmin ? 'disabled' : ''}>
+                                ${photo}
+                                <span style="font-weight:500;font-size:11px;">${c.name}</span>
+                                <span class="client-tag" style="border-color:#2c3e50;background:#ecf0f1;">🌙 ${formatTime(c.returnSoirTime)}</span>
+                                <span class="client-tag">${c.returnSoirArret || '-'}</span>
+                                <span class="badge-status ${isPresent ? 'present' : 'absent'}">${isPresent ? '✅' : '❌'}</span>
+                            </div>
+                        </div>`;
+                });
+                presenceListSoir.innerHTML = html;
+                activeCountSoir.textContent = `${actifs.length}`;
+
+                const checks = presenceListSoir.querySelectorAll('.soir-check');
+                const checked = presenceListSoir.querySelectorAll('.soir-check:checked');
+                selectAllSoir.checked = checks.length > 0 && checks.length === checked.length;
+
+                presenceListSoir.querySelectorAll('.soir-check').forEach(cb => {
+                    cb.addEventListener('change', function() {
+                        data.presenceSoir[this.dataset.id] = this.checked;
+                        saveData();
+                    });
+                });
+                selectAllSoir.onchange = function() {
+                    presenceListSoir.querySelectorAll('.soir-check').forEach(cb => {
+                        if (!cb.disabled) { cb.checked = this.checked;
+                            data.presenceSoir[cb.dataset.id] = this.checked; }
+                    });
+                    saveData();
+                };
+            }
+
+            // ---- VALIDER DEPARTS ----
+            validateMatinBtn.addEventListener('click', function() {
+                if (!isAdmin) { alert('Mode admin requis'); return; }
+                const selected = data.clients.filter(c => data.presenceMatin[c.id] === true);
+                if (selected.length === 0) { alert('Aucun signalé'); return; }
+                departMatinValide = selected;
+                const mois = getCurrentMonth(),
+                    annee = getCurrentYear();
+                selected.forEach(c => {
+                    if (!isRenewedForMonth(c.id)) {
+                        data.renouvellements.push({ clientId: c.id, dateRenouvellement: todayStr(), mois, annee,
+                            montant: c.amount || 0, type: 'depart_matin' });
+                    }
+                });
+                saveData();
+                renderDepartMatinValide();
+            });
+
+            validateSoirBtn.addEventListener('click', function() {
+                if (!isAdmin) { alert('Mode admin requis'); return; }
+                const selected = data.clients.filter(c => data.presenceSoir[c.id] === true);
+                if (selected.length === 0) { alert('Aucun signalé'); return; }
+                departSoirValide = selected;
+                const mois = getCurrentMonth(),
+                    annee = getCurrentYear();
+                selected.forEach(c => {
+                    if (!isRenewedForMonth(c.id)) {
+                        data.renouvellements.push({ clientId: c.id, dateRenouvellement: todayStr(), mois, annee,
+                            montant: c.amount || 0, type: 'depart_soir' });
+                    }
+                });
+                saveData();
+                renderDepartSoirValide();
+            });
+
+            // ---- RENDU DEPART VALIDE ----
+            function renderDepartMatinValide() {
+                if (departMatinValide.length === 0) {
+                    departMatinListContent.innerHTML = '<p class="text-muted">Aucun</p>';
+                    departMatinCount.textContent = '0';
+                    return;
+                }
+                const groups = {};
+                departMatinValide.forEach(c => {
+                    const key = c.departMatinArret || 'Sans arrêt';
+                    if (!groups[key]) groups[key] = [];
+                    groups[key].push(c);
+                });
+                let html =
+                    `<div style="margin-bottom:6px;">Total: <strong style="color:#d4a017;">${departMatinValide.length}</strong></div>`;
+                Object.keys(groups).sort().forEach(arret => {
+                    const clients = groups[arret];
+                    clients.sort((a, b) => (a.departMatinTime || '00:00').localeCompare(b.departMatinTime || '00:00'));
+                    html +=
+                        `<div class="depart-section" style="border-left-color:#d4a017;"><div class="header"><h3 style="color:#d4a017;">📍 ${arret}</h3><span class="count">${clients.length}</span></div><div>`;
+                    clients.forEach(c => {
+                        const photo = getPhotoHtml(c.id);
+                        html +=
+                            `<span class="client-tag" style="border-color:#d4a017;background:#fff8e1;">${photo} ${c.name} <span class="time">🌅 ${formatTime(c.departMatinTime)}</span></span>`;
+                    });
+                    html += `</div></div>`;
+                });
+                departMatinListContent.innerHTML = html;
+                departMatinCount.textContent = `${departMatinValide.length}`;
+            }
+
+            function renderDepartSoirValide() {
+                if (departSoirValide.length === 0) {
+                    departSoirListContent.innerHTML = '<p class="text-muted">Aucun</p>';
+                    departSoirCount.textContent = '0';
+                    return;
+                }
+                const groups = {};
+                departSoirValide.forEach(c => {
+                    const key = c.returnSoirArret || 'Sans arrêt';
+                    if (!groups[key]) groups[key] = [];
+                    groups[key].push(c);
+                });
+                let html =
+                    `<div style="margin-bottom:6px;">Total: <strong style="color:#2c3e50;">${departSoirValide.length}</strong></div>`;
+                Object.keys(groups).sort().forEach(arret => {
+                    const clients = groups[arret];
+                    clients.sort((a, b) => (a.returnSoirTime || '00:00').localeCompare(b.returnSoirTime || '00:00'));
+                    html +=
+                        `<div class="depart-section" style="border-left-color:#2c3e50;"><div class="header"><h3 style="color:#2c3e50;">📍 ${arret}</h3><span class="count">${clients.length}</span></div><div>`;
+                    clients.forEach(c => {
+                        const photo = getPhotoHtml(c.id);
+                        html +=
+                            `<span class="client-tag" style="border-color:#2c3e50;background:#ecf0f1;">${photo} ${c.name} <span class="time">🌙 ${formatTime(c.returnSoirTime)}</span></span>`;
+                    });
+                    html += `</div></div>`;
+                });
+                departSoirListContent.innerHTML = html;
+                departSoirCount.textContent = `${departSoirValide.length}`;
+            }
+
+            // ---- RESET ----
+            resetMatinBtn.addEventListener('click', function() {
+                if (!isAdmin) { alert('Mode admin requis'); return; }
+                if (!confirm('Réinitialiser ?')) return;
+                data.presenceMatin = {};
+                departMatinValide = [];
+                saveData();
+            });
+
+            resetSoirBtn.addEventListener('click', function() {
+                if (!isAdmin) { alert('Mode admin requis'); return; }
+                if (!confirm('Réinitialiser ?')) return;
+                data.presenceSoir = {};
+                departSoirValide = [];
+                saveData();
+            });
+
+            // ---- EXPORT PDF/EXCEL DEPART ----
+            exportMatinPdfBtn.addEventListener('click', function() {
+                exportDepartPdf(departMatinValide, 'matin');
+            });
+            exportMatinPdfListBtn.addEventListener('click', function() {
+                exportDepartPdf(departMatinValide, 'matin');
+            });
+            exportSoirPdfBtn.addEventListener('click', function() {
+                exportDepartPdf(departSoirValide, 'soir');
+            });
+            exportSoirPdfListBtn.addEventListener('click', function() {
+                exportDepartPdf(departSoirValide, 'soir');
+            });
+
+            exportMatinBtn.addEventListener('click', function() {
+                exportDepartList(departMatinValide, 'depart_matin', 'matin');
+            });
+            exportSoirBtn.addEventListener('click', function() {
+                exportDepartList(departSoirValide, 'depart_soir', 'soir');
+            });
+
+            // ---- RENDU CLIENTS ----
+            function renderClients() {
+                let filtered = [...data.clients];
+                if (filterPayment.value) filtered = filtered.filter(c => getPaymentStatus(c) === filterPayment.value);
+                if (filterStatus.value) filtered = filtered.filter(c => getClientStatus(c) === filterStatus.value);
+
+                if (filtered.length === 0) {
+                    clientTableBody.innerHTML =
+                        '<tr><td colspan="10" style="text-align:center;color:var(--yt-text-muted);">Aucun</td></tr>';
+                    return;
+                }
+                let html = '';
+                filtered.forEach(c => {
+                    const canEdit = isAdmin;
+                    const photo = getPhotoHtml(c.id);
+                    html += `<tr>
                             <td>${photo}</td>
                             <td><strong>${c.name}</strong></td>
                             <td>${c.phone || '-'}</td>
-                            <td><span style="font-size:10px;font-family:monospace;">${c.numeroCarte || '-'}</span></td>
+                            <td><span style="font-size:8px;font-family:monospace;">${c.numeroCarte || '-'}</span></td>
+                            <td>${formatDate(c.startDate)}</td>
+                            <td>${formatDate(c.endDate)}</td>
                             <td>${c.amount ? c.amount + ' CFA' : '-'}</td>
                             <td>${getPaymentBadge(c)}</td>
                             <td>${getStatusBadge(c)}</td>
-                            <td>${isAdmin ? `<button class="btn btn-danger btn-sm" onclick="deleteClient('${c.id}')">🗑️</button>` : '--'}</td>
-                        </tr>
-                    `;
-            });
-            document.getElementById('clientTable').innerHTML = html;
+                            <td>${canEdit ? `<button class="btn btn-primary btn-sm" onclick="window.openEditModal('${c.id}')">✏️</button> <button class="btn btn-danger btn-sm" onclick="window.deleteClient('${c.id}')">🗑️</button>` : '--'}</td>
+                        </tr>`;
+                });
+                clientTableBody.innerHTML = html;
 
-            // Mettre à jour le select des cartes
-            const select = document.getElementById('carteSelect');
-            const currentVal = select.value;
-            select.innerHTML = '<option value="">-- Choisir --</option>';
-            data.clients.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c.id;
-                opt.textContent = `${c.name} - ${c.numeroCarte || 'Sans carte'}`;
-                select.appendChild(opt);
-            });
-            if (currentVal && getClientById(currentVal)) select.value = currentVal;
-        }
+                // Mettre à jour les selects
+                const select = carteClientSelect;
+                const currentVal = select.value;
+                select.innerHTML = '<option value="">-- Choisir --</option>';
+                data.clients.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = `${c.name} - ${c.numeroCarte || 'Sans carte'}`;
+                    select.appendChild(opt);
+                });
+                if (currentVal && getClientById(currentVal)) select.value = currentVal;
 
-        // ---- SUPPRESSION ----
-        function deleteClient(id) {
-            if (!isAdmin) { alert('Mode admin requis'); return; }
-            if (!confirm('Supprimer cet abonné ?')) return;
-            data.clients = data.clients.filter(c => c.id !== id);
-            data.paiements = data.paiements.filter(p => p.clientId !== id);
-            delete data.presence[id];
-            saveData();
-        }
-
-        // ---- RAPPORT ----
-        function generateReport() {
-            const total = data.clients.length;
-            const actifs = data.clients.filter(c => getClientStatus(c) === 'actif').length;
-            const inactifs = data.clients.filter(c => getClientStatus(c) === 'inactif').length;
-            const impayes = data.clients.filter(c => getPaymentStatus(c) === 'unpaid').length;
-            const encaisse = getTotalEncaisse();
-
-            let html = `
-                    <div style="background:#e8f5ed;border-radius:8px;padding:14px;border:1px solid #d4e8dc;">
-                        <div style="font-weight:600;color:#1a5e3a;margin-bottom:8px;">📊 Résumé</div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:13px;">
-                            <div><span style="color:#666;">Total:</span> <strong>${total}</strong></div>
-                            <div><span style="color:#666;">Actifs:</span> <strong>${actifs}</strong></div>
-                            <div><span style="color:#666;">Inactifs:</span> <strong>${inactifs}</strong></div>
-                            <div><span style="color:#666;">Impayés:</span> <strong style="color:#c0392b;">${impayes}</strong></div>
-                            <div><span style="color:#666;">Total encaissé:</span> <strong style="color:#1a7e3a;">${encaisse.toLocaleString()} CFA</strong></div>
-                        </div>
-                    </div>
-                `;
-
-            // Liste des impayés
-            const listImpayes = data.clients.filter(c => getPaymentStatus(c) === 'unpaid');
-            if (listImpayes.length > 0) {
-                html += `
-                        <div style="background:#f8d7da;border-radius:8px;padding:14px;margin-top:8px;border:1px solid #f5c6cb;">
-                            <div style="font-weight:600;color:#c0392b;margin-bottom:6px;">🔴 Abonnés en impayé</div>
-                            ${listImpayes.map(c => `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #f5c6cb;font-size:13px;"><span>${c.name}</span><strong style="color:#c0392b;">${c.amount || 0} CFA</strong></div>`).join('')}
-                        </div>
-                    `;
+                const cSelect = congeClientSelect;
+                const cVal = cSelect.value;
+                cSelect.innerHTML = '<option value="">-- Choisir --</option>';
+                data.clients.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = c.name;
+                    cSelect.appendChild(opt);
+                });
+                if (cVal && getClientById(cVal)) cSelect.value = cVal;
             }
 
-            document.getElementById('reportContent').innerHTML = html;
-        }
-
-        // ---- RENDU STATS ----
-        function renderStats() {
-            const total = data.clients.length;
-            const actifs = data.clients.filter(c => getClientStatus(c) === 'actif').length;
-            const impayes = data.clients.filter(c => getPaymentStatus(c) === 'unpaid').length;
-            const encaisse = getTotalEncaisse();
-
-            document.getElementById('nbClients').textContent = total;
-            document.getElementById('nbActifs').textContent = actifs;
-            document.getElementById('nbImpayes').textContent = impayes;
-            document.getElementById('totalMois').textContent = encaisse.toLocaleString() + ' CFA';
-        }
-
-        // ---- ALERTES ----
-        function renderAlerts() {
-            let html = '';
-            const impayes = data.clients.filter(c => getPaymentStatus(c) === 'unpaid');
-            if (impayes.length > 0) {
-                html += `<div class="alert alert-danger" style="background:#f8d7da;padding:8px 12px;border-radius:8px;margin-bottom:6px;border:1px solid #f5c6cb;color:#721c24;">
-                        <span><strong>⚠️ ${impayes.length} abonné(s) en impayé</strong></span>
-                        <span style="font-size:11px;">${impayes.map(c => c.name).join(', ')}</span>
-                    </div>`;
-            }
-            document.getElementById('alerts').innerHTML = html;
-        }
-
-        // ---- EXPORT/IMPORT ----
-        function exportData() {
-            const exportData = { ...data, exportDate: new Date().toISOString() };
-            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `yt_sauvegarde_${todayStr()}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const imported = JSON.parse(e.target.result);
-                    if (imported.clients) {
-                        if (confirm('Remplacer toutes les données ?')) {
-                            data = imported;
-                            if (!data.paiements) data.paiements = [];
-                            if (!data.presence) data.presence = {};
-                            if (!data.lastCarteNum) data.lastCarteNum = 0;
-                            saveData();
-                            alert('✅ Import réussi');
-                        }
-                    } else {
-                        alert('❌ Fichier invalide');
-                    }
-                } catch (err) {
-                    alert('❌ Erreur lecture');
+            // ---- SUPPRESSION ----
+            window.deleteClient = function(id) {
+                if (!isAdmin) { alert('Mode admin requis'); return; }
+                if (confirm('Supprimer ?')) {
+                    data.clients = data.clients.filter(c => c.id !== id);
+                    data.conges = data.conges.filter(c => c.clientId !== id);
+                    data.paiements = data.paiements.filter(p => p.clientId !== id);
+                    data.renouvellements = data.renouvellements.filter(r => r.clientId !== id);
+                    delete data.presenceMatin[id];
+                    delete data.presenceSoir[id];
+                    delete data.pointages[id];
+                    saveData();
                 }
             };
-            reader.readAsText(file);
-            event.target.value = '';
-        }
 
-        // ---- RENDU GLOBAL ----
-        function renderAll() {
-            renderStats();
-            renderAlerts();
-            renderClients();
-            renderPresence();
-            renderDepartList();
-            generateReport();
-            updateAdminUI();
+            // ---- MODAL EDITION ----
+            window.openEditModal = function(id) {
+                if (!isAdmin) { alert('Mode admin requis'); return; }
+                const client = getClientById(id);
+                if (!client) return;
+                editClientId.value = id;
+                editName.value = client.name || '';
+                editPhone.value = client.phone || '';
+                editAdresse.value = client.adresse || '';
+                editStartDate.value = client.startDate || '';
+                editEndDate.value = client.endDate || '';
+                editAmount.value = client.amount || '';
+                editPaymentStatus.value = getPaymentStatus(client);
+                editTripType.value = client.tripType || 'aller-retour';
+                editDepartMatinTime.value = client.departMatinTime || '';
+                editDepartMatinArret.value = client.departMatinArret || '';
+                editReturnSoirTime.value = client.returnSoirTime || '';
+                editReturnSoirArret.value = client.returnSoirArret || '';
+                if (client.photo) {
+                    editPhotoPreview.src = client.photo;
+                } else {
+                    editPhotoPreview.src = '';
+                }
+                editModal.classList.add('show');
+            };
 
-            // Si une carte est affichée, la régénérer
-            const select = document.getElementById('carteSelect');
-            if (select.value) {
-                genererCarte();
+            closeEditBtn.addEventListener('click', () => editModal.classList.remove('show'));
+            editModal.addEventListener('click', e => { if (e.target === this) editModal.classList.remove('show'); });
+
+            saveEditBtn.addEventListener('click', function() {
+                if (!isAdmin) { alert('Mode admin requis'); return; }
+                const id = editClientId.value;
+                const client = getClientById(id);
+                if (!client) return;
+
+                const name = editName.value.trim();
+                const phone = editPhone.value.trim();
+                const adresse = editAdresse.value.trim();
+                const startDate = editStartDate.value;
+                const endDate = editEndDate.value;
+                const amount = editAmount.value ? parseInt(editAmount.value) : null;
+                const payStatus = editPaymentStatus.value;
+                const tripType = editTripType.value;
+                const departMatinTime = editDepartMatinTime.value;
+                const departMatinArret = editDepartMatinArret.value.trim();
+                const returnSoirTime = editReturnSoirTime.value;
+                const returnSoirArret = editReturnSoirArret.value.trim();
+
+                if (!name) { alert('Nom requis'); return; }
+                if (!startDate) { alert('Début requis'); return; }
+                if (!endDate) { alert('Fin requise'); return; }
+                if (startDate > endDate) { alert('Début avant fin'); return; }
+                if (!amount) { alert('Montant requis'); return; }
+
+                const photoFile = editPhoto.files[0];
+                const sauvegarder = function(photoData) {
+                    client.name = name;
+                    client.phone = phone;
+                    client.adresse = adresse;
+                    client.startDate = startDate;
+                    client.endDate = endDate;
+                    client.amount = amount;
+                    client.tripType = tripType;
+                    client.departMatinTime = departMatinTime;
+                    client.departMatinArret = departMatinArret;
+                    client.returnSoirTime = returnSoirTime;
+                    client.returnSoirArret = returnSoirArret;
+                    if (photoData) client.photo = photoData;
+
+                    if (payStatus === 'paid') {
+                        const existing = data.paiements.filter(p => p.clientId === id);
+                        if (existing.length === 0 || getPaymentStatus(client) !== 'paid') {
+                            data.paiements.push({ clientId: id, date: todayStr(), montant: amount,
+                                type: 'abonnement' });
+                        }
+                    }
+                    saveData();
+                    editModal.classList.remove('show');
+                    alert('✅ Modifié !');
+                };
+
+                if (photoFile) {
+                    const reader = new FileReader();
+                    reader.onload = function(ev) { sauvegarder(ev.target.result); };
+                    reader.readAsDataURL(photoFile);
+                } else {
+                    sauvegarder(null);
+                }
+            });
+
+            // ---- AJOUT CLIENT ----
+            addClientBtn.addEventListener('click', function() {
+                if (!isAdmin) { alert('🔒 Mode admin requis'); return; }
+
+                const name = clientName.value.trim();
+                const phone = clientPhone.value.trim();
+                const adresse = clientAdresse.value.trim();
+                const startDate = clientStartDate.value;
+                const endDate = clientEndDate.value;
+                const amount = clientAmount.value ? parseInt(clientAmount.value) : null;
+                const payStatus = paymentStatus.value;
+                const tripType = clientTripType.value;
+                const departMatinTime = clientDepartMatinTime.value;
+                const departMatinArret = clientDepartMatinArret.value.trim();
+                const returnSoirTime = clientReturnSoirTime.value;
+                const returnSoirArret = clientReturnSoirArret.value.trim();
+
+                if (!name) { alert('Nom requis'); return; }
+                if (!startDate) { alert('Date début requise'); return; }
+                if (!endDate) { alert('Date fin requise'); return; }
+                if (startDate > endDate) { alert('La date de début doit être avant la date de fin'); return; }
+                if (!amount) { alert('Montant requis'); return; }
+                if (!departMatinTime && !returnSoirTime) { alert('Au moins un horaire requis'); return; }
+
+                const numeroCarte = genererNumeroCarte();
+
+                const photoFile = clientPhoto.files[0];
+                const sauvegarderClient = function(photoData) {
+                    const newClient = {
+                        id: generateId(),
+                        name,
+                        phone,
+                        adresse,
+                        startDate,
+                        endDate,
+                        amount,
+                        tripType,
+                        departMatinTime,
+                        departMatinArret,
+                        returnSoirTime,
+                        returnSoirArret,
+                        numeroCarte: numeroCarte,
+                        photo: photoData || ''
+                    };
+                    data.clients.push(newClient);
+                    if (payStatus === 'paid') {
+                        data.paiements.push({ clientId: newClient.id, date: todayStr(), montant: amount,
+                            type: 'abonnement' });
+                    }
+                    saveData();
+
+                    // Réinitialiser le formulaire
+                    clientName.value = '';
+                    clientPhone.value = '';
+                    clientAdresse.value = '';
+                    clientAmount.value = '';
+                    clientDepartMatinArret.value = '';
+                    clientReturnSoirArret.value = '';
+                    clientPhoto.value = '';
+                    photoPreview.src = '';
+
+                    // Générer la carte
+                    const carteData = genererCarte(newClient.id);
+                    if (carteData) {
+                        const carteHtml = afficherCarte(carteData);
+                        if (carteHtml) {
+                            cartePreview.innerHTML = carteHtml;
+                            setTimeout(() => genererQR('qrcode', carteData.qrData), 200);
+                        }
+                    }
+                    alert(`✅ Abonné ajouté ! Carte N° ${numeroCarte}`);
+                };
+
+                if (photoFile) {
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        sauvegarderClient(ev.target.result);
+                    };
+                    reader.readAsDataURL(photoFile);
+                } else {
+                    sauvegarderClient(null);
+                }
+            });
+
+            // ---- CARTES ----
+            genererCarteBtn.addEventListener('click', function() {
+                const clientId = carteClientSelect.value;
+                if (!clientId) { alert('Sélectionnez un abonné'); return; }
+                currentCarteClientId = clientId;
+
+                const carteData = genererCarte(clientId);
+                if (!carteData) { alert('Erreur génération'); return; }
+
+                const carteHtml = afficherCarte(carteData);
+                if (carteHtml) {
+                    cartePreview.innerHTML = carteHtml;
+                    setTimeout(() => genererQR('qrcode', carteData.qrData), 200);
+                }
+
+                renderPointageHistory(clientId);
+            });
+
+            function renderPointageHistory(clientId) {
+                const client = getClientById(clientId);
+                if (!client) {
+                    pointageHistory.innerHTML = '<p class="text-muted">Sélectionnez un abonné</p>';
+                    return;
+                }
+
+                const pointages = data.pointages[clientId] || {};
+                const dates = Object.keys(pointages).sort().reverse();
+
+                if (dates.length === 0) {
+                    pointageHistory.innerHTML = `<p class="text-muted">Aucun pointage pour ${client.name}</p>`;
+                    return;
+                }
+
+                let html = `<div style="font-weight:600;margin-bottom:6px;">📋 ${client.name}</div>`;
+                dates.slice(0, 20).forEach(date => {
+                    const type = pointages[date];
+                    const typeLabel = type === 'aller' ? '🟢 Aller' : type === 'retour' ? '🔵 Retour' : '✅';
+                    html += `
+                            <div class="pointage-item">
+                                <div class="info">
+                                    <span>${formatDate(date)}</span>
+                                    <span class="badge-type ${type}">${typeLabel}</span>
+                                </div>
+                                <span class="text-muted">${type === 'aller' ? 'Départ' : 'Retour'}</span>
+                            </div>
+                        `;
+                });
+                pointageHistory.innerHTML = html;
             }
-        }
 
-        // ---- INIT ----
-        const today = todayStr();
-        document.getElementById('clientStartDate').value = today;
-        const future = new Date();
-        future.setMonth(future.getMonth() + 1);
-        document.getElementById('clientEndDate').value = future.toISOString().split('T')[0];
-        document.getElementById('clientDepartMatinTime').value = '07:00';
-        document.getElementById('clientReturnSoirTime').value = '18:00';
+            // ---- IMPRIMER / TÉLÉCHARGER CARTE PDF ----
+            imprimerCarteBtn.addEventListener('click', function() {
+                const clientId = carteClientSelect.value;
+                if (!clientId) { alert('Sélectionnez un abonné'); return; }
+                const carteData = genererCarte(clientId);
+                if (!carteData) { alert('Erreur'); return; }
 
-        renderAll();
+                const carteHtml = afficherCarte(carteData);
+                if (carteHtml) {
+                    carteModalContent.innerHTML = carteHtml;
+                    carteModal.classList.add('show');
+                    setTimeout(() => {
+                        genererQR('qrcode', carteData.qrData);
+                    }, 200);
+                }
+            });
 
-        console.log('🚀 YT Transport Pro démarrée');
-        console.log('🔑 Code admin: YT2024');
-        console.log('📦 Données stockées dans localStorage');
+            imprimerCarteModalBtn.addEventListener('click', function() {
+                // Télécharger le PDF de la carte
+                const element = document.getElementById('carteAImprimer');
+                if (!element) { alert('Carte non trouvée'); return; }
+                exportPdf('carteAImprimer', `carte_${todayStr()}.pdf`);
+            });
+
+            closeCarteModalBtn.addEventListener('click', () => carteModal.classList.remove('show'));
+            carteModal.addEventListener('click', e => { if (e.target === this) carteModal.classList.remove('show'); });
+
+            // ---- SCANNER QR ----
+            let scannerActive = false;
+            let scannerStream = null;
+
+            startScanBtn.addEventListener('click', async function() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                    scannerStream = stream;
+                    video.srcObject = stream;
+                    video.style.display = 'block';
+                    scannerPlaceholder.style.display = 'none';
+                    scannerActive = true;
+
+                    if (!('BarcodeDetector' in window)) {
+                        scanResult.className = 'scan-result error';
+                        scanResult.innerHTML = '⚠️ Navigateur non supporté';
+                        scanResult.classList.remove('hidden');
+                        return;
+                    }
+
+                    const detector = new BarcodeDetector({ formats: ['qr_code'] });
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+
+                    async function scanLoop() {
+                        if (!scannerActive) return;
+                        if (!video.videoWidth) { setTimeout(scanLoop, 500); return; }
+
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                        try {
+                            const barcodes = await detector.detect(canvas);
+                            if (barcodes.length > 0) {
+                                const qrData = barcodes[0].rawValue;
+                                await traiterQR(qrData);
+                            }
+                        } catch (e) {}
+
+                        setTimeout(scanLoop, 300);
+                    }
+                    scanLoop();
+
+                } catch (err) {
+                    alert('Erreur caméra: ' + err.message);
+                }
+            });
+
+            async function traiterQR(qrData) {
+                try {
+                    const data = JSON.parse(qrData);
+                    if (!data.clientId) { throw new Error('QR invalide'); }
+
+                    const type = confirm(`Pointage pour ${data.nom || 'client'} ?\n\nOK = ALLER\nAnnuler = RETOUR`) ?
+                        'aller' : 'retour';
+
+                    const result = pointerParQR(data.clientId, type);
+                    scanResult.className = `scan-result ${result.success ? 'success' : 'error'}`;
+                    scanResult.innerHTML = result.success ? `✅ ${result.message}` : `❌ ${result.message}`;
+                    scanResult.classList.remove('hidden');
+
+                    if (result.success) {
+                        renderScanHistory();
+                        renderStats();
+                        if (currentCarteClientId) {
+                            const carteData = genererCarte(currentCarteClientId);
+                            if (carteData) {
+                                const carteHtml = afficherCarte(carteData);
+                                if (carteHtml) {
+                                    const preview = document.querySelector('#cartePreview .carte-abonnement');
+                                    if (preview) {
+                                        const newCarte = document.createElement('div');
+                                        newCarte.innerHTML = carteHtml;
+                                        preview.parentNode.replaceChild(newCarte.firstElementChild, preview);
+                                    }
+                                }
+                            }
+                            renderPointageHistory(currentCarteClientId);
+                        }
+                    }
+
+                    setTimeout(() => scanResult.classList.add('hidden'), 3000);
+
+                } catch (e) {
+                    scanResult.className = 'scan-result error';
+                    scanResult.innerHTML = '❌ QR invalide';
+                    scanResult.classList.remove('hidden');
+                    setTimeout(() => scanResult.classList.add('hidden'), 2000);
+                }
+            }
+
+            stopScanBtn.addEventListener('click', function() {
+                scannerActive = false;
+                if (scannerStream) {
+                    scannerStream.getTracks().forEach(t => t.stop());
+                    scannerStream = null;
+                }
+                video.style.display = 'none';
+                scannerPlaceholder.style.display = 'block';
+                scanResult.classList.add('hidden');
+            });
+
+            // ---- SCAN HISTORY ----
+            function renderScanHistory() {
+                const pointages = [];
+                Object.keys(data.pointages).forEach(clientId => {
+                    const client = getClientById(clientId);
+                    if (client) {
+                        Object.keys(data.pointages[clientId]).forEach(date => {
+                            const type = data.pointages[clientId][date];
+                            pointages.push({ clientId, nom: client.name, date, type });
+                        });
+                    }
+                });
+                pointages.sort((a, b) => b.date.localeCompare(a.date));
+
+                if (pointages.length === 0) {
+                    scanHistoryEl.innerHTML = '<p class="text-muted">Aucun pointage</p>';
+                    return;
+                }
+
+                let html = '';
+                pointages.slice(0, 20).forEach(p => {
+                    const typeLabel = p.type === 'aller' ? '🟢 Aller' : p.type === 'retour' ? '🔵 Retour' : '✅';
+                    html +=
+                        `<div class="pointage-item">
+                                <div class="info">
+                                    <span><strong>${p.nom}</strong></span>
+                                    <span class="text-muted">${formatDate(p.date)}</span>
+                                    <span class="badge-type ${p.type}">${typeLabel}</span>
+                                </div>
+                            </div>`;
+                });
+                scanHistoryEl.innerHTML = html;
+            }
+
+            // ---- CONGES ----
+            function renderConges() {
+                if (data.conges.length === 0) {
+                    congeList.innerHTML = '<p class="text-muted">Aucun congé</p>';
+                    return;
+                }
+                let html = '<div style="display:flex;flex-wrap:wrap;gap:4px;">';
+                data.conges.forEach((c, idx) => {
+                    const client = getClientById(c.clientId);
+                    const nom = client ? client.name : 'Inconnu';
+                    html +=
+                        `<span style="background:#fff3cd;padding:2px 8px;border-radius:20px;font-size:10px;border:1px solid #ffc107;">
+                                ${nom} : ${formatDate(c.start)} → ${formatDate(c.end)}
+                                ${isAdmin ? `<button onclick="window.deleteConge(${idx})" style="background:transparent;border:none;color:#dc3545;font-weight:bold;cursor:pointer;">✕</button>` : ''}
+                            </span>`;
+                });
+                html += '</div>';
+                congeList.innerHTML = html;
+            }
+
+            addCongeBtn.addEventListener('click', function() {
+                if (!isAdmin) { alert('Mode admin requis'); return; }
+                const clientId = congeClientSelect.value;
+                const start = congeStart.value;
+                const end = congeEnd.value;
+                if (!clientId) { alert('Sélectionnez un abonné'); return; }
+                if (!start || !end) { alert('Choisissez les dates'); return; }
+                if (start > end) { alert('La date de début doit être avant la date de fin'); return; }
+                data.conges.push({ clientId, start, end });
+                saveData();
+                congeStart.value = '';
+                congeEnd.value = '';
+            });
+
+            window.deleteConge = function(index) {
+                if (!isAdmin) { alert('Mode admin requis'); return; }
+                data.conges.splice(index, 1);
+                saveData();
+            };
+
+            // ---- FILTRES ----
+            [filterPayment, filterStatus].forEach(el => el.addEventListener('change', renderClients));
+            clearFiltersBtn.addEventListener('click', function() {
+                filterPayment.value = '';
+                filterStatus.value = '';
+                renderClients();
+            });
+
+            // ---- ADMIN ----
+            function unlockAdmin() {
+                const pwd = adminPasswordInput.value;
+                if (pwd === ADMIN_PASSWORD) {
+                    isAdmin = true;
+                    updateAdminUI();
+                    adminPasswordInput.style.borderColor = '#1e7e34';
+                    adminStatus.textContent = '✅ Déverrouillé';
+                    adminStatus.style.color = '#1e7e34';
+                    setTimeout(() => adminPasswordInput.style.borderColor = '', 2000);
+                    alert('✅ Mode admin déverrouillé !');
+                } else {
+                    alert('❌ Code incorrect. Le code par défaut est YT2024');
+                    adminPasswordInput.style.borderColor = 'red';
+                    setTimeout(() => adminPasswordInput.style.borderColor = '', 2000);
+                }
+            }
+
+            unlockBtn.addEventListener('click', unlockAdmin);
+            adminPasswordInput.addEventListener('keydown', e => { if (e.key === 'Enter') unlockAdmin(); });
+
+            toggleAdminBtn.addEventListener('click', function() {
+                if (isAdmin) {
+                    isAdmin = false;
+                    updateAdminUI();
+                    adminStatus.textContent = '🔒 Verrouillé';
+                    adminStatus.style.color = 'var(--yt-text-muted)';
+                } else {
+                    adminLock.scrollIntoView({ behavior: 'smooth' });
+                    adminPasswordInput.focus();
+                }
+            });
+
+            function updateAdminUI() {
+                const inputs = [
+                    clientName, clientPhone, clientAdresse, clientStartDate, clientEndDate,
+                    clientAmount, paymentStatus, clientTripType,
+                    clientDepartMatinTime, clientDepartMatinArret,
+                    clientReturnSoirTime, clientReturnSoirArret,
+                    clientPhoto, addClientBtn,
+                    congeStart, congeEnd, addCongeBtn,
+                    renewSelectedBtn, renewAllBtn,
+                    selectAllMatin, selectAllSoir,
+                    validateMatinBtn, validateSoirBtn,
+                    resetMatinBtn, resetSoirBtn,
+                    saveEditBtn,
+                    genererCarteBtn, imprimerCarteBtn
+                ];
+                inputs.forEach(el => { if (el) el.disabled = !isAdmin; });
+                [addClientCard].forEach(card => {
+                    if (card) { card.style.opacity = isAdmin ? '1' : '0.6';
+                        card.style.pointerEvents = isAdmin ? 'auto' : 'none'; }
+                });
+                adminStatus.textContent = isAdmin ? '✅ Déverrouillé' : '🔒 Verrouillé';
+                adminStatus.style.color = isAdmin ? '#1e7e34' : 'var(--yt-text-muted)';
+            }
+
+            // ---- RAPPORT ----
+            function generateReport() {
+                const totalClients = data.clients.length;
+                const actifs = data.clients.filter(c => getClientStatus(c) === 'actif').length;
+                const conges = data.clients.filter(c => getClientStatus(c) === 'conge').length;
+                const inactifs = data.clients.filter(c => getClientStatus(c) === 'inactif').length;
+                const impayes = getNbImpayes();
+                const encaisse = getTotalEncaisse();
+                const theorique = getTotalTheorique();
+                const ecart = theorique - encaisse;
+                const totalAnnee = getTotalAnnee();
+                const retard2 = data.clients.filter(c => getRetardMois(c) >= 2).length;
+
+                const renewByMonth = {};
+                data.renouvellements.forEach(r => {
+                    const key = `${r.mois}/${r.annee}`;
+                    if (!renewByMonth[key]) renewByMonth[key] = 0;
+                    renewByMonth[key] += r.montant || 0;
+                });
+
+                let html = `
+                        <div style="background:var(--yt-green-light);border-radius:8px;padding:12px;border:1px solid #d4e8dc;">
+                            <div style="font-weight:600;color:var(--yt-green-dark);margin-bottom:6px;">📊 Résumé</div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;font-size:12px;">
+                                <div><span class="text-muted">Total:</span> <strong>${totalClients}</strong></div>
+                                <div><span class="text-muted">Actifs:</span> <strong>${actifs}</strong></div>
+                                <div><span class="text-muted">Congé:</span> <strong>${conges}</strong></div>
+                                <div><span class="text-muted">Inactifs:</span> <strong>${inactifs}</strong></div>
+                                <div><span class="text-muted">Impayés:</span> <strong style="color:var(--yt-danger);">${impayes}</strong></div>
+                                <div><span class="text-muted">Retard 2+:</span> <strong style="color:var(--yt-danger);">${retard2}</strong></div>
+                            </div>
+                        </div>
+                        <div style="background:var(--yt-green-light);border-radius:8px;padding:12px;margin-top:6px;border:1px solid #d4e8dc;">
+                            <div style="font-weight:600;color:var(--yt-green-dark);margin-bottom:6px;">💰 Abonnements</div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;font-size:12px;">
+                                <div><span class="text-muted">Encaissé:</span> <strong style="color:var(--yt-success);">${encaisse.toLocaleString()} CFA</strong></div>
+                                <div><span class="text-muted">Théorique:</span> <strong>${theorique.toLocaleString()} CFA</strong></div>
+                                <div><span class="text-muted">Écart:</span> <strong style="color:${ecart > 0 ? 'var(--yt-danger)' : 'var(--yt-success)'};">${ecart > 0 ? '- ' + ecart.toLocaleString() : '✅'} CFA</strong></div>
+                                <div><span class="text-muted">Total année:</span> <strong style="color:var(--yt-success);">${totalAnnee.toLocaleString()} CFA</strong></div>
+                            </div>
+                        </div>
+                    `;
+
+                const sortedMonths = Object.keys(renewByMonth).sort();
+                if (sortedMonths.length > 0) {
+                    html +=
+                        `<div style="background:var(--yt-green-light);border-radius:8px;padding:12px;margin-top:6px;border:1px solid #d4e8dc;">
+                            <div style="font-weight:600;color:var(--yt-green-dark);margin-bottom:4px;">📅 Par mois</div>
+                            ${sortedMonths.map(key => `<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #d4e8dc;font-size:12px;"><span class="text-muted">${key}</span><strong>${renewByMonth[key].toLocaleString()} CFA</strong></div>`).join('')}
+                        </div>`;
+                }
+
+                const listImpayes = data.clients.filter(c => getPaymentStatus(c) === 'unpaid');
+                if (listImpayes.length > 0) {
+                    html +=
+                        `<div style="background:#f8d7da;border-radius:8px;padding:12px;margin-top:6px;border:1px solid #f5c6cb;">
+                            <div style="font-weight:600;color:var(--yt-danger);margin-bottom:4px;">🔴 Impayés</div>
+                            ${listImpayes.map(c => `<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #f5c6cb;font-size:12px;"><span>${c.name}</span><strong style="color:var(--yt-danger);">${c.amount || 0} CFA</strong></div>`).join('')}
+                        </div>`;
+                }
+
+                reportContent.innerHTML = html;
+            }
+
+            // ---- EXPORT EXCEL ----
+            function exportExcel(dataExport, filename) {
+                let csv = '';
+                const headers = Object.keys(dataExport[0] || {});
+                csv += headers.join(',') + '\n';
+                dataExport.forEach(row => {
+                    csv += headers.map(h => {
+                        const val = row[h] || '';
+                        return typeof val === 'string' && val.includes(',') ? `"${val}"` : val;
+                    }).join(',') + '\n';
+                });
+                downloadFile(csv, filename, 'text/csv');
+            }
+
+            exportExcelBtn.addEventListener('click', function() {
+                const dataExport = data.clients.map(c => ({
+                    'Nom': c.name,
+                    'Téléphone': c.phone || '',
+                    'Adresse': c.adresse || '',
+                    'N° Carte': c.numeroCarte || '',
+                    'Début': formatDate(c.startDate),
+                    'Fin': formatDate(c.endDate),
+                    'Montant': c.amount || 0,
+                    'Paiement': getPaymentStatus(c),
+                    'Trajet': getTripTypeLabel(c.tripType),
+                    'Matin': c.departMatinTime || '',
+                    'Soir': c.returnSoirTime || '',
+                    'Statut': getClientStatus(c)
+                }));
+                exportExcel(dataExport, `abonnes_${todayStr()}.csv`);
+            });
+
+            exportReportBtn.addEventListener('click', function() {
+                generateReport();
+                const dataExport = data.clients.map(c => ({
+                    'Nom': c.name,
+                    'Téléphone': c.phone || '',
+                    'N° Carte': c.numeroCarte || '',
+                    'Montant': c.amount || 0,
+                    'Paiement': getPaymentStatus(c),
+                    'Statut': getClientStatus(c),
+                    'Retard': getRetardMois(c),
+                    'Renouvelé': isRenewedForMonth(c.id) ? 'Oui' : 'Non',
+                    'Matin': c.departMatinArret || '',
+                    'Soir': c.returnSoirArret || ''
+                }));
+                const encaisse = getTotalEncaisse();
+                const theorique = getTotalTheorique();
+                dataExport.push({ 'Nom': '--- TOTAUX ---', 'Téléphone': '', 'N° Carte': '', 'Montant': encaisse,
+                    'Paiement': 'Encaissé', 'Statut': '', 'Retard': '', 'Renouvelé': '', 'Matin': '', 'Soir': '' });
+                dataExport.push({ 'Nom': '', 'Téléphone': '', 'N° Carte': '', 'Montant': theorique,
+                    'Paiement': 'Théorique', 'Statut': '', 'Retard': '', 'Renouvelé': '', 'Matin': '', 'Soir': '' });
+                dataExport.push({ 'Nom': '', 'Téléphone': '', 'N° Carte': '', 'Montant': theorique - encaisse,
+                    'Paiement': 'Écart', 'Statut': '', 'Retard': '', 'Renouvelé': '', 'Matin': '', 'Soir': '' });
+                dataExport.push({ 'Nom': '', 'Téléphone': '', 'N° Carte': '', 'Montant': getTotalAnnee(),
+                    'Paiement': 'Total année', 'Statut': '', 'Retard': '', 'Renouvelé': '', 'Matin': '', 'Soir': '' });
+                exportExcel(dataExport, `rapport_${todayStr()}.csv`);
+            });
+
+            // ---- EXPORT/IMPORT ----
+            exportBtn.addEventListener('click', function() {
+                const exportData = { ...data, exportDate: new Date().toISOString(), version: '13.0' };
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `yt_sauvegarde_${todayStr()}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+
+            importBtn.addEventListener('click', function() {
+                if (!isAdmin) { alert('Mode admin requis'); return; }
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    try {
+                        const imported = JSON.parse(ev.target.result);
+                        if (imported.clients) {
+                            if (confirm('Remplacer toutes les données ?')) {
+                                data = imported;
+                                if (!data.paiements) data.paiements = [];
+                                if (!data.renouvellements) data.renouvellements = [];
+                                if (!data.presenceMatin) data.presenceMatin = {};
+                                if (!data.presenceSoir) data.presenceSoir = {};
+                                if (!data.pointages) data.pointages = {};
+                                if (!data.arrets) data.arrets = ['Départ'];
+                                if (!data.lastCarteNum) data.lastCarteNum = 0;
+                                saveData();
+                                alert('✅ Import réussi');
+                            }
+                        } else {
+                            alert('❌ Fichier invalide');
+                        }
+                    } catch (err) {
+                        alert('❌ Erreur lecture');
+                    }
+                };
+                reader.readAsText(file);
+                fileInput.value = '';
+            });
+
+            // ---- GPS ----
+            let tracking = false,
+                watchId = null;
+
+            function updateGps(position) {
+                const lat = position.coords.latitude,
+                    lng = position.coords.longitude;
+                gpsCoords.textContent = `Lat: ${lat.toFixed(6)} • Lng: ${lng.toFixed(6)}`;
+                gpsStatus.textContent = '📡 En direct';
+                gpsDot.style.background = '#1e7e34';
+                whatsappShareBtn.href =
+                    `https://wa.me/?text=🚌 Le car YAOU est à : https://www.google.com/maps?q=${lat},${lng}`;
+            }
+
+            function gpsError(err) {
+                gpsStatus.textContent = '⚠️ ' + err.message;
+                gpsDot.style.background = '#dc3545';
+            }
+
+            startTrackingBtn.addEventListener('click', function() {
+                if (!navigator.geolocation) { alert('Géolocalisation non supportée'); return; }
+                if (tracking) return;
+                tracking = true;
+                watchId = navigator.geolocation.watchPosition(updateGps, gpsError, { enableHighAccuracy: true,
+                    timeout: 15000, maximumAge: 10000 });
+                gpsStatus.textContent = '⏳ Recherche...';
+                gpsDot.style.background = '#d4a017';
+            });
+
+            stopTrackingBtn.addEventListener('click', function() {
+                if (watchId) { navigator.geolocation.clearWatch(watchId);
+                    watchId = null; }
+                tracking = false;
+                gpsStatus.textContent = '⏹️ Arrêté';
+                gpsDot.style.background = '#dc3545';
+            });
+
+            // ---- ARRETS ----
+            function renderArrets() {
+                let html = data.arrets.map(a => `<span class="client-tag">📍 ${a}</span>`).join('');
+                arretList.innerHTML = html;
+            }
+
+            addArretBtn.addEventListener('click', function() {
+                const val = arretInput.value.trim();
+                if (!val) { alert('Entrez un nom'); return; }
+                data.arrets.push(val);
+                saveData();
+                arretInput.value = '';
+                renderArrets();
+            });
+
+            // ---- INIT ----
+            const today = todayStr();
+            clientStartDate.value = today;
+            const futureDate = new Date();
+            futureDate.setMonth(futureDate.getMonth() + 1);
+            clientEndDate.value = futureDate.toISOString().split('T')[0];
+            clientDepartMatinTime.value = '07:00';
+            clientReturnSoirTime.value = '18:00';
+
+            renderAll();
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => updateGps(pos), () => {}, { enableHighAccuracy: true,
+                    timeout: 5000 });
+            }
+
+            setInterval(() => {
+                renderStats();
+                renderAlerts();
+                renderRenewSelect();
+            }, 60000);
+
+            // ---- RENDU GLOBAL ----
+            function renderAll() {
+                renderStats();
+                renderAlerts();
+                renderRenewSelect();
+                renderPresenceMatin();
+                renderPresenceSoir();
+                renderDepartMatinValide();
+                renderDepartSoirValide();
+                renderClients();
+                renderConges();
+                renderArrets();
+                renderScanHistory();
+                updateAdminUI();
+                generateReport();
+                departDateDisplay.textContent = formatDate(today);
+
+                if (carteClientSelect.value && currentCarteClientId) {
+                    const carteData = genererCarte(carteClientSelect.value);
+                    if (carteData) {
+                        const carteHtml = afficherCarte(carteData);
+                        if (carteHtml) {
+                            cartePreview.innerHTML = carteHtml;
+                            setTimeout(() => genererQR('qrcode', carteData.qrData), 200);
+                        }
+                        renderPointageHistory(carteClientSelect.value);
+                    }
+                }
+            }
+
+            // ---- SERVICE WORKER ----
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js')
+                    .then(() => console.log('✅ Service Worker enregistré'))
+                    .catch(err => console.error('❌ Erreur SW:', err));
+            }
+
+            console.log('🚀 YT Transport Pro démarrée');
+            console.log('🔑 Code admin: YT2024');
+
+        })();
     </script>
-
 </body>
 </html>
