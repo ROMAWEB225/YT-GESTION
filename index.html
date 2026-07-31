@@ -6,13 +6,13 @@
     <meta name="theme-color" content="#1a7a3a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>YT Transport Pro</title>
-    <!-- Bibliothèques légères -->
+    <!-- Bibliothèques -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
     </script>
     <style>
-        /* Styles simplifiés mais complets */
+        /* ===== STYLES ===== */
         * {
             margin: 0;
             padding: 0;
@@ -373,7 +373,7 @@
             display: none !important;
         }
 
-        /* CARTE ABONNEMENT */
+        /* CARTE ABONNEMENT - CORRIGÉE POUR PDF */
         .carte-abonnement {
             max-width: 350px;
             margin: 0 auto;
@@ -382,6 +382,7 @@
             padding: 12px;
             border: 2px solid #1a5e3a;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
         }
         .carte-abonnement .header-carte {
             display: flex;
@@ -413,6 +414,7 @@
             border: 3px solid #1a5e3a;
             object-fit: cover;
             background: #f0f0f0;
+            flex-shrink: 0;
         }
         .carte-abonnement .info-abonne .photo-placeholder {
             width: 45px;
@@ -425,6 +427,7 @@
             font-size: 18px;
             color: #ccc;
             background: #fafbfc;
+            flex-shrink: 0;
         }
         .carte-abonnement .info-abonne .details .nom {
             font-size: 14px;
@@ -742,6 +745,21 @@
                 height: 70px;
             }
         }
+
+        /* STYLE POUR LE PDF */
+        @media print {
+            body {
+                background: white !important;
+                padding: 10px !important;
+            }
+            .carte-abonnement {
+                box-shadow: none !important;
+                max-width: 100% !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -766,7 +784,7 @@
         <div class="admin-lock" id="adminLock">
             <span style="font-size:14px;">🔒</span>
             <span style="font-weight:600;color:#1a5e3a;">Admin</span>
-            <input type="password" id="adminPassword" placeholder="Code (YT2024)">
+            <input type="password" id="adminPassword" placeholder="Code (NTR2026)">
             <button class="btn btn-primary" onclick="unlockAdmin()">Déverrouiller</button>
             <span class="status" id="adminStatus">🔒 Verrouillé</span>
         </div>
@@ -907,6 +925,7 @@
                     <div id="scannerPlaceholder" style="color:white;padding:15px;">
                         <p style="font-size:13px;">📷 Prêt</p>
                         <p style="font-size:9px;opacity:0.6;">Cliquez sur Scanner</p>
+                        <p style="font-size:8px;opacity:0.4;margin-top:5px;color:#ffaa00;">⚠️ Sur PC, utilisez le pointage manuel ci-dessous</p>
                     </div>
                     <video id="video" style="display:none;width:100%;max-width:400px;border-radius:5px;"></video>
                     <div class="flex mt-6" style="justify-content:center;">
@@ -916,8 +935,11 @@
                     <div id="scanResult" class="scan-result hidden"></div>
                 </div>
                 <div class="flex mt-6">
-                    <button class="btn btn-success btn-sm" onclick="pointerAller()">🟢 Aller</button>
-                    <button class="btn btn-info btn-sm" onclick="pointerRetour()" style="background:#2c3e50;color:white;">🔵 Retour</button>
+                    <button class="btn btn-success btn-sm" onclick="pointerAller()">🟢 Pointer ALLER</button>
+                    <button class="btn btn-info btn-sm" onclick="pointerRetour()" style="background:#2c3e50;color:white;">🔵 Pointer RETOUR</button>
+                </div>
+                <div style="margin-top:4px;padding:4px 8px;background:#fff3cd;border-radius:4px;border:1px solid #ffc107;font-size:8px;color:#856404;">
+                    💡 <strong>Sur PC :</strong> Sélectionnez l'abonné dans la liste du haut, puis cliquez sur "Pointer ALLER" ou "Pointer RETOUR"
                 </div>
             </div>
             <div class="card">
@@ -995,11 +1017,12 @@
 
     <script>
         // ================================================================
-        // ===== APPLICATION COMPLETE - VERSION SIMPLIFIEE ================
+        // ===== APPLICATION - VERSION CORRIGÉE ===========================
         // ================================================================
 
         // ---- CONSTANTES ----
-        const ADMIN_PASSWORD = 'YT2024';
+        // ⚠️ MOT DE PASSE MODIFIÉ : NTR2026
+        const ADMIN_PASSWORD = 'NTR2026';
         const STORAGE_KEY = 'yt_transport_light';
 
         // ---- DONNEES ----
@@ -1358,7 +1381,7 @@
             return { success: true, message: `${client.name} - ${type === 'aller' ? 'ALLER' : 'RETOUR'} enregistré !` };
         }
 
-        // ---- EXPORT PDF ----
+        // ---- EXPORT PDF - CORRIGÉ ----
         function exportPdf(elementId, filename) {
             const element = document.getElementById(elementId);
             if (!element) { alert('Élément non trouvé'); return; }
@@ -1368,12 +1391,30 @@
                 return;
             }
 
+            // Options corrigées pour éviter la coupure
             const opt = {
-                margin: 10,
+                margin: {
+                    top: 10,
+                    bottom: 10,
+                    left: 10,
+                    right: 10
+                },
                 filename: filename || 'document.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    width: element.scrollWidth,
+                    height: element.scrollHeight,
+                    windowWidth: element.scrollWidth,
+                    windowHeight: element.scrollHeight
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'portrait'
+                },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
 
             html2pdf()
@@ -1405,7 +1446,7 @@
             });
 
             let pdfHtml = `
-                    <div id="pdf-depart" style="font-family:'Segoe UI',Arial,sans-serif;padding:15px;max-width:900px;margin:0 auto;">
+                    <div id="pdf-depart" style="font-family:'Segoe UI',Arial,sans-serif;padding:15px;max-width:900px;margin:0 auto;background:white;">
                         <div style="text-align:center;border-bottom:3px solid #1a5e3a;padding-bottom:8px;margin-bottom:10px;">
                             <h1 style="color:#1a5e3a;font-size:20px;">🚌 YAOU TRANSPORT</h1>
                             <div style="color:#666;font-size:12px;font-weight:600;">Liste - ${label}</div>
@@ -1424,12 +1465,12 @@
                             <div style="background:#eaf5ef;padding:4px 8px;border-radius:4px;font-size:13px;font-weight:600;color:#1a5e3a;border-left:4px solid ${color};">
                                 📍 ${arret} (${clients.length})
                             </div>
-                            <div>
+                            <div style="padding:4px 0;">
                     `;
                 clients.forEach(c => {
                     const time = c[timeField] || '--:--';
                     pdfHtml +=
-                        `<span style="display:inline-block;background:#f6faf8;padding:2px 6px;border-radius:15px;font-size:10px;margin:1px 2px 1px 0;border:1px solid ${color};">
+                        `<span style="display:inline-block;background:#f6faf8;padding:3px 8px;border-radius:15px;font-size:10px;margin:2px 3px 2px 0;border:1px solid ${color};">
                                 ${c.name} <span style="color:#999;font-size:8px;">⏰ ${time}</span>
                             </span>`;
                 });
@@ -1437,7 +1478,7 @@
             });
 
             pdfHtml += `
-                        <div style="text-align:center;padding:6px;background:${bgColor};border-radius:5px;font-size:13px;font-weight:600;color:${color};">
+                        <div style="text-align:center;padding:8px;background:${bgColor};border-radius:5px;font-size:14px;font-weight:600;color:${color};margin-top:6px;">
                             Total: ${totalVoyageurs} voyageurs
                         </div>
                         <div style="text-align:center;font-size:8px;color:#999;border-top:1px solid #dce8e2;padding-top:6px;margin-top:8px;">
@@ -1456,17 +1497,29 @@
             container.style.zIndex = '9999';
             document.body.appendChild(container);
 
+            const element = container.querySelector('#pdf-depart');
+
             const opt = {
-                margin: 8,
+                margin: {
+                    top: 10,
+                    bottom: 10,
+                    left: 10,
+                    right: 10
+                },
                 filename: `liste_${type}_${todayStr()}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    width: element.scrollWidth,
+                    height: element.scrollHeight
+                },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             html2pdf()
                 .set(opt)
-                .from(container.querySelector('#pdf-depart'))
+                .from(element)
                 .save()
                 .then(() => { document.body.removeChild(container); })
                 .catch(() => { document.body.removeChild(container);
@@ -1508,7 +1561,7 @@
                 updateAdminUI();
                 alert('✅ Mode admin déverrouillé !');
             } else {
-                alert('❌ Code incorrect. Le code par défaut est YT2024');
+                alert('❌ Code incorrect. Le code par défaut est NTR2026');
             }
         }
 
@@ -1716,7 +1769,34 @@
             setTimeout(() => {
                 genererQR('qrcode', carteData.qrData);
                 setTimeout(() => {
-                    exportPdf('carteAImprimer', `carte_${todayStr()}.pdf`);
+                    // Utiliser l'export PDF corrigé
+                    const element = document.getElementById('carteAImprimer');
+                    if (element) {
+                        const opt = {
+                            margin: {
+                                top: 10,
+                                bottom: 10,
+                                left: 10,
+                                right: 10
+                            },
+                            filename: `carte_${todayStr()}.pdf`,
+                            image: { type: 'jpeg', quality: 0.98 },
+                            html2canvas: {
+                                scale: 2,
+                                useCORS: true,
+                                width: element.scrollWidth,
+                                height: element.scrollHeight
+                            },
+                            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                        };
+                        html2pdf()
+                            .set(opt)
+                            .from(element)
+                            .save()
+                            .catch(() => alert('Erreur PDF'));
+                    } else {
+                        alert('Carte non trouvée');
+                    }
                 }, 300);
             }, 200);
         }
@@ -1747,6 +1827,15 @@
         let scannerStream = null;
 
         function startScanner() {
+            // Vérifier si le navigateur supporte la caméra
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                document.getElementById('scanResult').className = 'scan-result info';
+                document.getElementById('scanResult').innerHTML =
+                    '📱 Sur PC, utilisez les boutons "Pointer ALLER" ou "Pointer RETOUR" ci-dessous après avoir sélectionné un abonné.';
+                document.getElementById('scanResult').classList.remove('hidden');
+                return;
+            }
+
             navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
                 .then(function(stream) {
                     scannerStream = stream;
@@ -1757,8 +1846,9 @@
                     scannerActive = true;
 
                     if (!('BarcodeDetector' in window)) {
-                        document.getElementById('scanResult').className = 'scan-result error';
-                        document.getElementById('scanResult').innerHTML = '⚠️ Navigateur non supporté';
+                        document.getElementById('scanResult').className = 'scan-result info';
+                        document.getElementById('scanResult').innerHTML =
+                            '📱 Scannez avec votre téléphone ou utilisez les boutons ci-dessous.';
                         document.getElementById('scanResult').classList.remove('hidden');
                         return;
                     }
@@ -1787,7 +1877,10 @@
                     scanLoop();
 
                 }).catch(function(err) {
-                    alert('Erreur caméra: ' + err.message);
+                    document.getElementById('scanResult').className = 'scan-result info';
+                    document.getElementById('scanResult').innerHTML =
+                        '📱 Utilisez les boutons "Pointer ALLER" ou "Pointer RETOUR" ci-dessous.';
+                    document.getElementById('scanResult').classList.remove('hidden');
                 });
         }
 
@@ -1849,7 +1942,10 @@
 
         function pointerAller() {
             const clientId = document.getElementById('carteSelect').value;
-            if (!clientId) { alert('Sélectionnez un abonné'); return; }
+            if (!clientId) {
+                alert('⚠️ Sélectionnez d\'abord un abonné dans la liste "Sélectionner"');
+                return;
+            }
             const result = pointerParQR(clientId, 'aller');
             document.getElementById('scanResult').className = `scan-result ${result.success ? 'success' : 'error'}`;
             document.getElementById('scanResult').innerHTML = result.success ? `✅ ${result.message}` :
@@ -1861,7 +1957,10 @@
 
         function pointerRetour() {
             const clientId = document.getElementById('carteSelect').value;
-            if (!clientId) { alert('Sélectionnez un abonné'); return; }
+            if (!clientId) {
+                alert('⚠️ Sélectionnez d\'abord un abonné dans la liste "Sélectionner"');
+                return;
+            }
             const result = pointerParQR(clientId, 'retour');
             document.getElementById('scanResult').className = `scan-result ${result.success ? 'success' : 'error'}`;
             document.getElementById('scanResult').innerHTML = result.success ? `✅ ${result.message}` :
@@ -2436,17 +2535,17 @@
 
         renderAll();
 
-        // Démarrer le GPS automatiquement si disponible
+        // Démarrer le GPS automatiquement
         if (navigator.geolocation) {
             setTimeout(startGps, 1000);
         }
 
         console.log('🚀 YT Transport Pro démarrée');
-        console.log('🔑 Code admin: YT2024');
+        console.log('🔑 Code admin: NTR2026');
         console.log('📦 Données: localStorage');
         console.log('✅ Application 100% fonctionnelle');
 
-        // Rafraîchissement automatique toutes les 30s
+        // Rafraîchissement automatique
         setInterval(function() {
             renderStats();
             renderAlerts();
