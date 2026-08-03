@@ -524,6 +524,17 @@
             font-size: 9px;
             color: #666;
         }
+        .qr-car-container .qr-image {
+            margin: 10px 0;
+        }
+        .qr-car-container .qr-image img {
+            max-width: 180px;
+            height: auto;
+            border: 2px solid #1a5e3a;
+            border-radius: 8px;
+            padding: 8px;
+            background: white;
+        }
 
         .scanner-container {
             background: #1a1a1a;
@@ -785,6 +796,14 @@
             .no-print {
                 display: none !important;
             }
+            .qr-car-container {
+                border: 2px solid #1a5e3a !important;
+                page-break-inside: avoid;
+                padding: 20px !important;
+            }
+            .qr-car-container .qr-image img {
+                max-width: 200px !important;
+            }
         }
     </style>
 </head>
@@ -927,7 +946,7 @@
                 </div>
             </div>
 
-            <!-- SCANNER POUR L'ABONNÉ (scanner le QR du car) -->
+            <!-- SCANNER POUR L'ABONNÉ -->
             <div class="card" style="border:2px solid #d4a017;background:#fff8e1;">
                 <div class="card-title" style="color:#d4a017;">📱 Scanner le QR du car</div>
                 <p style="font-size:9px;color:#666;margin-bottom:4px;">
@@ -965,25 +984,25 @@
             </div>
         </div>
 
-        <!-- TAB 4: QR CAR (pour l'admin - générer les QR à imprimer) -->
+        <!-- TAB 4: QR CAR (pour l'admin) -->
         <div class="tab-content" id="tab4">
             <div class="card">
-                <div class="card-title">📄 Générer QR pour le car</div>
-                <p style="font-size:9px;color:#666;margin-bottom:4px;">
+                <div class="card-title">📄 QR pour le car - À imprimer</div>
+                <p style="font-size:9px;color:#666;margin-bottom:6px;">
                     Imprimez ces QR codes et collez-les dans le car (Matin et Soir)
                 </p>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                    <div class="qr-car-container">
+                    <div class="qr-car-container" id="qrMatinBox">
                         <div class="qr-type">🌅 ALLER MATIN</div>
-                        <div id="qrMatinContainer"></div>
-                        <div class="qr-sub">À coller dans le car</div>
-                        <button class="btn btn-success btn-sm mt-6" onclick="imprimerQR('qrMatinContainer','QR_Aller_Matin')">🖨️ Imprimer</button>
+                        <div class="qr-image" id="qrMatinImage"></div>
+                        <div class="qr-sub">Scannez pour pointer l'aller</div>
+                        <button class="btn btn-success btn-sm mt-6 no-print" onclick="imprimerQRMatin()">🖨️ Imprimer</button>
                     </div>
-                    <div class="qr-car-container">
+                    <div class="qr-car-container" id="qrSoirBox">
                         <div class="qr-type">🌙 RETOUR SOIR</div>
-                        <div id="qrSoirContainer"></div>
-                        <div class="qr-sub">À coller dans le car</div>
-                        <button class="btn btn-success btn-sm mt-6" onclick="imprimerQR('qrSoirContainer','QR_Retour_Soir')">🖨️ Imprimer</button>
+                        <div class="qr-image" id="qrSoirImage"></div>
+                        <div class="qr-sub">Scannez pour pointer le retour</div>
+                        <button class="btn btn-success btn-sm mt-6 no-print" onclick="imprimerQRSoir()">🖨️ Imprimer</button>
                     </div>
                 </div>
             </div>
@@ -1063,12 +1082,12 @@
 
     <script>
         // ================================================================
-        // ===== APPLICATION AVEC SCAN QR CAR (ABONNÉ) ====================
+        // ===== APPLICATION AVEC QR CAR IMPRIMABLE ======================
         // ================================================================
 
         // ---- CONSTANTES ----
         const ADMIN_PASSWORD = 'NTR2026';
-        const STORAGE_KEY = 'yt_transport_full';
+        const STORAGE_KEY = 'yt_transport_qr';
 
         // ---- DONNEES ----
         let data = loadData();
@@ -1076,7 +1095,6 @@
         let departMatinValide = [];
         let departSoirValide = [];
         let currentCarteClientId = null;
-        let scanHistory = [];
 
         // ---- CHARGEMENT ----
         function getDefaultData() {
@@ -1088,9 +1106,7 @@
                 presenceMatin: {},
                 presenceSoir: {},
                 pointages: {},
-                lastCarteNum: 0,
-                qrMatin: '',
-                qrSoir: ''
+                lastCarteNum: 0
             };
         }
 
@@ -1248,7 +1264,49 @@
             return `<span style="display:inline-block;width:20px;height:20px;border-radius:50%;background:#f0f0f0;text-align:center;line-height:20px;font-size:10px;border:2px dashed #ccc;">👤</span>`;
         }
 
-        // ---- QR CODE ----
+        // ---- QR CODE avec retour image ----
+        function genererQRImage(data, size) {
+            return new Promise(function(resolve) {
+                const container = document.createElement('div');
+                container.style.position = 'fixed';
+                container.style.left = '-9999px';
+                container.style.top = '-9999px';
+                document.body.appendChild(container);
+
+                if (typeof QRCode !== 'undefined') {
+                    try {
+                        new QRCode(container, {
+                            text: data,
+                            width: size || 200,
+                            height: size || 200,
+                            colorDark: '#1a5e3a',
+                            colorLight: '#ffffff',
+                            correctLevel: QRCode.CorrectLevel.H
+                        });
+
+                        // Attendre que le QR soit généré
+                        setTimeout(function() {
+                            const canvas = container.querySelector('canvas');
+                            if (canvas) {
+                                const imgData = canvas.toDataURL('image/png');
+                                document.body.removeChild(container);
+                                resolve(imgData);
+                            } else {
+                                document.body.removeChild(container);
+                                resolve(null);
+                            }
+                        }, 200);
+                    } catch (e) {
+                        document.body.removeChild(container);
+                        resolve(null);
+                    }
+                } else {
+                    document.body.removeChild(container);
+                    resolve(null);
+                }
+            });
+        }
+
         function genererQR(elementId, data, size) {
             const container = document.getElementById(elementId);
             if (!container) return;
@@ -1268,6 +1326,123 @@
             }
             container.innerHTML =
                 `<div style="font-size:8px;color:#666;word-break:break-all;max-width:150px;padding:5px;background:#f5f5f5;border-radius:3px;">QR: ${data.substring(0, 40)}...</div>`;
+        }
+
+        // ---- GÉNÉRER QR CAR AVEC IMAGE ----
+        async function genererQRCars() {
+            const qrMatinData = JSON.stringify({
+                type: 'aller',
+                source: 'car',
+                version: '1.0'
+            });
+            const qrSoirData = JSON.stringify({
+                type: 'retour',
+                source: 'car',
+                version: '1.0'
+            });
+
+            // Générer les images QR
+            const imgMatin = await genererQRImage(qrMatinData, 200);
+            const imgSoir = await genererQRImage(qrSoirData, 200);
+
+            // Afficher les images
+            const matinContainer = document.getElementById('qrMatinImage');
+            const soirContainer = document.getElementById('qrSoirImage');
+
+            if (imgMatin) {
+                matinContainer.innerHTML = `<img src="${imgMatin}" alt="QR Matin">`;
+            } else {
+                matinContainer.innerHTML =
+                    `<div style="padding:10px;background:#f5f5f5;border-radius:5px;font-size:10px;color:#999;">QR non disponible</div>`;
+            }
+
+            if (imgSoir) {
+                soirContainer.innerHTML = `<img src="${imgSoir}" alt="QR Soir">`;
+            } else {
+                soirContainer.innerHTML =
+                    `<div style="padding:10px;background:#f5f5f5;border-radius:5px;font-size:10px;color:#999;">QR non disponible</div>`;
+            }
+
+            // Stocker les données
+            data.qrMatinData = qrMatinData;
+            data.qrSoirData = qrSoirData;
+            data.qrMatinImage = imgMatin;
+            data.qrSoirImage = imgSoir;
+            saveData();
+        }
+
+        function imprimerQRMatin() {
+            const img = document.querySelector('#qrMatinImage img');
+            if (!img) { alert('QR non généré'); return; }
+
+            const win = window.open('', '_blank');
+            win.document.write(`
+                    <html><head><title>QR ALLER MATIN</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+                        .qr-box { border: 3px solid #1a5e3a; padding: 30px; border-radius: 10px; display: inline-block; background: white; max-width: 400px; }
+                        .qr-box h2 { color: #1a5e3a; font-size: 24px; margin-bottom: 10px; }
+                        .qr-box .sub { color: #666; font-size: 14px; }
+                        .qr-box .qr-image { margin: 15px 0; }
+                        .qr-box .qr-image img { max-width: 250px; height: auto; border: 2px solid #1a5e3a; border-radius: 8px; padding: 10px; background: white; }
+                        .qr-box .footer { margin-top: 15px; font-size: 12px; color: #999; border-top: 1px solid #ddd; padding-top: 10px; }
+                        .qr-box .info { font-size: 11px; color: #666; margin-top: 5px; }
+                        .no-print { display: inline-block; margin-top: 15px; padding: 10px 30px; background: #1a5e3a; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+                        @media print { .no-print { display: none; } body { padding: 10px; } .qr-box { border-width: 2px; padding: 20px; } }
+                    </style>
+                    </head>
+                    <body>
+                        <div class="qr-box">
+                            <h2>🚌 YAOU TRANSPORT</h2>
+                            <div class="sub">🌅 ALLER - MATIN</div>
+                            <div class="qr-image">${img.outerHTML}</div>
+                            <div class="info">Scannez ce QR code pour pointer votre ALLER</div>
+                            <div class="footer">À coller dans le car</div>
+                        </div>
+                        <div>
+                            <button onclick="window.print()" class="no-print">🖨️ Imprimer</button>
+                        </div>
+                    </body>
+                    </html>
+                `);
+            win.document.close();
+        }
+
+        function imprimerQRSoir() {
+            const img = document.querySelector('#qrSoirImage img');
+            if (!img) { alert('QR non généré'); return; }
+
+            const win = window.open('', '_blank');
+            win.document.write(`
+                    <html><head><title>QR RETOUR SOIR</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+                        .qr-box { border: 3px solid #1a5e3a; padding: 30px; border-radius: 10px; display: inline-block; background: white; max-width: 400px; }
+                        .qr-box h2 { color: #1a5e3a; font-size: 24px; margin-bottom: 10px; }
+                        .qr-box .sub { color: #666; font-size: 14px; }
+                        .qr-box .qr-image { margin: 15px 0; }
+                        .qr-box .qr-image img { max-width: 250px; height: auto; border: 2px solid #1a5e3a; border-radius: 8px; padding: 10px; background: white; }
+                        .qr-box .footer { margin-top: 15px; font-size: 12px; color: #999; border-top: 1px solid #ddd; padding-top: 10px; }
+                        .qr-box .info { font-size: 11px; color: #666; margin-top: 5px; }
+                        .no-print { display: inline-block; margin-top: 15px; padding: 10px 30px; background: #1a5e3a; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+                        @media print { .no-print { display: none; } body { padding: 10px; } .qr-box { border-width: 2px; padding: 20px; } }
+                    </style>
+                    </head>
+                    <body>
+                        <div class="qr-box">
+                            <h2>🚌 YAOU TRANSPORT</h2>
+                            <div class="sub">🌙 RETOUR - SOIR</div>
+                            <div class="qr-image">${img.outerHTML}</div>
+                            <div class="info">Scannez ce QR code pour pointer votre RETOUR</div>
+                            <div class="footer">À coller dans le car</div>
+                        </div>
+                        <div>
+                            <button onclick="window.print()" class="no-print">🖨️ Imprimer</button>
+                        </div>
+                    </body>
+                    </html>
+                `);
+            win.document.close();
         }
 
         // ---- CARTE ----
@@ -1428,65 +1603,6 @@
             if (scanHistory.length > 50) scanHistory.pop();
 
             return { success: true, message: `${client.name} - ${type === 'aller' ? 'ALLER' : 'RETOUR'} enregistré !` };
-        }
-
-        // ---- GENERER QR CAR ----
-        function genererQRCars() {
-            const qrMatinData = JSON.stringify({
-                type: 'aller',
-                source: 'car',
-                version: '1.0'
-            });
-            const qrSoirData = JSON.stringify({
-                type: 'retour',
-                source: 'car',
-                version: '1.0'
-            });
-
-            data.qrMatin = qrMatinData;
-            data.qrSoir = qrSoirData;
-            saveData();
-
-            // Générer les QR dans les conteneurs
-            setTimeout(function() {
-                genererQR('qrMatinContainer', qrMatinData, 150);
-                genererQR('qrSoirContainer', qrSoirData, 150);
-            }, 100);
-        }
-
-        function imprimerQR(containerId, nom) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-
-            const canvas = container.querySelector('canvas');
-            if (!canvas) { alert('QR non généré'); return; }
-
-            const win = window.open('', '_blank');
-            win.document.write(`
-                    <html><head><title>${nom}</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
-                        .qr-box { border: 3px solid #1a5e3a; padding: 20px; border-radius: 10px; display: inline-block; background: white; }
-                        .qr-box h2 { color: #1a5e3a; font-size: 24px; margin-bottom: 10px; }
-                        .qr-box .sub { color: #666; font-size: 14px; }
-                        .qr-box .footer { margin-top: 15px; font-size: 12px; color: #999; border-top: 1px solid #ddd; padding-top: 10px; }
-                        @media print { .no-print { display: none; } }
-                    </style>
-                    </head>
-                    <body>
-                        <div class="qr-box">
-                            <h2>🚌 YAOU TRANSPORT</h2>
-                            <div class="sub">${nom}</div>
-                            <div style="margin:15px 0;">${canvas.outerHTML}</div>
-                            <div class="footer">À coller dans le car • Scannez pour pointer</div>
-                        </div>
-                        <div style="margin-top:15px;">
-                            <button onclick="window.print()" class="no-print" style="padding:10px 30px;background:#1a5e3a;color:white;border:none;border-radius:8px;font-size:16px;cursor:pointer;">🖨️ Imprimer</button>
-                        </div>
-                    </body>
-                    </html>
-                `);
-            win.document.close();
         }
 
         // ---- EXPORT PDF ----
@@ -1892,21 +2008,20 @@
             }
         }
 
-        // ---- SCANNER ABONNÉ (pour scanner le QR du car) ----
+        // ---- SCANNER ABONNÉ ----
         let scannerAbonneActive = false;
         let scannerAbonneStream = null;
+        let scanHistory = [];
 
         function startScannerAbonne() {
-            // Vérifier si le navigateur supporte la caméra
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 document.getElementById('scanResultAbonne').className = 'scan-result info';
                 document.getElementById('scanResultAbonne').innerHTML =
-                    '📱 Sur PC, utilisez les boutons "Pointer ALLER" ou "Pointer RETOUR" dans l\'onglet Scanner.';
+                    '📱 Sur PC, utilisez les boutons dans l\'onglet Scanner.';
                 document.getElementById('scanResultAbonne').classList.remove('hidden');
                 return;
             }
 
-            // Vérifier qu'un abonné est sélectionné
             const clientId = document.getElementById('carteSelect').value;
             if (!clientId) {
                 document.getElementById('scanResultAbonne').className = 'scan-result error';
@@ -1929,7 +2044,7 @@
                     if (!('BarcodeDetector' in window)) {
                         document.getElementById('scanResultAbonne').className = 'scan-result info';
                         document.getElementById('scanResultAbonne').innerHTML =
-                            '📱 Scannez avec votre téléphone ou utilisez les boutons ci-dessous.';
+                            '📱 Scannez avec votre téléphone.';
                         document.getElementById('scanResultAbonne').classList.remove('hidden');
                         return;
                     }
@@ -1960,7 +2075,7 @@
                 }).catch(function(err) {
                     document.getElementById('scanResultAbonne').className = 'scan-result info';
                     document.getElementById('scanResultAbonne').innerHTML =
-                        '📱 Utilisez les boutons "Pointer ALLER" ou "Pointer RETOUR" dans l\'onglet Scanner.';
+                        '📱 Utilisez le pointage manuel dans l\'onglet Scanner.';
                     document.getElementById('scanResultAbonne').classList.remove('hidden');
                 });
         }
@@ -1993,21 +2108,17 @@
                     return;
                 }
 
-                const type = dataQr.type; // 'aller' ou 'retour'
-                const client = getClientById(clientId);
+                const type = dataQr.type;
                 const result = pointerParQRCar(clientId, type);
 
                 document.getElementById('scanResultAbonne').className = `scan-result ${result.success ? 'success' : 'error'}`;
                 document.getElementById('scanResultAbonne').innerHTML = result.success ?
-                    `✅ ${result.message} (QR Car ${type === 'aller' ? '🌅' : '🌙'})` :
+                    `✅ ${result.message}` :
                     `❌ ${result.message}`;
                 document.getElementById('scanResultAbonne').classList.remove('hidden');
 
                 if (result.success) {
-                    // Vibrer le téléphone
                     if (navigator.vibrate) navigator.vibrate(200);
-
-                    // Mettre à jour l'affichage
                     renderAll();
                     if (currentCarteClientId) {
                         const carteData = genererCarteData(currentCarteClientId);
@@ -2350,7 +2461,6 @@
             });
             document.getElementById('clientTable').innerHTML = html;
 
-            // Mettre à jour le select des cartes
             const select = document.getElementById('carteSelect');
             const currentVal = select.value;
             select.innerHTML = '<option value="">-- Choisir --</option>';
@@ -2444,7 +2554,7 @@
                             nom: client.name,
                             date: date,
                             type: type,
-                            source: data.pointages[clientId][date] ? 'QR_Car' : 'manuel'
+                            source: 'QR_Car'
                         });
                     });
                 }
@@ -2465,7 +2575,7 @@
                                 <span><strong>${p.nom}</strong></span>
                                 <span class="text-muted">${formatDate(p.date)}</span>
                                 <span class="badge-type ${p.type}">${typeLabel}</span>
-                                <span style="font-size:6px;color:#999;background:#e8f5ed;padding:1px 5px;border-radius:10px;">${p.source === 'QR_Car' ? '📱 QR' : '👤'}</span>
+                                <span style="font-size:6px;color:#999;background:#e8f5ed;padding:1px 5px;border-radius:10px;">📱 QR</span>
                             </div>
                         </div>
                     `;
@@ -2592,17 +2702,8 @@
                 }
             }
 
-            // Générer les QR du car si pas déjà fait
-            if (!data.qrMatin && !data.qrSoir) {
-                genererQRCars();
-            } else {
-                setTimeout(function() {
-                    genererQR('qrMatinContainer', data.qrMatin || JSON.stringify({ type: 'aller', source: 'car' }),
-                    150);
-                    genererQR('qrSoirContainer', data.qrSoir || JSON.stringify({ type: 'retour', source: 'car' }),
-                    150);
-                }, 200);
-            }
+            // Générer les QR images
+            genererQRCars();
         }
 
         // ---- INIT ----
@@ -2622,7 +2723,7 @@
 
         console.log('🚀 YT Transport Pro démarrée');
         console.log('🔑 Code admin: NTR2026');
-        console.log('📱 Flux QR: Abonné → Scanner QR car → Pointage automatique');
+        console.log('📱 QR imprimables générés');
         console.log('✅ Application 100% fonctionnelle');
 
         setInterval(function() {
