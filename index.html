@@ -328,6 +328,14 @@
             background: #f8d7da;
             color: #721c24;
         }
+        .badge-status.present {
+            background: #cce5ff;
+            color: #004085;
+        }
+        .badge-status.absent {
+            background: #f5c6cb;
+            color: #721c24;
+        }
 
         .stats-grid {
             display: grid;
@@ -373,9 +381,9 @@
             display: none !important;
         }
 
-        /* CARTE ABONNEMENT - CORRIGÉE POUR PDF */
+        /* CARTE ABONNEMENT */
         .carte-abonnement {
-            max-width: 350px;
+            max-width: 380px;
             margin: 0 auto;
             background: white;
             border-radius: 12px;
@@ -496,6 +504,105 @@
             padding: 3px;
             background: #f5f5f5;
             border-radius: 3px;
+        }
+
+        /* QR CAR */
+        .qr-car-container {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px dashed #1a5e3a;
+        }
+        .qr-car-container .qr-type {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a5e3a;
+            margin-bottom: 5px;
+        }
+        .qr-car-container .qr-sub {
+            font-size: 9px;
+            color: #666;
+        }
+
+        .scanner-container {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+        .scanner-container video {
+            max-width: 100%;
+            border-radius: 5px;
+            background: #000;
+            max-height: 250px;
+        }
+        .scanner-container .scan-result {
+            margin-top: 5px;
+            padding: 5px;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 11px;
+        }
+        .scanner-container .scan-result.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .scanner-container .scan-result.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .scanner-container .scan-result.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .whatsapp-link {
+            background: #25D366;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 9px;
+            transition: 0.2s;
+        }
+        .whatsapp-link:hover {
+            background: #1da85a;
+        }
+
+        .sub-tabs {
+            display: flex;
+            gap: 3px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+        .sub-tab-btn {
+            padding: 3px 8px;
+            border: none;
+            border-radius: 4px;
+            background: #dce8e2;
+            font-size: 8px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .sub-tab-btn:hover {
+            background: #e8f5ed;
+        }
+        .sub-tab-btn.active {
+            background: #1a5e3a;
+            color: white;
+        }
+        .sub-tab-content {
+            display: none;
+        }
+        .sub-tab-content.active {
+            display: block;
         }
 
         .depart-section {
@@ -619,86 +726,6 @@
             accent-color: #1a5e3a;
         }
 
-        .scanner-container {
-            background: #1a1a1a;
-            border-radius: 10px;
-            padding: 10px;
-            text-align: center;
-        }
-        .scanner-container video {
-            max-width: 100%;
-            border-radius: 5px;
-            background: #000;
-            max-height: 250px;
-        }
-        .scanner-container .scan-result {
-            margin-top: 5px;
-            padding: 5px;
-            border-radius: 5px;
-            font-weight: 600;
-            font-size: 11px;
-        }
-        .scanner-container .scan-result.success {
-            background: #d4edda;
-            color: #155724;
-        }
-        .scanner-container .scan-result.error {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        .scanner-container .scan-result.info {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-
-        .whatsapp-link {
-            background: #25D366;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 30px;
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 9px;
-            transition: 0.2s;
-        }
-        .whatsapp-link:hover {
-            background: #1da85a;
-        }
-
-        .sub-tabs {
-            display: flex;
-            gap: 3px;
-            margin-bottom: 6px;
-            flex-wrap: wrap;
-        }
-        .sub-tab-btn {
-            padding: 3px 8px;
-            border: none;
-            border-radius: 4px;
-            background: #dce8e2;
-            font-size: 8px;
-            font-weight: 600;
-            color: #666;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .sub-tab-btn:hover {
-            background: #e8f5ed;
-        }
-        .sub-tab-btn.active {
-            background: #1a5e3a;
-            color: white;
-        }
-        .sub-tab-content {
-            display: none;
-        }
-        .sub-tab-content.active {
-            display: block;
-        }
-
         .pointage-item {
             display: flex;
             justify-content: space-between;
@@ -721,6 +748,10 @@
         }
         .pointage-item .badge-type.retour {
             background: #2c3e50;
+            color: white;
+        }
+        .pointage-item .badge-type.car {
+            background: #1a5e3a;
             color: white;
         }
 
@@ -746,15 +777,10 @@
             }
         }
 
-        /* STYLE POUR LE PDF */
         @media print {
             body {
                 background: white !important;
                 padding: 10px !important;
-            }
-            .carte-abonnement {
-                box-shadow: none !important;
-                max-width: 100% !important;
             }
             .no-print {
                 display: none !important;
@@ -770,7 +796,7 @@
         <div class="header">
             <div>
                 <h1>🚌 YT Pro</h1>
-                <div class="sub">YAOU • Gestion des abonnements</div>
+                <div class="sub">YAOU • Carte & QR Code</div>
             </div>
             <div class="header-actions">
                 <button onclick="toggleAdmin()">🔐 Admin</button>
@@ -784,7 +810,7 @@
         <div class="admin-lock" id="adminLock">
             <span style="font-size:14px;">🔒</span>
             <span style="font-weight:600;color:#1a5e3a;">Admin</span>
-            <input type="password" id="adminPassword" placeholder="Code Admin">
+            <input type="password" id="adminPassword" placeholder="Code (NTR2026)">
             <button class="btn btn-primary" onclick="unlockAdmin()">Déverrouiller</button>
             <span class="status" id="adminStatus">🔒 Verrouillé</span>
         </div>
@@ -794,7 +820,7 @@
             <button class="tab-btn active" onclick="showTab('tab1')">📊 Dashboard</button>
             <button class="tab-btn" onclick="showTab('tab2')">👥 Abonnés</button>
             <button class="tab-btn" onclick="showTab('tab3')">🪪 Carte</button>
-            <button class="tab-btn" onclick="showTab('tab4')">📱 Scan</button>
+            <button class="tab-btn" onclick="showTab('tab4')">📱 Scanner</button>
             <button class="tab-btn" onclick="showTab('tab5')">🚌 Départs</button>
             <button class="tab-btn" onclick="showTab('tab6')">📈 Rapport</button>
         </div>
@@ -884,12 +910,12 @@
             </div>
         </div>
 
-        <!-- TAB 3: CARTE -->
+        <!-- TAB 3: CARTE ABONNÉ (avec scanner intégré) -->
         <div class="tab-content" id="tab3">
             <div class="card">
-                <div class="card-title">🪪 Ma carte</div>
+                <div class="card-title">🪪 Ma carte virtuelle</div>
                 <div class="form-group">
-                    <label>Sélectionner</label>
+                    <label>Sélectionner votre compte</label>
                     <select id="carteSelect" style="width:100%;padding:4px 8px;border:2px solid #dce8e2;border-radius:5px;font-size:10px;">
                         <option value="">-- Choisir --</option>
                     </select>
@@ -900,6 +926,31 @@
                     <button class="btn btn-outline btn-sm" onclick="partagerCarte()">📤 Partager</button>
                 </div>
             </div>
+
+            <!-- SCANNER POUR L'ABONNÉ (scanner le QR du car) -->
+            <div class="card" style="border:2px solid #d4a017;background:#fff8e1;">
+                <div class="card-title" style="color:#d4a017;">📱 Scanner le QR du car</div>
+                <p style="font-size:9px;color:#666;margin-bottom:4px;">
+                    Scannez le QR code affiché dans le car pour pointer automatiquement
+                </p>
+                <div class="scanner-container" style="background:#1a1a1a;border-radius:8px;padding:8px;">
+                    <div id="scannerPlaceholderAbonne" style="color:white;padding:10px;">
+                        <p style="font-size:12px;">📷 Prêt à scanner</p>
+                        <p style="font-size:8px;opacity:0.6;">Cliquez sur "Scanner"</p>
+                        <p style="font-size:7px;opacity:0.4;margin-top:3px;color:#ffaa00;">Scannez le QR code du car</p>
+                    </div>
+                    <video id="videoAbonne" style="display:none;width:100%;max-width:400px;border-radius:5px;"></video>
+                    <div class="flex mt-6" style="justify-content:center;">
+                        <button class="btn btn-primary" onclick="startScannerAbonne()">📷 Scanner</button>
+                        <button class="btn btn-danger" onclick="stopScannerAbonne()">⏹️ Arrêter</button>
+                    </div>
+                    <div id="scanResultAbonne" class="scan-result hidden"></div>
+                </div>
+                <div style="margin-top:4px;font-size:8px;color:#666;text-align:center;">
+                    💡 Le QR code du car est collé dans le véhicule
+                </div>
+            </div>
+
             <div class="card">
                 <div class="card-title">🪪 Ma carte</div>
                 <div id="cartePreview"><p class="text-muted text-center">Sélectionnez votre nom</p></div>
@@ -914,36 +965,31 @@
             </div>
         </div>
 
-        <!-- TAB 4: SCANNER -->
+        <!-- TAB 4: QR CAR (pour l'admin - générer les QR à imprimer) -->
         <div class="tab-content" id="tab4">
             <div class="card">
-                <div class="card-title">📱 Scanner QR</div>
-                <div style="background:#e8f5ed;padding:4px 8px;border-radius:5px;margin-bottom:4px;">
-                    <p style="font-size:9px;color:#666;">📷 Scannez le QR code de l'abonné pour pointer</p>
-                </div>
-                <div class="scanner-container" id="scannerContainer">
-                    <div id="scannerPlaceholder" style="color:white;padding:15px;">
-                        <p style="font-size:13px;">📷 Prêt</p>
-                        <p style="font-size:9px;opacity:0.6;">Cliquez sur Scanner</p>
-                        <p style="font-size:8px;opacity:0.4;margin-top:5px;color:#ffaa00;">⚠️ Sur PC, utilisez le pointage manuel ci-dessous</p>
+                <div class="card-title">📄 Générer QR pour le car</div>
+                <p style="font-size:9px;color:#666;margin-bottom:4px;">
+                    Imprimez ces QR codes et collez-les dans le car (Matin et Soir)
+                </p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                    <div class="qr-car-container">
+                        <div class="qr-type">🌅 ALLER MATIN</div>
+                        <div id="qrMatinContainer"></div>
+                        <div class="qr-sub">À coller dans le car</div>
+                        <button class="btn btn-success btn-sm mt-6" onclick="imprimerQR('qrMatinContainer','QR_Aller_Matin')">🖨️ Imprimer</button>
                     </div>
-                    <video id="video" style="display:none;width:100%;max-width:400px;border-radius:5px;"></video>
-                    <div class="flex mt-6" style="justify-content:center;">
-                        <button class="btn btn-primary" onclick="startScanner()">📷 Scanner</button>
-                        <button class="btn btn-danger" onclick="stopScanner()">⏹️ Arrêter</button>
+                    <div class="qr-car-container">
+                        <div class="qr-type">🌙 RETOUR SOIR</div>
+                        <div id="qrSoirContainer"></div>
+                        <div class="qr-sub">À coller dans le car</div>
+                        <button class="btn btn-success btn-sm mt-6" onclick="imprimerQR('qrSoirContainer','QR_Retour_Soir')">🖨️ Imprimer</button>
                     </div>
-                    <div id="scanResult" class="scan-result hidden"></div>
-                </div>
-                <div class="flex mt-6">
-                    <button class="btn btn-success btn-sm" onclick="pointerAller()">🟢 Pointer ALLER</button>
-                    <button class="btn btn-info btn-sm" onclick="pointerRetour()" style="background:#2c3e50;color:white;">🔵 Pointer RETOUR</button>
-                </div>
-                <div style="margin-top:4px;padding:4px 8px;background:#fff3cd;border-radius:4px;border:1px solid #ffc107;font-size:8px;color:#856404;">
-                    💡 <strong>Sur PC :</strong> Sélectionnez l'abonné dans la liste du haut, puis cliquez sur "Pointer ALLER" ou "Pointer RETOUR"
                 </div>
             </div>
+
             <div class="card">
-                <div class="card-title">📋 Derniers pointages</div>
+                <div class="card-title">📋 Derniers pointages (temps réel)</div>
                 <div id="scanHistory"><p class="text-muted">Aucun pointage</p></div>
             </div>
         </div>
@@ -951,7 +997,7 @@
         <!-- TAB 5: DEPARTS -->
         <div class="tab-content" id="tab5">
             <div class="card">
-                <div class="card-title">🚌 Départs <span class="badge badge-info" id="departDateDisplay"></span></div>
+                <div class="card-title">🚌 Gestion des départs <span class="badge badge-info" id="departDateDisplay"></span></div>
                 <div class="sub-tabs">
                     <button class="sub-tab-btn active" onclick="showSubTab('subtab-matin')">🌅 MATIN</button>
                     <button class="sub-tab-btn" onclick="showSubTab('subtab-soir')">🌙 SOIR</button>
@@ -1017,13 +1063,12 @@
 
     <script>
         // ================================================================
-        // ===== APPLICATION - VERSION CORRIGÉE ===========================
+        // ===== APPLICATION AVEC SCAN QR CAR (ABONNÉ) ====================
         // ================================================================
 
         // ---- CONSTANTES ----
-        // ⚠️ MOT DE PASSE MODIFIÉ : NTR2026
         const ADMIN_PASSWORD = 'NTR2026';
-        const STORAGE_KEY = 'yt_transport_light';
+        const STORAGE_KEY = 'yt_transport_full';
 
         // ---- DONNEES ----
         let data = loadData();
@@ -1043,7 +1088,9 @@
                 presenceMatin: {},
                 presenceSoir: {},
                 pointages: {},
-                lastCarteNum: 0
+                lastCarteNum: 0,
+                qrMatin: '',
+                qrSoir: ''
             };
         }
 
@@ -1202,7 +1249,7 @@
         }
 
         // ---- QR CODE ----
-        function genererQR(elementId, data) {
+        function genererQR(elementId, data, size) {
             const container = document.getElementById(elementId);
             if (!container) return;
             container.innerHTML = '';
@@ -1210,8 +1257,8 @@
                 try {
                     new QRCode(container, {
                         text: data,
-                        width: 100,
-                        height: 100,
+                        width: size || 120,
+                        height: size || 120,
                         colorDark: '#1a5e3a',
                         colorLight: '#ffffff',
                         correctLevel: QRCode.CorrectLevel.H
@@ -1340,8 +1387,8 @@
                 `;
         }
 
-        // ---- POINTAGE ----
-        function pointerParQR(clientId, type = 'aller') {
+        // ---- POINTAGE PAR QR CAR ----
+        function pointerParQRCar(clientId, type = 'aller') {
             const client = getClientById(clientId);
             if (!client) return { success: false, message: 'Client introuvable' };
 
@@ -1369,19 +1416,80 @@
             data.pointages[clientId][today] = type;
             saveData();
 
+            // Mettre à jour l'historique des scans
             scanHistory.unshift({
                 clientId: clientId,
                 nom: client.name,
                 date: today,
                 heure: new Date().toLocaleTimeString('fr-FR'),
-                type: type
+                type: type,
+                source: 'QR_Car'
             });
             if (scanHistory.length > 50) scanHistory.pop();
 
             return { success: true, message: `${client.name} - ${type === 'aller' ? 'ALLER' : 'RETOUR'} enregistré !` };
         }
 
-        // ---- EXPORT PDF - CORRIGÉ ----
+        // ---- GENERER QR CAR ----
+        function genererQRCars() {
+            const qrMatinData = JSON.stringify({
+                type: 'aller',
+                source: 'car',
+                version: '1.0'
+            });
+            const qrSoirData = JSON.stringify({
+                type: 'retour',
+                source: 'car',
+                version: '1.0'
+            });
+
+            data.qrMatin = qrMatinData;
+            data.qrSoir = qrSoirData;
+            saveData();
+
+            // Générer les QR dans les conteneurs
+            setTimeout(function() {
+                genererQR('qrMatinContainer', qrMatinData, 150);
+                genererQR('qrSoirContainer', qrSoirData, 150);
+            }, 100);
+        }
+
+        function imprimerQR(containerId, nom) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const canvas = container.querySelector('canvas');
+            if (!canvas) { alert('QR non généré'); return; }
+
+            const win = window.open('', '_blank');
+            win.document.write(`
+                    <html><head><title>${nom}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+                        .qr-box { border: 3px solid #1a5e3a; padding: 20px; border-radius: 10px; display: inline-block; background: white; }
+                        .qr-box h2 { color: #1a5e3a; font-size: 24px; margin-bottom: 10px; }
+                        .qr-box .sub { color: #666; font-size: 14px; }
+                        .qr-box .footer { margin-top: 15px; font-size: 12px; color: #999; border-top: 1px solid #ddd; padding-top: 10px; }
+                        @media print { .no-print { display: none; } }
+                    </style>
+                    </head>
+                    <body>
+                        <div class="qr-box">
+                            <h2>🚌 YAOU TRANSPORT</h2>
+                            <div class="sub">${nom}</div>
+                            <div style="margin:15px 0;">${canvas.outerHTML}</div>
+                            <div class="footer">À coller dans le car • Scannez pour pointer</div>
+                        </div>
+                        <div style="margin-top:15px;">
+                            <button onclick="window.print()" class="no-print" style="padding:10px 30px;background:#1a5e3a;color:white;border:none;border-radius:8px;font-size:16px;cursor:pointer;">🖨️ Imprimer</button>
+                        </div>
+                    </body>
+                    </html>
+                `);
+            win.document.close();
+        }
+
+        // ---- EXPORT PDF ----
         function exportPdf(elementId, filename) {
             const element = document.getElementById(elementId);
             if (!element) { alert('Élément non trouvé'); return; }
@@ -1391,30 +1499,12 @@
                 return;
             }
 
-            // Options corrigées pour éviter la coupure
             const opt = {
-                margin: {
-                    top: 10,
-                    bottom: 10,
-                    left: 10,
-                    right: 10
-                },
+                margin: { top: 10, bottom: 10, left: 10, right: 10 },
                 filename: filename || 'document.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true,
-                    width: element.scrollWidth,
-                    height: element.scrollHeight,
-                    windowWidth: element.scrollWidth,
-                    windowHeight: element.scrollHeight
-                },
-                jsPDF: {
-                    unit: 'mm',
-                    format: 'a4',
-                    orientation: 'portrait'
-                },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                html2canvas: { scale: 2, useCORS: true, width: element.scrollWidth, height: element.scrollHeight },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             html2pdf()
@@ -1500,20 +1590,10 @@
             const element = container.querySelector('#pdf-depart');
 
             const opt = {
-                margin: {
-                    top: 10,
-                    bottom: 10,
-                    left: 10,
-                    right: 10
-                },
+                margin: { top: 10, bottom: 10, left: 10, right: 10 },
                 filename: `liste_${type}_${todayStr()}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true,
-                    width: element.scrollWidth,
-                    height: element.scrollHeight
-                },
+                html2canvas: { scale: 2, useCORS: true, width: element.scrollWidth, height: element.scrollHeight },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
@@ -1769,24 +1849,14 @@
             setTimeout(() => {
                 genererQR('qrcode', carteData.qrData);
                 setTimeout(() => {
-                    // Utiliser l'export PDF corrigé
                     const element = document.getElementById('carteAImprimer');
                     if (element) {
                         const opt = {
-                            margin: {
-                                top: 10,
-                                bottom: 10,
-                                left: 10,
-                                right: 10
-                            },
+                            margin: { top: 10, bottom: 10, left: 10, right: 10 },
                             filename: `carte_${todayStr()}.pdf`,
                             image: { type: 'jpeg', quality: 0.98 },
-                            html2canvas: {
-                                scale: 2,
-                                useCORS: true,
-                                width: element.scrollWidth,
-                                height: element.scrollHeight
-                            },
+                            html2canvas: { scale: 2, useCORS: true, width: element.scrollWidth,
+                                height: element.scrollHeight },
                             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
                         };
                         html2pdf()
@@ -1822,34 +1892,45 @@
             }
         }
 
-        // ---- SCANNER ----
-        let scannerActive = false;
-        let scannerStream = null;
+        // ---- SCANNER ABONNÉ (pour scanner le QR du car) ----
+        let scannerAbonneActive = false;
+        let scannerAbonneStream = null;
 
-        function startScanner() {
+        function startScannerAbonne() {
             // Vérifier si le navigateur supporte la caméra
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                document.getElementById('scanResult').className = 'scan-result info';
-                document.getElementById('scanResult').innerHTML =
-                    '📱 Sur PC, utilisez les boutons "Pointer ALLER" ou "Pointer RETOUR" ci-dessous après avoir sélectionné un abonné.';
-                document.getElementById('scanResult').classList.remove('hidden');
+                document.getElementById('scanResultAbonne').className = 'scan-result info';
+                document.getElementById('scanResultAbonne').innerHTML =
+                    '📱 Sur PC, utilisez les boutons "Pointer ALLER" ou "Pointer RETOUR" dans l\'onglet Scanner.';
+                document.getElementById('scanResultAbonne').classList.remove('hidden');
+                return;
+            }
+
+            // Vérifier qu'un abonné est sélectionné
+            const clientId = document.getElementById('carteSelect').value;
+            if (!clientId) {
+                document.getElementById('scanResultAbonne').className = 'scan-result error';
+                document.getElementById('scanResultAbonne').innerHTML =
+                    '⚠️ Sélectionnez d\'abord votre nom dans la liste ci-dessus';
+                document.getElementById('scanResultAbonne').classList.remove('hidden');
+                setTimeout(function() { document.getElementById('scanResultAbonne').classList.add('hidden'); }, 3000);
                 return;
             }
 
             navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
                 .then(function(stream) {
-                    scannerStream = stream;
-                    const video = document.getElementById('video');
+                    scannerAbonneStream = stream;
+                    const video = document.getElementById('videoAbonne');
                     video.srcObject = stream;
                     video.style.display = 'block';
-                    document.getElementById('scannerPlaceholder').style.display = 'none';
-                    scannerActive = true;
+                    document.getElementById('scannerPlaceholderAbonne').style.display = 'none';
+                    scannerAbonneActive = true;
 
                     if (!('BarcodeDetector' in window)) {
-                        document.getElementById('scanResult').className = 'scan-result info';
-                        document.getElementById('scanResult').innerHTML =
+                        document.getElementById('scanResultAbonne').className = 'scan-result info';
+                        document.getElementById('scanResultAbonne').innerHTML =
                             '📱 Scannez avec votre téléphone ou utilisez les boutons ci-dessous.';
-                        document.getElementById('scanResult').classList.remove('hidden');
+                        document.getElementById('scanResultAbonne').classList.remove('hidden');
                         return;
                     }
 
@@ -1858,7 +1939,7 @@
                     const ctx = canvas.getContext('2d');
 
                     function scanLoop() {
-                        if (!scannerActive) return;
+                        if (!scannerAbonneActive) return;
                         if (!video.videoWidth) { setTimeout(scanLoop, 500); return; }
 
                         canvas.width = video.videoWidth;
@@ -1868,7 +1949,7 @@
                         detector.detect(canvas).then(function(barcodes) {
                             if (barcodes.length > 0) {
                                 const qrData = barcodes[0].rawValue;
-                                traiterQR(qrData);
+                                traiterQRCar(qrData);
                             }
                         }).catch(function() {});
 
@@ -1877,97 +1958,78 @@
                     scanLoop();
 
                 }).catch(function(err) {
-                    document.getElementById('scanResult').className = 'scan-result info';
-                    document.getElementById('scanResult').innerHTML =
-                        '📱 Utilisez les boutons "Pointer ALLER" ou "Pointer RETOUR" ci-dessous.';
-                    document.getElementById('scanResult').classList.remove('hidden');
+                    document.getElementById('scanResultAbonne').className = 'scan-result info';
+                    document.getElementById('scanResultAbonne').innerHTML =
+                        '📱 Utilisez les boutons "Pointer ALLER" ou "Pointer RETOUR" dans l\'onglet Scanner.';
+                    document.getElementById('scanResultAbonne').classList.remove('hidden');
                 });
         }
 
-        function stopScanner() {
-            scannerActive = false;
-            if (scannerStream) {
-                scannerStream.getTracks().forEach(function(t) { t.stop(); });
-                scannerStream = null;
+        function stopScannerAbonne() {
+            scannerAbonneActive = false;
+            if (scannerAbonneStream) {
+                scannerAbonneStream.getTracks().forEach(function(t) { t.stop(); });
+                scannerAbonneStream = null;
             }
-            document.getElementById('video').style.display = 'none';
-            document.getElementById('scannerPlaceholder').style.display = 'block';
-            document.getElementById('scanResult').classList.add('hidden');
+            document.getElementById('videoAbonne').style.display = 'none';
+            document.getElementById('scannerPlaceholderAbonne').style.display = 'block';
+            document.getElementById('scanResultAbonne').classList.add('hidden');
         }
 
-        function traiterQR(qrData) {
+        function traiterQRCar(qrData) {
             try {
-                const data = JSON.parse(qrData);
-                if (!data.clientId) { throw new Error('QR invalide'); }
+                const dataQr = JSON.parse(qrData);
+                if (!dataQr.type || dataQr.source !== 'car') {
+                    throw new Error('QR invalide');
+                }
 
-                document.getElementById('scanResult').className = 'scan-result info';
-                document.getElementById('scanResult').innerHTML = `👤 ${data.nom || 'Inconnu'}`;
-                document.getElementById('scanResult').classList.remove('hidden');
+                const clientId = document.getElementById('carteSelect').value;
+                if (!clientId) {
+                    document.getElementById('scanResultAbonne').className = 'scan-result error';
+                    document.getElementById('scanResultAbonne').innerHTML =
+                        '⚠️ Sélectionnez d\'abord votre nom dans la liste ci-dessus';
+                    document.getElementById('scanResultAbonne').classList.remove('hidden');
+                    setTimeout(function() { document.getElementById('scanResultAbonne').classList.add('hidden'); }, 3000);
+                    return;
+                }
 
-                if (navigator.vibrate) navigator.vibrate(100);
+                const type = dataQr.type; // 'aller' ou 'retour'
+                const client = getClientById(clientId);
+                const result = pointerParQRCar(clientId, type);
 
-                setTimeout(function() {
-                    const type = confirm(`Pointer ${data.nom || 'client'} ?\nOK = ALLER | Annuler = RETOUR`) ?
-                        'aller' : 'retour';
-                    const result = pointerParQR(data.clientId, type);
-                    document.getElementById('scanResult').className = `scan-result ${result.success ? 'success' : 'error'}`;
-                    document.getElementById('scanResult').innerHTML = result.success ? `✅ ${result.message}` :
-                        `❌ ${result.message}`;
-                    document.getElementById('scanResult').classList.remove('hidden');
+                document.getElementById('scanResultAbonne').className = `scan-result ${result.success ? 'success' : 'error'}`;
+                document.getElementById('scanResultAbonne').innerHTML = result.success ?
+                    `✅ ${result.message} (QR Car ${type === 'aller' ? '🌅' : '🌙'})` :
+                    `❌ ${result.message}`;
+                document.getElementById('scanResultAbonne').classList.remove('hidden');
 
-                    if (result.success) {
-                        renderAll();
-                        if (currentCarteClientId) {
-                            const carteData = genererCarteData(currentCarteClientId);
-                            if (carteData) {
-                                const carteHtml = afficherCarteHtml(carteData);
-                                if (carteHtml) {
-                                    document.getElementById('cartePreview').innerHTML = carteHtml;
-                                    setTimeout(function() { genererQR('qrcode', carteData.qrData); }, 200);
-                                }
+                if (result.success) {
+                    // Vibrer le téléphone
+                    if (navigator.vibrate) navigator.vibrate(200);
+
+                    // Mettre à jour l'affichage
+                    renderAll();
+                    if (currentCarteClientId) {
+                        const carteData = genererCarteData(currentCarteClientId);
+                        if (carteData) {
+                            const carteHtml = afficherCarteHtml(carteData);
+                            if (carteHtml) {
+                                document.getElementById('cartePreview').innerHTML = carteHtml;
+                                setTimeout(function() { genererQR('qrcode', carteData.qrData); }, 200);
                             }
-                            renderPointageHistory(currentCarteClientId);
                         }
+                        renderPointageHistory(currentCarteClientId);
                     }
-                    setTimeout(function() { document.getElementById('scanResult').classList.add('hidden'); }, 3000);
-                }, 500);
+                }
+
+                setTimeout(function() { document.getElementById('scanResultAbonne').classList.add('hidden'); }, 4000);
 
             } catch (e) {
-                document.getElementById('scanResult').className = 'scan-result error';
-                document.getElementById('scanResult').innerHTML = '❌ QR invalide';
-                document.getElementById('scanResult').classList.remove('hidden');
-                setTimeout(function() { document.getElementById('scanResult').classList.add('hidden'); }, 2000);
+                document.getElementById('scanResultAbonne').className = 'scan-result error';
+                document.getElementById('scanResultAbonne').innerHTML = '❌ QR invalide - Scannez le QR du car';
+                document.getElementById('scanResultAbonne').classList.remove('hidden');
+                setTimeout(function() { document.getElementById('scanResultAbonne').classList.add('hidden'); }, 3000);
             }
-        }
-
-        function pointerAller() {
-            const clientId = document.getElementById('carteSelect').value;
-            if (!clientId) {
-                alert('⚠️ Sélectionnez d\'abord un abonné dans la liste "Sélectionner"');
-                return;
-            }
-            const result = pointerParQR(clientId, 'aller');
-            document.getElementById('scanResult').className = `scan-result ${result.success ? 'success' : 'error'}`;
-            document.getElementById('scanResult').innerHTML = result.success ? `✅ ${result.message}` :
-                `❌ ${result.message}`;
-            document.getElementById('scanResult').classList.remove('hidden');
-            if (result.success) renderAll();
-            setTimeout(function() { document.getElementById('scanResult').classList.add('hidden'); }, 3000);
-        }
-
-        function pointerRetour() {
-            const clientId = document.getElementById('carteSelect').value;
-            if (!clientId) {
-                alert('⚠️ Sélectionnez d\'abord un abonné dans la liste "Sélectionner"');
-                return;
-            }
-            const result = pointerParQR(clientId, 'retour');
-            document.getElementById('scanResult').className = `scan-result ${result.success ? 'success' : 'error'}`;
-            document.getElementById('scanResult').innerHTML = result.success ? `✅ ${result.message}` :
-                `❌ ${result.message}`;
-            document.getElementById('scanResult').classList.remove('hidden');
-            if (result.success) renderAll();
-            setTimeout(function() { document.getElementById('scanResult').classList.add('hidden'); }, 3000);
         }
 
         // ---- DEPARTS ----
@@ -2370,6 +2432,47 @@
             document.getElementById('reportContent').innerHTML = html;
         }
 
+        // ---- RENDU SCAN HISTORY ----
+        function renderScanHistory() {
+            const pointages = [];
+            Object.keys(data.pointages).forEach(function(clientId) {
+                const client = getClientById(clientId);
+                if (client) {
+                    Object.keys(data.pointages[clientId]).forEach(function(date) {
+                        const type = data.pointages[clientId][date];
+                        pointages.push({
+                            nom: client.name,
+                            date: date,
+                            type: type,
+                            source: data.pointages[clientId][date] ? 'QR_Car' : 'manuel'
+                        });
+                    });
+                }
+            });
+            pointages.sort(function(a, b) { return b.date.localeCompare(a.date); });
+
+            if (pointages.length === 0) {
+                document.getElementById('scanHistory').innerHTML = '<p class="text-muted">Aucun pointage</p>';
+                return;
+            }
+
+            let html = '';
+            pointages.slice(0, 30).forEach(function(p) {
+                const typeLabel = p.type === 'aller' ? '🟢 Aller' : p.type === 'retour' ? '🔵 Retour' : '✅';
+                html += `
+                        <div class="pointage-item">
+                            <div class="info">
+                                <span><strong>${p.nom}</strong></span>
+                                <span class="text-muted">${formatDate(p.date)}</span>
+                                <span class="badge-type ${p.type}">${typeLabel}</span>
+                                <span style="font-size:6px;color:#999;background:#e8f5ed;padding:1px 5px;border-radius:10px;">${p.source === 'QR_Car' ? '📱 QR' : '👤'}</span>
+                            </div>
+                        </div>
+                    `;
+            });
+            document.getElementById('scanHistory').innerHTML = html;
+        }
+
         // ---- EXPORT ----
         function exportData() {
             const exportData = { ...data, exportDate: new Date().toISOString() };
@@ -2488,40 +2591,18 @@
                     renderPaiementHistory(document.getElementById('carteSelect').value);
                 }
             }
-        }
 
-        function renderScanHistory() {
-            const pointages = [];
-            Object.keys(data.pointages).forEach(function(clientId) {
-                const client = getClientById(clientId);
-                if (client) {
-                    Object.keys(data.pointages[clientId]).forEach(function(date) {
-                        const type = data.pointages[clientId][date];
-                        pointages.push({ nom: client.name, date: date, type: type });
-                    });
-                }
-            });
-            pointages.sort(function(a, b) { return b.date.localeCompare(a.date); });
-
-            if (pointages.length === 0) {
-                document.getElementById('scanHistory').innerHTML = '<p class="text-muted">Aucun pointage</p>';
-                return;
+            // Générer les QR du car si pas déjà fait
+            if (!data.qrMatin && !data.qrSoir) {
+                genererQRCars();
+            } else {
+                setTimeout(function() {
+                    genererQR('qrMatinContainer', data.qrMatin || JSON.stringify({ type: 'aller', source: 'car' }),
+                    150);
+                    genererQR('qrSoirContainer', data.qrSoir || JSON.stringify({ type: 'retour', source: 'car' }),
+                    150);
+                }, 200);
             }
-
-            let html = '';
-            pointages.slice(0, 20).forEach(function(p) {
-                const typeLabel = p.type === 'aller' ? '🟢 Aller' : p.type === 'retour' ? '🔵 Retour' : '✅';
-                html += `
-                        <div class="pointage-item">
-                            <div class="info">
-                                <span><strong>${p.nom}</strong></span>
-                                <span class="text-muted">${formatDate(p.date)}</span>
-                                <span class="badge-type ${p.type}">${typeLabel}</span>
-                            </div>
-                        </div>
-                    `;
-            });
-            document.getElementById('scanHistory').innerHTML = html;
         }
 
         // ---- INIT ----
@@ -2535,17 +2616,15 @@
 
         renderAll();
 
-        // Démarrer le GPS automatiquement
         if (navigator.geolocation) {
             setTimeout(startGps, 1000);
         }
 
         console.log('🚀 YT Transport Pro démarrée');
         console.log('🔑 Code admin: NTR2026');
-        console.log('📦 Données: localStorage');
+        console.log('📱 Flux QR: Abonné → Scanner QR car → Pointage automatique');
         console.log('✅ Application 100% fonctionnelle');
 
-        // Rafraîchissement automatique
         setInterval(function() {
             renderStats();
             renderAlerts();
