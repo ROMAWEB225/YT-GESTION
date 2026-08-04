@@ -14,7 +14,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
     </script>
     <style>
-        /* ===== STYLES COMPLETS ===== */
+        /* ===== STYLES ===== */
         * {
             margin: 0;
             padding: 0;
@@ -146,20 +146,6 @@
         }
         .btn-block {
             width: 100%;
-        }
-        .btn-import-special {
-            background: #d4a017;
-            color: white;
-            border: none;
-            padding: 5px 12px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 10px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .btn-import-special:hover {
-            background: #b8860b;
         }
 
         .tabs {
@@ -397,6 +383,7 @@
             display: none !important;
         }
 
+        /* CARTE ABONNEMENT */
         .carte-abonnement {
             max-width: 380px;
             margin: 0 auto;
@@ -835,7 +822,7 @@
             border: 2px solid #1a5e3a;
         }
 
-        /* IMPORT */
+        /* IMPORT - CORRIGÉ */
         .import-box {
             border: 2px dashed #1a5e3a;
             border-radius: 8px;
@@ -909,34 +896,6 @@
         }
         .import-box .preview-stats .stat-error {
             color: #c0392b;
-        }
-        .import-box .btn-import-force {
-            background: #d4a017;
-            color: white;
-            border: none;
-            padding: 5px 12px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 10px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .import-box .btn-import-force:hover {
-            background: #b8860b;
-        }
-        .import-box .btn-import-special {
-            background: #2c7a9e;
-            color: white;
-            border: none;
-            padding: 5px 12px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 10px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .import-box .btn-import-special:hover {
-            background: #1e5a7a;
         }
 
         @media (max-width: 768px) {
@@ -1082,21 +1041,19 @@
                 <button class="btn btn-primary btn-block" onclick="addClient()">➕ Ajouter & Générer</button>
             </div>
 
-            <!-- IMPORT -->
+            <!-- IMPORTATION EXCEL - CORRIGÉE -->
             <div class="card" id="importCard">
                 <div class="card-title">📥 Importer une liste <span class="badge badge-admin">Admin</span></div>
                 <div class="import-box">
                     <div style="font-size:13px;font-weight:600;color:#1a5e3a;">📂 Importer un fichier</div>
                     <div class="drop-text">
                         Formats supportés : <strong>Excel (.xlsx)</strong> • CSV • JSON
-                        <br><span class="supported">Pour le fichier "RAM+SUIVI", utilisez le bouton <strong>"📋 Importer les abonnés"</strong></span>
+                        <br><span class="supported">Colonnes: Nom, Téléphone, Adresse, Début, Fin, Montant, Trajet, Départ Matin, Arrêt Matin, Retour Soir, Arrêt Soir</span>
                     </div>
                     <input type="file" id="importFile" accept=".xlsx,.xls,.csv,.json" style="width:100%;padding:6px;border:2px dashed #dce8e2;border-radius:4px;margin:4px 0;">
                     <div id="importPreview" class="preview-list" style="display:none;"></div>
-                    <div class="flex mt-6" style="justify-content:center;gap:6px;flex-wrap:wrap;">
-                        <button class="btn btn-success" onclick="importerListe()">📥 Importer (sans doublons)</button>
-                        <button class="btn btn-import-force" onclick="importerListeForce()">⚠️ Importer TOUT</button>
-                        <button class="btn btn-import-special" onclick="importerListeSpeciale()">📋 Importer les abonnés</button>
+                    <div class="flex mt-6" style="justify-content:center;">
+                        <button class="btn btn-success" onclick="importerListe()">📥 Importer</button>
                         <button class="btn btn-outline" onclick="document.getElementById('importFile').value='';document.getElementById('importPreview').style.display='none';">🔄 Effacer</button>
                     </div>
                     <div style="margin-top:4px;font-size:8px;color:#999;">
@@ -1355,12 +1312,12 @@
 
     <script>
         // ================================================================
-        // ===== APPLICATION COMPLETE - AVEC IMPORTATION SPÉCIALE =========
+        // ===== APPLICATION - IMPORT EXCEL CORRIGÉ =======================
         // ================================================================
 
         // ---- CONSTANTES ----
         const ADMIN_PASSWORD = 'NTR2026';
-        const STORAGE_KEY = 'yt_transport_final_v8';
+        const STORAGE_KEY = 'yt_transport_final_v5';
         let selectedPaymentMethod = 'orange';
 
         // ---- DONNEES ----
@@ -1540,63 +1497,8 @@
             if (!str) return '';
             return str.trim()
                 .toLowerCase()
-                .replace(/[^a-z0-9\s]/g, '')
-                .replace(/\s+/g, ' ');
-        }
-
-        function normaliserColonne(col) {
-            const colLower = col.toLowerCase().trim()
-                .replace(/[^a-z0-9\s]/g, '')
-                .replace(/\s+/g, '_');
-
-            const mapping = {
-                'nom': 'nom',
-                'name': 'nom',
-                'client': 'nom',
-                'nom_complet': 'nom',
-                'nom complet': 'nom',
-                'nom & prenoms': 'nom',
-                'nom_prenoms': 'nom',
-                'telephone': 'telephone',
-                'tel': 'telephone',
-                'phone': 'telephone',
-                'numero': 'telephone',
-                'numéro': 'telephone',
-                'portable': 'telephone',
-                'contact': 'telephone',
-                'adresse': 'adresse',
-                'address': 'adresse',
-                'lieu': 'adresse',
-                'lieu de residence': 'adresse',
-                'lieu_residence': 'adresse',
-                'debut': 'debut',
-                'start': 'debut',
-                'date_debut': 'debut',
-                'fin': 'fin',
-                'end': 'fin',
-                'date_fin': 'fin',
-                'montant': 'montant',
-                'amount': 'montant',
-                'prix': 'montant',
-                'tarif': 'montant',
-                'trajet': 'trajet',
-                'type': 'trajet',
-                'trip': 'trajet',
-                'depart_matin': 'depart_matin',
-                'departmatin': 'depart_matin',
-                'heure_depart': 'depart_matin',
-                'arret_matin': 'arret_matin',
-                'arretmatin': 'arret_matin',
-                'lieu_depart': 'arret_matin',
-                'retour_soir': 'retour_soir',
-                'retoursoir': 'retour_soir',
-                'heure_retour': 'retour_soir',
-                'arret_soir': 'arret_soir',
-                'arretsoir': 'arret_soir',
-                'lieu_retour': 'arret_soir'
-            };
-
-            return mapping[colLower] || colLower;
+                .replace(/[^a-z0-9\s]/g, '') // enlever accents et caractères spéciaux
+                .replace(/\s+/g, ' '); // espaces simples
         }
 
         // ---- PHOTO ----
@@ -1878,7 +1780,7 @@
             downloadFile(csv, `historique_${todayStr()}.csv`, 'text/csv');
         }
 
-        // ---- EXPORT PDF ----
+        // ---- EXPORT PDF CARTE ----
         function exporterCartePDF() {
             const clientId = $('carteSelect').value;
             if (!clientId) { alert('Sélectionnez un abonné'); return; }
@@ -2081,7 +1983,7 @@ csv += c.name + ',' + (c.phone || '') + ',' + (c.adresse || '') + ',' + (c.numer
 downloadFile(csv, `rapport_${todayStr()}.csv`, 'text/csv');
 }
 
-// ---- IMPORTATION ----
+// ---- IMPORTATION EXCEL - CORRIGÉE ----
 document.getElementById('importFile').addEventListener('change', function(e) {
 const file = e.target.files[0];
 if (!file) return;
@@ -2126,6 +2028,7 @@ alert('Erreur de lecture CSV: ' + err.message);
 };
 reader.readAsText(file);
 } else {
+// Excel (.xlsx, .xls)
 reader.onload = function(ev) {
 try {
 const data = new Uint8Array(ev.target.result);
@@ -2136,37 +2039,14 @@ const jsonData = XLSX.utils.sheet_to_json(firstSheet);
 const parsedData = jsonData.map(row => {
 const obj = {};
 Object.keys(row).forEach(key => {
-const normalizedKey = normaliserColonne(key);
-obj[normalizedKey] = row[key] || '';
+const normalized = key.toLowerCase().trim()
+.replace(/é/g, 'e').replace(/è/g, 'e')
+.replace(/ê/g, 'e').replace(/à/g, 'a')
+.replace(/ç/g, 'c').replace(/ /g, '');
+obj[normalized] = row[key] || '';
 });
 return obj;
 });
-
-// Si la première feuille est vide ou n'a pas de données, essayer les autres feuilles
-if (parsedData.length === 0 || !parsedData.some(item => item.nom)) {
-// Essayer de trouver une feuille avec des abonnés
-let found = false;
-workbook.SheetNames.forEach(sheetName => {
-if (found) return;
-const sheet = workbook.Sheets[sheetName];
-const sheetData = XLSX.utils.sheet_to_json(sheet);
-if (sheetData.length > 0) {
-const testData = sheetData.map(row => {
-const obj = {};
-Object.keys(row).forEach(key => {
-const normalizedKey = normaliserColonne(key);
-obj[normalizedKey] = row[key] || '';
-});
-return obj;
-});
-// Vérifier si cette feuille contient des noms
-if (testData.some(item => item.nom)) {
-importPreviewData = testData;
-found = true;
-}
-}
-});
-}
 
 importPreviewData = parsedData;
 showImportPreview(parsedData);
@@ -2178,7 +2058,7 @@ reader.readAsArrayBuffer(file);
 }
 });
 
-// ---- AFFICHAGE APERÇU ----
+// ---- AFFICHAGE APERÇU - CORRIGÉ ----
 function showImportPreview(data) {
 const preview = $('importPreview');
 if (!data || data.length === 0) {
@@ -2190,10 +2070,12 @@ let newCount = 0,
 dupCount = 0,
 errorCount = 0;
 
+// Préparer la liste des noms normalisés existants
 const existingNames = data.clients.map(c => normalizeName(c.name));
 
+// Analyser chaque ligne
 const itemsHtml = data.map((item, i) => {
-const name = (item.nom || '').toString().trim();
+const name = (item.nom || item.name || '').trim();
 if (!name) {
 errorCount++;
 return `<div class="item">
@@ -2207,10 +2089,9 @@ const exists = existingNames.includes(normalized);
 if (exists) dupCount++;
 else newCount++;
 
-const phone = item.telephone || '';
-const lieu = item.adresse || '';
+const phone = item.telephone || item.phone || '';
 return `<div class="item">
-            <span>${i+1}. <strong>${name}</strong> ${phone ? '📞 ' + phone : ''} ${lieu ? '📍 ' + lieu : ''}</span>
+            <span>${i+1}. <strong>${name}</strong> ${phone ? '📞 ' + phone : ''}</span>
             <span class="badge-import ${exists ? 'duplicate' : 'new'}">${exists ? '⚠️ Doublon' : '✅ Nouveau'}</span>
         </div>`;
 }).join('');
@@ -2228,140 +2109,83 @@ preview.innerHTML = statsHtml + itemsHtml;
 preview.style.display = 'block';
 }
 
-// ---- IMPORTER SANS DOUBLONS ----
+// ---- IMPORTER LISTE - CORRIGÉ ----
 function importerListe() {
-    if (!isAdmin) { alert('🔒 Mode admin requis'); return; }
-    if (importPreviewData.length === 0) { alert('Aucune donnée à importer. Chargez d\'abord un fichier.'); return; }
+if (!isAdmin) { alert('🔒 Mode admin requis'); return; }
+if (importPreviewData.length === 0) { alert('Aucune donnée à importer. Chargez d\'abord un fichier.'); return; }
 
-    const existingNames = data.clients.map(c => normalizeName(c.name));
-    const newClients = importPreviewData.filter(item => {
-        const name = (item.nom || '').toString().trim();
-        if (!name) return false;
-        const normalized = normalizeName(name);
-        return !existingNames.includes(normalized);
-    });
+// Filtrer les doublons
+const existingNames = data.clients.map(c => normalizeName(c.name));
+const newClients = importPreviewData.filter(item => {
+const name = (item.nom || item.name || '').trim();
+if (!name) return false;
+const normalized = normalizeName(name);
+return !existingNames.includes(normalized);
+});
 
-    if (newClients.length === 0) {
-        alert('⚠️ Tous les abonnés sont déjà dans la liste (doublons)\n\nUtilisez le bouton "Importer TOUT" pour forcer l\'importation.');
-        return;
-    }
-
-    if (!confirm(`Importer ${newClients.length} nouveaux abonnés sur ${importPreviewData.length} trouvés ?`)) return;
-
-    importerDonnees(newClients);
+if (newClients.length === 0) {
+alert('⚠️ Tous les abonnés sont déjà dans la liste (doublons)');
+return;
 }
 
-// ---- IMPORTER TOUT (FORCÉ) ----
-function importerListeForce() {
-    if (!isAdmin) { alert('🔒 Mode admin requis'); return; }
-    if (importPreviewData.length === 0) { alert('Aucune donnée à importer.'); return; }
+if (!confirm(`Importer ${newClients.length} nouveaux abonnés sur ${importPreviewData.length} trouvés ?`)) return;
 
-    if (!confirm(`⚠️ IMPORTATION FORCÉE\n\nVoulez-vous vraiment importer TOUS les ${importPreviewData.length} abonnés du fichier ?\n\n(Des doublons peuvent être créés)`)) return;
+let count = 0;
+let errors = [];
+newClients.forEach((item, idx) => {
+try {
+const name = (item.nom || item.name || '').trim();
+if (!name) return;
 
-    importerDonnees(importPreviewData);
+const phone = (item.telephone || item.phone || '').trim();
+const adresse = (item.adresse || '').trim();
+const startDate = (item.debut || item.startdate || '').trim() || todayStr();
+const endDate = (item.fin || item.enddate || '').trim() || new Date(new Date().setMonth(new Date().getMonth() + 1))
+.toISOString().split('T')[0];
+const amount = parseInt((item.montant || '').trim()) || 25000;
+const tripType = (item.trajet || '').trim() || 'aller-retour';
+const departMatinTime = (item.departmatin || item.depart_matin || item.heure_depart || '').trim() || '07:00';
+const departMatinArret = (item.arretmatin || item.arret_matin || item.arret_depart || '').trim() || 'Gare centrale';
+const returnSoirTime = (item.retoursoir || item.retour_soir || item.heure_retour || '').trim() || '18:00';
+const returnSoirArret = (item.arretsoir || item.arret_soir || item.arret_retour || '').trim() || 'Marché';
+
+const numeroCarte = genererNumeroCarte();
+
+const newClient = {
+id: generateId(),
+name: name,
+phone: phone,
+adresse: adresse,
+startDate: startDate,
+endDate: endDate,
+amount: amount,
+tripType: tripType,
+departMatinTime: departMatinTime,
+departMatinArret: departMatinArret,
+returnSoirTime: returnSoirTime,
+returnSoirArret: returnSoirArret,
+numeroCarte: numeroCarte,
+photo: ''
+};
+
+data.clients.push(newClient);
+count++;
+} catch (e) {
+errors.push(`Ligne ${idx+1}: ${e.message}`);
 }
+});
 
-// ---- IMPORTER SPÉCIALE (pour votre fichier) ----
-function importerListeSpeciale() {
-    if (!isAdmin) { alert('🔒 Mode admin requis'); return; }
-    if (importPreviewData.length === 0) { alert('Aucune donnée à importer. Chargez d\'abord un fichier.'); return; }
-
-    // Filtrer uniquement les lignes qui contiennent des noms
-    const abonnesData = importPreviewData.filter(item => {
-        const nom = (item.nom || '').toString().trim();
-        return nom.length > 0;
-    });
-
-    if (abonnesData.length === 0) {
-        alert('❌ Aucun abonné trouvé dans le fichier.\n\n' +
-            'Assurez-vous que votre fichier contient une feuille avec les colonnes:\n' +
-            '- "Nom & Prenoms"\n' +
-            '- "Lieu de Residence"\n' +
-            '- "Telephone"\n\n' +
-            'La feuille "Sheet6" de votre fichier contient ces informations.');
-        return;
-    }
-
-    if (!confirm(`📥 ${abonnesData.length} abonnés trouvés dans le fichier.\n\nVoulez-vous les importer ?`)) return;
-
-    // Préparer les données pour l'importation
-    const dataToImport = abonnesData.map(item => ({
-        nom: (item.nom || '').toString().trim(),
-        telephone: (item.telephone || '').toString().trim(),
-        adresse: (item.adresse || '').toString().trim()
-    }));
-
-    importerDonnees(dataToImport);
+if (count > 0) {
+saveData();
+let msg = `✅ ${count} abonnés importés avec succès !`;
+if (errors.length > 0) msg += `\n\n⚠️ Erreurs: ${errors.join('\n')}`;
+alert(msg);
+importPreviewData = [];
+$('importFile').value = '';
+$('importPreview').style.display = 'none';
+} else {
+alert('⚠️ Aucun nouvel abonné à importer');
 }
-
-// ---- FONCTION D'IMPORTATION COMMUNE ----
-function importerDonnees(dataList) {
-    let count = 0;
-    let errors = [];
-    let doublons = 0;
-
-    dataList.forEach((item, idx) => {
-        try {
-            const name = (item.nom || '').toString().trim();
-            if (!name) {
-                errors.push(`Ligne ${idx+1}: Nom manquant`);
-                return;
-            }
-
-            const existing = data.clients.some(c => normalizeName(c.name) === normalizeName(name));
-            if (existing) doublons++;
-
-            const phone = (item.telephone || '').toString().trim();
-            const adresse = (item.adresse || '').toString().trim();
-            const startDate = (item.debut || '').toString().trim() || todayStr();
-            const endDate = (item.fin || '').toString().trim() || new Date(new Date().setMonth(new Date().getMonth() + 1))
-                .toISOString().split('T')[0];
-            const amount = parseInt((item.montant || '').toString().trim()) || 25000;
-            const tripType = (item.trajet || '').toString().trim() || 'aller-retour';
-            const departMatinTime = (item.depart_matin || '').toString().trim() || '07:00';
-            const departMatinArret = (item.arret_matin || '').toString().trim() || 'Gare centrale';
-            const returnSoirTime = (item.retour_soir || '').toString().trim() || '18:00';
-            const returnSoirArret = (item.arret_soir || '').toString().trim() || 'Marché';
-
-            const numeroCarte = genererNumeroCarte();
-
-            const newClient = {
-                id: generateId(),
-                name: name,
-                phone: phone,
-                adresse: adresse,
-                startDate: startDate,
-                endDate: endDate,
-                amount: amount,
-                tripType: tripType,
-                departMatinTime: departMatinTime,
-                departMatinArret: departMatinArret,
-                returnSoirTime: returnSoirTime,
-                returnSoirArret: returnSoirArret,
-                numeroCarte: numeroCarte,
-                photo: ''
-            };
-
-            data.clients.push(newClient);
-            count++;
-        } catch (e) {
-            errors.push(`Ligne ${idx+1}: ${e.message}`);
-        }
-    });
-
-    if (count > 0) {
-        saveData();
-        let msg = `✅ ${count} abonnés importés avec succès !\n`;
-        if (doublons > 0) msg += `⚠️ ${doublons} doublons détectés (importés quand même)\n`;
-        if (errors.length > 0) msg += `\n❌ Erreurs: ${errors.join('\n')}`;
-        alert(msg);
-        importPreviewData = [];
-        $('importFile').value = '';
-        $('importPreview').style.display = 'none';
-        renderAll();
-    } else {
-        alert('⚠️ Aucun abonné n\'a pu être importé.');
-    }
 }
 
 function exporterModeleExcel() {
@@ -3573,9 +3397,9 @@ if (navigator.geolocation) {
 setTimeout(startGps, 1000);
 }
 
-console.log('🚀 YT Transport Pro v8 démarrée');
+console.log('🚀 YT Transport Pro v5 démarrée');
 console.log('🔑 Code admin: NTR2026');
-console.log('📥 Importation spéciale pour fichier "RAM+SUIVI"');
+console.log('📥 Import Excel corrigé - affiche tous les abonnés');
 console.log('✅ Application complète');
 
 setInterval(() => {
