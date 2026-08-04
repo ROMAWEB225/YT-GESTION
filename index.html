@@ -14,7 +14,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
     </script>
     <style>
-        /* ===== STYLES ===== */
+        /* ===== STYLES COMPLETS ===== */
         * {
             margin: 0;
             padding: 0;
@@ -822,7 +822,7 @@
             border: 2px solid #1a5e3a;
         }
 
-        /* IMPORT - CORRIGÉ */
+        /* IMPORT */
         .import-box {
             border: 2px dashed #1a5e3a;
             border-radius: 8px;
@@ -1041,14 +1041,15 @@
                 <button class="btn btn-primary btn-block" onclick="addClient()">➕ Ajouter & Générer</button>
             </div>
 
-            <!-- IMPORTATION EXCEL - CORRIGÉE -->
+            <!-- IMPORT -->
             <div class="card" id="importCard">
                 <div class="card-title">📥 Importer une liste <span class="badge badge-admin">Admin</span></div>
                 <div class="import-box">
                     <div style="font-size:13px;font-weight:600;color:#1a5e3a;">📂 Importer un fichier</div>
                     <div class="drop-text">
                         Formats supportés : <strong>Excel (.xlsx)</strong> • CSV • JSON
-                        <br><span class="supported">Colonnes: Nom, Téléphone, Adresse, Début, Fin, Montant, Trajet, Départ Matin, Arrêt Matin, Retour Soir, Arrêt Soir</span>
+                        <br><span class="supported">Colonnes acceptées: Nom, Téléphone, Adresse, Début, Fin, Montant, Trajet, Départ Matin, Arrêt Matin, Retour Soir, Arrêt Soir</span>
+                        <br><span style="font-size:7px;color:#999;">💡 Seuls le NOM et le TÉLÉPHONE sont obligatoires, le reste sera complété automatiquement</span>
                     </div>
                     <input type="file" id="importFile" accept=".xlsx,.xls,.csv,.json" style="width:100%;padding:6px;border:2px dashed #dce8e2;border-radius:4px;margin:4px 0;">
                     <div id="importPreview" class="preview-list" style="display:none;"></div>
@@ -1312,12 +1313,12 @@
 
     <script>
         // ================================================================
-        // ===== APPLICATION - IMPORT EXCEL CORRIGÉ =======================
+        // ===== APPLICATION COMPLETE ======================================
         // ================================================================
 
         // ---- CONSTANTES ----
         const ADMIN_PASSWORD = 'NTR2026';
-        const STORAGE_KEY = 'yt_transport_final_v5';
+        const STORAGE_KEY = 'yt_transport_final_v6';
         let selectedPaymentMethod = 'orange';
 
         // ---- DONNEES ----
@@ -1497,8 +1498,67 @@
             if (!str) return '';
             return str.trim()
                 .toLowerCase()
-                .replace(/[^a-z0-9\s]/g, '') // enlever accents et caractères spéciaux
-                .replace(/\s+/g, ' '); // espaces simples
+                .replace(/[^a-z0-9\s]/g, '')
+                .replace(/\s+/g, ' ');
+        }
+
+        // ---- NORMALISATION DES COLONNES POUR L'IMPORT ----
+        function normaliserColonne(col) {
+            const colLower = col.toLowerCase().trim()
+                .replace(/[^a-z0-9\s]/g, '')
+                .replace(/\s+/g, '_');
+
+            const mapping = {
+                'nom': 'nom',
+                'name': 'nom',
+                'client': 'nom',
+                'nom_complet': 'nom',
+                'nom complet': 'nom',
+                'nomclient': 'nom',
+                'telephone': 'telephone',
+                'tel': 'telephone',
+                'phone': 'telephone',
+                'numero': 'telephone',
+                'numéro': 'telephone',
+                'portable': 'telephone',
+                'contact': 'telephone',
+                'adresse': 'adresse',
+                'address': 'adresse',
+                'lieu': 'adresse',
+                'debut': 'debut',
+                'start': 'debut',
+                'date_debut': 'debut',
+                'date debut': 'debut',
+                'fin': 'fin',
+                'end': 'fin',
+                'date_fin': 'fin',
+                'date fin': 'fin',
+                'montant': 'montant',
+                'amount': 'montant',
+                'prix': 'montant',
+                'tarif': 'montant',
+                'trajet': 'trajet',
+                'type': 'trajet',
+                'trip': 'trajet',
+                'depart_matin': 'depart_matin',
+                'departmatin': 'depart_matin',
+                'heure_depart': 'depart_matin',
+                'depart': 'depart_matin',
+                'arret_matin': 'arret_matin',
+                'arretmatin': 'arret_matin',
+                'lieu_depart': 'arret_matin',
+                'arret_depart': 'arret_matin',
+                'retour_soir': 'retour_soir',
+                'retoursoir': 'retour_soir',
+                'heure_retour': 'retour_soir',
+                'retour': 'retour_soir',
+                'arret_soir': 'arret_soir',
+                'arretsoir': 'arret_soir',
+                'lieu_retour': 'arret_soir',
+                'arret_retour': 'arret_soir'
+            };
+
+            return mapping[colLower] || colLower;
         }
 
         // ---- PHOTO ----
@@ -1780,7 +1840,7 @@
             downloadFile(csv, `historique_${todayStr()}.csv`, 'text/csv');
         }
 
-        // ---- EXPORT PDF CARTE ----
+        // ---- EXPORT PDF ----
         function exporterCartePDF() {
             const clientId = $('carteSelect').value;
             if (!clientId) { alert('Sélectionnez un abonné'); return; }
@@ -1983,7 +2043,7 @@ csv += c.name + ',' + (c.phone || '') + ',' + (c.adresse || '') + ',' + (c.numer
 downloadFile(csv, `rapport_${todayStr()}.csv`, 'text/csv');
 }
 
-// ---- IMPORTATION EXCEL - CORRIGÉE ----
+// ---- IMPORT EXCEL ----
 document.getElementById('importFile').addEventListener('change', function(e) {
 const file = e.target.files[0];
 if (!file) return;
@@ -2039,11 +2099,8 @@ const jsonData = XLSX.utils.sheet_to_json(firstSheet);
 const parsedData = jsonData.map(row => {
 const obj = {};
 Object.keys(row).forEach(key => {
-const normalized = key.toLowerCase().trim()
-.replace(/é/g, 'e').replace(/è/g, 'e')
-.replace(/ê/g, 'e').replace(/à/g, 'a')
-.replace(/ç/g, 'c').replace(/ /g, '');
-obj[normalized] = row[key] || '';
+const normalizedKey = normaliserColonne(key);
+obj[normalizedKey] = row[key] || '';
 });
 return obj;
 });
@@ -2058,7 +2115,7 @@ reader.readAsArrayBuffer(file);
 }
 });
 
-// ---- AFFICHAGE APERÇU - CORRIGÉ ----
+// ---- AFFICHAGE APERÇU ----
 function showImportPreview(data) {
 const preview = $('importPreview');
 if (!data || data.length === 0) {
@@ -2070,12 +2127,10 @@ let newCount = 0,
 dupCount = 0,
 errorCount = 0;
 
-// Préparer la liste des noms normalisés existants
 const existingNames = data.clients.map(c => normalizeName(c.name));
 
-// Analyser chaque ligne
 const itemsHtml = data.map((item, i) => {
-const name = (item.nom || item.name || '').trim();
+const name = (item.nom || '').toString().trim();
 if (!name) {
 errorCount++;
 return `<div class="item">
@@ -2089,7 +2144,7 @@ const exists = existingNames.includes(normalized);
 if (exists) dupCount++;
 else newCount++;
 
-const phone = item.telephone || item.phone || '';
+const phone = item.telephone || '';
 return `<div class="item">
             <span>${i+1}. <strong>${name}</strong> ${phone ? '📞 ' + phone : ''}</span>
             <span class="badge-import ${exists ? 'duplicate' : 'new'}">${exists ? '⚠️ Doublon' : '✅ Nouveau'}</span>
@@ -2109,15 +2164,14 @@ preview.innerHTML = statsHtml + itemsHtml;
 preview.style.display = 'block';
 }
 
-// ---- IMPORTER LISTE - CORRIGÉ ----
+// ---- IMPORTER LISTE ----
 function importerListe() {
 if (!isAdmin) { alert('🔒 Mode admin requis'); return; }
 if (importPreviewData.length === 0) { alert('Aucune donnée à importer. Chargez d\'abord un fichier.'); return; }
 
-// Filtrer les doublons
 const existingNames = data.clients.map(c => normalizeName(c.name));
 const newClients = importPreviewData.filter(item => {
-const name = (item.nom || item.name || '').trim();
+const name = (item.nom || '').toString().trim();
 if (!name) return false;
 const normalized = normalizeName(name);
 return !existingNames.includes(normalized);
@@ -2134,20 +2188,20 @@ let count = 0;
 let errors = [];
 newClients.forEach((item, idx) => {
 try {
-const name = (item.nom || item.name || '').trim();
+const name = (item.nom || '').toString().trim();
 if (!name) return;
 
-const phone = (item.telephone || item.phone || '').trim();
-const adresse = (item.adresse || '').trim();
-const startDate = (item.debut || item.startdate || '').trim() || todayStr();
-const endDate = (item.fin || item.enddate || '').trim() || new Date(new Date().setMonth(new Date().getMonth() + 1))
+const phone = (item.telephone || '').toString().trim();
+const adresse = (item.adresse || '').toString().trim();
+const startDate = (item.debut || '').toString().trim() || todayStr();
+const endDate = (item.fin || '').toString().trim() || new Date(new Date().setMonth(new Date().getMonth() + 1))
 .toISOString().split('T')[0];
-const amount = parseInt((item.montant || '').trim()) || 25000;
-const tripType = (item.trajet || '').trim() || 'aller-retour';
-const departMatinTime = (item.departmatin || item.depart_matin || item.heure_depart || '').trim() || '07:00';
-const departMatinArret = (item.arretmatin || item.arret_matin || item.arret_depart || '').trim() || 'Gare centrale';
-const returnSoirTime = (item.retoursoir || item.retour_soir || item.heure_retour || '').trim() || '18:00';
-const returnSoirArret = (item.arretsoir || item.arret_soir || item.arret_retour || '').trim() || 'Marché';
+const amount = parseInt((item.montant || '').toString().trim()) || 25000;
+const tripType = (item.trajet || '').toString().trim() || 'aller-retour';
+const departMatinTime = (item.depart_matin || '').toString().trim() || '07:00';
+const departMatinArret = (item.arret_matin || '').toString().trim() || 'Gare centrale';
+const returnSoirTime = (item.retour_soir || '').toString().trim() || '18:00';
+const returnSoirArret = (item.arret_soir || '').toString().trim() || 'Marché';
 
 const numeroCarte = genererNumeroCarte();
 
@@ -2183,6 +2237,7 @@ alert(msg);
 importPreviewData = [];
 $('importFile').value = '';
 $('importPreview').style.display = 'none';
+renderAll();
 } else {
 alert('⚠️ Aucun nouvel abonné à importer');
 }
@@ -3397,9 +3452,9 @@ if (navigator.geolocation) {
 setTimeout(startGps, 1000);
 }
 
-console.log('🚀 YT Transport Pro v5 démarrée');
+console.log('🚀 YT Transport Pro v6 démarrée');
 console.log('🔑 Code admin: NTR2026');
-console.log('📥 Import Excel corrigé - affiche tous les abonnés');
+console.log('📥 Importation flexible - accepte plusieurs formats de colonnes');
 console.log('✅ Application complète');
 
 setInterval(() => {
