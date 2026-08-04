@@ -7,16 +7,14 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>YT Transport Pro</title>
-    <!-- Bibliothèques -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
     </script>
-    <!-- SheetJS pour Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
     </script>
     <style>
-        /* ===== STYLES COMPLETS ===== */
+        /* ===== STYLES ===== */
         * {
             margin: 0;
             padding: 0;
@@ -824,7 +822,7 @@
             border: 2px solid #1a5e3a;
         }
 
-        /* IMPORT */
+        /* IMPORT - CORRIGÉ */
         .import-box {
             border: 2px dashed #1a5e3a;
             border-radius: 8px;
@@ -846,7 +844,7 @@
             color: #999;
         }
         .import-box .preview-list {
-            max-height: 150px;
+            max-height: 300px;
             overflow-y: auto;
             font-size: 9px;
             text-align: left;
@@ -858,12 +856,17 @@
         .import-box .preview-list .item {
             padding: 2px 0;
             border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 4px;
         }
         .import-box .preview-list .item .badge-import {
             font-size: 7px;
             padding: 1px 6px;
             border-radius: 10px;
             font-weight: 600;
+            white-space: nowrap;
         }
         .import-box .preview-list .item .badge-import.new {
             background: #d4edda;
@@ -872,6 +875,27 @@
         .import-box .preview-list .item .badge-import.duplicate {
             background: #fff3cd;
             color: #856404;
+        }
+        .import-box .preview-list .item .badge-import.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .import-box .preview-stats {
+            font-size: 9px;
+            padding: 4px 0;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 4px;
+            font-weight: 600;
+            color: #1a5e3a;
+        }
+        .import-box .preview-stats .stat-new {
+            color: #1e7e34;
+        }
+        .import-box .preview-stats .stat-dup {
+            color: #d4a017;
+        }
+        .import-box .preview-stats .stat-error {
+            color: #c0392b;
         }
 
         @media (max-width: 768px) {
@@ -898,7 +922,10 @@
                 grid-template-columns: 1fr;
             }
             .import-box .preview-list {
-                max-height: 100px;
+                max-height: 200px;
+            }
+            .import-box .preview-list .item {
+                font-size: 8px;
             }
         }
 
@@ -1014,7 +1041,7 @@
                 <button class="btn btn-primary btn-block" onclick="addClient()">➕ Ajouter & Générer</button>
             </div>
 
-            <!-- IMPORTATION EXCEL -->
+            <!-- IMPORTATION EXCEL - CORRIGÉE -->
             <div class="card" id="importCard">
                 <div class="card-title">📥 Importer une liste <span class="badge badge-admin">Admin</span></div>
                 <div class="import-box">
@@ -1285,12 +1312,12 @@
 
     <script>
         // ================================================================
-        // ===== APPLICATION AVEC IMPORT EXCEL ============================
+        // ===== APPLICATION - IMPORT EXCEL CORRIGÉ =======================
         // ================================================================
 
         // ---- CONSTANTES ----
         const ADMIN_PASSWORD = 'NTR2026';
-        const STORAGE_KEY = 'yt_transport_final_v4';
+        const STORAGE_KEY = 'yt_transport_final_v5';
         let selectedPaymentMethod = 'orange';
 
         // ---- DONNEES ----
@@ -1464,6 +1491,14 @@
             const map = { 'orange': '🟧 Orange Money', 'mtn': '🟨 MTN Mobile Money', 'moov': '🟦 Moov Money',
                 'wave': '🟪 Wave', 'cash': '💵 Espèces' };
             return map[method] || method;
+        }
+
+        function normalizeName(str) {
+            if (!str) return '';
+            return str.trim()
+                .toLowerCase()
+                .replace(/[^a-z0-9\s]/g, '') // enlever accents et caractères spéciaux
+                .replace(/\s+/g, ' '); // espaces simples
         }
 
         // ---- PHOTO ----
@@ -1948,7 +1983,7 @@ csv += c.name + ',' + (c.phone || '') + ',' + (c.adresse || '') + ',' + (c.numer
 downloadFile(csv, `rapport_${todayStr()}.csv`, 'text/csv');
 }
 
-// ---- IMPORTATION EXCEL ----
+// ---- IMPORTATION EXCEL - CORRIGÉE ----
 document.getElementById('importFile').addEventListener('change', function(e) {
 const file = e.target.files[0];
 if (!file) return;
@@ -2001,7 +2036,6 @@ const workbook = XLSX.read(data, { type: 'array' });
 const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
 const jsonData = XLSX.utils.sheet_to_json(firstSheet);
 
-// Normaliser les noms de colonnes
 const parsedData = jsonData.map(row => {
 const obj = {};
 Object.keys(row).forEach(key => {
@@ -2024,6 +2058,7 @@ reader.readAsArrayBuffer(file);
 }
 });
 
+// ---- AFFICHAGE APERÇU - CORRIGÉ ----
 function showImportPreview(data) {
 const preview = $('importPreview');
 if (!data || data.length === 0) {
@@ -2031,39 +2066,61 @@ preview.style.display = 'none';
 return;
 }
 
-let html = `<div style="font-weight:600;font-size:9px;margin-bottom:4px;">📋 ${data.length} abonnés trouvés</div>`;
 let newCount = 0,
-dupCount = 0;
+dupCount = 0,
+errorCount = 0;
 
-data.slice(0, 30).forEach((item, i) => {
+// Préparer la liste des noms normalisés existants
+const existingNames = data.clients.map(c => normalizeName(c.name));
+
+// Analyser chaque ligne
+const itemsHtml = data.map((item, i) => {
 const name = (item.nom || item.name || '').trim();
-if (!name) return;
-const exists = data.clients.some(c => c.name.toLowerCase() === name.toLowerCase());
+if (!name) {
+errorCount++;
+return `<div class="item">
+                <span style="color:#c0392b;">❌ Ligne ${i+1}: Nom manquant</span>
+                <span class="badge-import error">⚠️ Erreur</span>
+            </div>`;
+}
+
+const normalized = normalizeName(name);
+const exists = existingNames.includes(normalized);
 if (exists) dupCount++;
 else newCount++;
 
-html += `<div class="item">
-            ${i+1}. ${name} 
-            ${item.telephone || item.phone ? '📞 ' + (item.telephone || item.phone) : ''}
+const phone = item.telephone || item.phone || '';
+return `<div class="item">
+            <span>${i+1}. <strong>${name}</strong> ${phone ? '📞 ' + phone : ''}</span>
             <span class="badge-import ${exists ? 'duplicate' : 'new'}">${exists ? '⚠️ Doublon' : '✅ Nouveau'}</span>
         </div>`;
-});
+}).join('');
 
-if (data.length > 30) html += `<div class="item">... et ${data.length - 30} autres</div>`;
-html += `<div style="margin-top:4px;font-size:8px;color:#666;">Nouveaux: ${newCount} | Doublons: ${dupCount}</div>`;
+const statsHtml = `
+    <div class="preview-stats">
+        Total: <strong>${data.length}</strong> lignes • 
+        <span class="stat-new">✅ Nouveaux: ${newCount}</span> • 
+        <span class="stat-dup">⚠️ Doublons: ${dupCount}</span>
+        ${errorCount > 0 ? `• <span class="stat-error">❌ Erreurs: ${errorCount}</span>` : ''}
+    </div>
+`;
 
-preview.innerHTML = html;
+preview.innerHTML = statsHtml + itemsHtml;
 preview.style.display = 'block';
 }
 
+// ---- IMPORTER LISTE - CORRIGÉ ----
 function importerListe() {
 if (!isAdmin) { alert('🔒 Mode admin requis'); return; }
 if (importPreviewData.length === 0) { alert('Aucune donnée à importer. Chargez d\'abord un fichier.'); return; }
 
+// Filtrer les doublons
+const existingNames = data.clients.map(c => normalizeName(c.name));
 const newClients = importPreviewData.filter(item => {
 const name = (item.nom || item.name || '').trim();
 if (!name) return false;
-return !data.clients.some(c => c.name.toLowerCase() === name.toLowerCase());
+const normalized = normalizeName(name);
+return !existingNames.includes(normalized);
 });
 
 if (newClients.length === 0) {
@@ -2074,7 +2131,9 @@ return;
 if (!confirm(`Importer ${newClients.length} nouveaux abonnés sur ${importPreviewData.length} trouvés ?`)) return;
 
 let count = 0;
-newClients.forEach(item => {
+let errors = [];
+newClients.forEach((item, idx) => {
+try {
 const name = (item.nom || item.name || '').trim();
 if (!name) return;
 
@@ -2111,11 +2170,16 @@ photo: ''
 
 data.clients.push(newClient);
 count++;
+} catch (e) {
+errors.push(`Ligne ${idx+1}: ${e.message}`);
+}
 });
 
 if (count > 0) {
 saveData();
-alert(`✅ ${count} abonnés importés avec succès !`);
+let msg = `✅ ${count} abonnés importés avec succès !`;
+if (errors.length > 0) msg += `\n\n⚠️ Erreurs: ${errors.join('\n')}`;
+alert(msg);
 importPreviewData = [];
 $('importFile').value = '';
 $('importPreview').style.display = 'none';
@@ -3333,9 +3397,9 @@ if (navigator.geolocation) {
 setTimeout(startGps, 1000);
 }
 
-console.log('🚀 YT Transport Pro v4 démarrée');
+console.log('🚀 YT Transport Pro v5 démarrée');
 console.log('🔑 Code admin: NTR2026');
-console.log('📥 Importation Excel disponible');
+console.log('📥 Import Excel corrigé - affiche tous les abonnés');
 console.log('✅ Application complète');
 
 setInterval(() => {
