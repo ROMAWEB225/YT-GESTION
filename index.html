@@ -11,6 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
     </script>
     <style>
+        /* ===== STYLES COMPLETS ===== */
         * {
             margin: 0;
             padding: 0;
@@ -375,7 +376,7 @@
             display: none !important;
         }
 
-        /* CARTE ABONNEMENT */
+        /* CARTE ABONNEMENT - POUR PDF */
         .carte-abonnement {
             max-width: 380px;
             margin: 0 auto;
@@ -523,7 +524,6 @@
             background: #000;
             max-height: 250px;
             transform: scaleX(-1);
-            /* Miroir pour la caméra frontale */
         }
         .scanner-container .scan-result {
             margin-top: 5px;
@@ -743,6 +743,36 @@
             background: #1da85a;
         }
 
+        /* Mobile Money */
+        .payment-method {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 4px 0;
+        }
+        .payment-method .method-btn {
+            padding: 4px 12px;
+            border: 2px solid #dce8e2;
+            border-radius: 5px;
+            background: white;
+            font-size: 9px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .payment-method .method-btn:hover {
+            border-color: #1a5e3a;
+            background: #e8f5ed;
+        }
+        .payment-method .method-btn.active {
+            border-color: #1a5e3a;
+            background: #1a5e3a;
+            color: white;
+        }
+        .payment-method .method-btn .icon {
+            font-size: 14px;
+        }
+
         @media (max-width: 768px) {
             .form-row {
                 grid-template-columns: 1fr;
@@ -772,6 +802,10 @@
             }
             .no-print {
                 display: none !important;
+            }
+            .carte-abonnement {
+                box-shadow: none !important;
+                border: 2px solid #1a5e3a !important;
             }
         }
     </style>
@@ -1001,12 +1035,51 @@
             </div>
         </div>
 
-        <!-- TAB 6 -->
+        <!-- TAB 6: RAPPORT + PAIEMENTS MOBILE MONEY -->
         <div class="tab-content" id="tab6">
             <div class="card">
                 <div class="card-title">📈 Rapport <button class="btn btn-primary btn-sm" onclick="exportReport()">📊 Excel</button></div>
                 <div id="reportContent"><p class="text-muted">Génération...</p></div>
             </div>
+
+            <!-- PAIEMENTS MOBILE MONEY -->
+            <div class="card">
+                <div class="card-title">💳 Paiements Mobile Money</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Abonné</label>
+                        <select id="paymentClientSelect" style="width:100%;padding:4px 8px;border:2px solid #dce8e2;border-radius:5px;font-size:10px;">
+                            <option value="">-- Choisir --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Montant (CFA)</label>
+                        <input type="number" id="paymentAmount" placeholder="25000">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Méthode de paiement</label>
+                    <div class="payment-method">
+                        <button class="method-btn active" data-method="orange" onclick="selectPaymentMethod('orange')">
+                            <span class="icon">🟧</span> Orange Money
+                        </button>
+                        <button class="method-btn" data-method="mtn" onclick="selectPaymentMethod('mtn')">
+                            <span class="icon">🟨</span> MTN Mobile Money
+                        </button>
+                        <button class="method-btn" data-method="moov" onclick="selectPaymentMethod('moov')">
+                            <span class="icon">🟦</span> Moov Money
+                        </button>
+                        <button class="method-btn" data-method="cash" onclick="selectPaymentMethod('cash')">
+                            <span class="icon">💵</span> Espèces
+                        </button>
+                    </div>
+                </div>
+                <button class="btn btn-success btn-block" onclick="enregistrerPaiement()">💳 Enregistrer le paiement</button>
+                <div id="paymentHistory" style="margin-top:6px;">
+                    <p class="text-muted">Aucun paiement enregistré</p>
+                </div>
+            </div>
+
             <div class="card">
                 <div class="card-title">📍 Position du car</div>
                 <div style="background:#e8f5ed;padding:6px 8px;border-radius:5px;border-left:3px solid #1a5e3a;">
@@ -1027,12 +1100,13 @@
 
     <script>
         // ================================================================
-        // ===== APPLICATION STABLE - VERSION CORRIGÉE ====================
+        // ===== APPLICATION COMPLETE - AVEC MOBILE MONEY =================
         // ================================================================
 
         // ---- CONSTANTES ----
         const ADMIN_PASSWORD = 'NTR2026';
-        const STORAGE_KEY = 'yt_transport_stable';
+        const STORAGE_KEY = 'yt_transport_final';
+        let selectedPaymentMethod = 'orange';
 
         // ---- DONNEES ----
         let data = loadData();
@@ -1052,7 +1126,8 @@
                 presenceMatin: {},
                 presenceSoir: {},
                 pointages: {},
-                lastCarteNum: 0
+                lastCarteNum: 0,
+                mobilePayments: [] // { clientId, date, montant, method, statut }
             };
         }
 
@@ -1068,6 +1143,7 @@
                         if (!parsed.presenceSoir) parsed.presenceSoir = {};
                         if (!parsed.pointages) parsed.pointages = {};
                         if (!parsed.lastCarteNum) parsed.lastCarteNum = 0;
+                        if (!parsed.mobilePayments) parsed.mobilePayments = [];
                         return parsed;
                     }
                 }
@@ -1082,7 +1158,9 @@
             renderAll();
         }
 
-        // ---- UTILITAIRES ----
+        // ---- UTILITAIRES (raccourcis) ----
+        function $(id) { return document.getElementById(id); }
+
         function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
 
         function todayStr() { return new Date().toISOString().split('T')[0]; }
@@ -1199,6 +1277,12 @@
             const map = { 'aller-simple': 'Aller simple', 'aller-retour': 'Aller-Retour',
                 'retour-simple': 'Retour simple' };
             return map[type] || type;
+        }
+
+        function getMethodLabel(method) {
+            const map = { 'orange': '🟧 Orange Money', 'mtn': '🟨 MTN Mobile Money', 'moov': '🟦 Moov Money',
+                'cash': '💵 Espèces' };
+            return map[method] || method;
         }
 
         // ---- PHOTO ----
@@ -1371,26 +1455,22 @@
 
             if (!data.pointages[clientId]) data.pointages[clientId] = {};
 
-            // Si déjà pointé avec le même type
             if (data.pointages[clientId][today] === type) {
                 return { success: false, message: `${client.name} déjà pointé en ${type}` };
             }
 
-            // Si déjà pointé en aller et qu'on pointe retour
             if (data.pointages[clientId][today] === 'aller' && type === 'retour') {
                 data.pointages[clientId][today] = 'both';
                 saveData();
                 return { success: true, message: `${client.name} - ALLER + RETOUR !` };
             }
 
-            // Si déjà pointé en retour et qu'on pointe aller
             if (data.pointages[clientId][today] === 'retour' && type === 'aller') {
                 data.pointages[clientId][today] = 'both';
                 saveData();
                 return { success: true, message: `${client.name} - ALLER + RETOUR !` };
             }
 
-            // Premier pointage
             data.pointages[clientId][today] = type;
             saveData();
 
@@ -1406,59 +1486,806 @@
             return { success: true, message: `${client.name} - ${type === 'aller' ? 'ALLER' : 'RETOUR'} enregistré !` };
         }
 
-        // ---- EXPORT PDF ----
-        function exportPdf(elementId, filename) {
-            const element = document.getElementById(elementId);
-            if (!element) { alert('Élément non trouvé'); return; }
+        // ---- EXPORT PDF - CORRIGÉ ----
+        function exporterCartePDF() {
+            const clientId = $('carteSelect').value;
+            if (!clientId) { alert('Sélectionnez un abonné'); return; }
 
-            if (typeof html2pdf === 'undefined') {
-                alert('La bibliothèque html2pdf n\'est pas chargée.');
+            const carteData = genererCarteData(clientId);
+            if (!carteData) { alert('Erreur génération'); return; }
+
+            // Afficher la carte dans la prévisualisation
+            const carteHtml = afficherCarteHtml(carteData);
+            $('cartePreview').innerHTML = carteHtml;
+
+            // Générer le QR
+            setTimeout(() => {
+                genererQR('qrcode', carteData.qrData);
+
+                // Attendre que le QR soit généré
+                setTimeout(() => {
+                    const element = document.getElementById('carteAImprimer');
+                    if (!element) { alert('Carte non trouvée'); return; }
+
+                    if (typeof html2pdf === 'undefined') {
+                        alert('La bibliothèque html2pdf n\'est pas chargée.');
+                        return;
+                    }
+
+                    // Cloner la carte pour le PDF
+                    const clone = element.cloneNode(true);
+                    clone.style.width = '380px';
+                    clone.style.margin = '0 auto';
+                    clone.style.padding = '12px';
+                    clone.style.background = 'white';
+                    clone.style.borderRadius = '12px';
+                    clone.style.border = '2px solid #1a5e3a';
+                    clone.style.boxShadow = 'none';
+
+                    // S'assurer que le QR est visible dans le clone
+                    const qrContainer = clone.querySelector('#qrcode');
+                    if (qrContainer) {
+                        const originalQR = document.querySelector('#carteAImprimer #qrcode');
+                        if (originalQR) {
+                            qrContainer.innerHTML = originalQR.innerHTML;
+                        }
+                    }
+
+                    const container = document.createElement('div');
+                    container.appendChild(clone);
+                    container.style.position = 'fixed';
+                    container.style.left = '-9999px';
+                    container.style.top = '0';
+                    container.style.width = '400px';
+                    container.style.background = 'white';
+                    container.style.zIndex = '9999';
+                    document.body.appendChild(container);
+
+                    // Utiliser html2canvas pour une capture plus fiable
+                    const opt = {
+                        margin: { top: 10, bottom: 10, left: 10, right: 10 },
+                        filename: `carte_${todayStr()}.pdf`,
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: {
+                            scale: 2,
+                            useCORS: true,
+                            width: 380,
+                            height: clone.scrollHeight
+                        },
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    };
+
+                    html2pdf()
+                        .set(opt)
+                        .from(clone)
+                        .save()
+                        .then(function() {
+                            document.body.removeChild(container);
+                            console.log('✅ PDF téléchargé');
+                        })
+                        .catch(function(err) {
+                            document.body.removeChild(container);
+                            console.error('Erreur PDF:', err);
+                            // Fallback: essayer avec l'élément original
+                            alert('Erreur lors de la génération du PDF. Veuillez réessayer.');
+                        });
+
+                }, 500);
+            }, 300);
+        }
+
+        // ---- MOBILE MONEY ----
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.method-btn[data-method="${method}"]`).classList.add('active');
+        }
+
+        function enregistrerPaiement() {
+            const clientId = $('paymentClientSelect').value;
+            const montant = parseInt($('paymentAmount').value);
+
+            if (!clientId) { alert('Sélectionnez un abonné'); return; }
+            if (!montant || montant <= 0) { alert('Entrez un montant valide'); return; }
+
+            const client = getClientById(clientId);
+            if (!client) { alert('Client introuvable'); return; }
+
+            // Enregistrer le paiement
+            data.mobilePayments.push({
+                clientId: clientId,
+                nom: client.name,
+                date: todayStr(),
+                montant: montant,
+                method: selectedPaymentMethod,
+                statut: 'confirmé'
+            });
+
+            // Ajouter aux paiements généraux
+            data.paiements.push({
+                clientId: clientId,
+                date: todayStr(),
+                montant: montant,
+                type: 'mobile_money',
+                method: selectedPaymentMethod
+            });
+
+            // Marquer comme payé si c'est le montant exact
+            if (montant >= (client.amount || 0)) {
+                // Vérifier si le paiement est à jour
+                const existing = data.paiements.filter(p => p.clientId === clientId);
+                if (existing.length === 1) {
+                    // Premier paiement
+                }
+            }
+
+            saveData();
+            $('paymentAmount').value = '';
+            renderPaymentHistory();
+            renderAll();
+            alert(`✅ Paiement de ${montant} CFA enregistré pour ${client.name} via ${getMethodLabel(selectedPaymentMethod)}`);
+        }
+
+        function renderPaymentHistory() {
+            if (data.mobilePayments.length === 0) {
+                $('paymentHistory').innerHTML = '<p class="text-muted">Aucun paiement enregistré</p>';
                 return;
             }
 
-            // Utiliser une approche plus simple pour le PDF
-            const clone = element.cloneNode(true);
-            clone.style.width = '380px';
-            clone.style.margin = '0 auto';
-            clone.style.padding = '12px';
-            clone.style.background = 'white';
-            clone.style.borderRadius = '12px';
-            clone.style.border = '2px solid #1a5e3a';
+            let html =
+                '<div style="max-height:200px;overflow-y:auto;font-size:10px;"><div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:3px;font-weight:600;padding:4px 0;border-bottom:2px solid #dce8e2;">';
+            html += '<span>Date</span><span>Nom</span><span>Montant</span><span>Méthode</span><span>Statut</span>';
+            html += '</div>';
 
-            const container = document.createElement('div');
-            container.appendChild(clone);
-            container.style.position = 'fixed';
-            container.style.left = '-9999px';
-            container.style.top = '0';
-            container.style.width = '400px';
-            container.style.background = 'white';
-            container.style.zIndex = '9999';
-            document.body.appendChild(container);
-
-            // Attendre que le QR soit chargé
-            setTimeout(function() {
-                const opt = {
-                    margin: { top: 10, bottom: 10, left: 10, right: 10 },
-                    filename: filename || 'carte.pdf',
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                };
-
-                html2pdf()
-                    .set(opt)
-                    .from(clone)
-                    .save()
-                    .then(function() {
-                        document.body.removeChild(container);
-                    })
-                    .catch(function(err) {
-                        document.body.removeChild(container);
-                        console.error('Erreur PDF:', err);
-                        alert('Erreur lors de la génération du PDF. Veuillez réessayer.');
-                    });
-            }, 500);
+            data.mobilePayments.slice().reverse().slice(0, 30).forEach(p => {
+                const methodLabel = getMethodLabel(p.method);
+                const statutBadge = p.statut === 'confirmé' ?
+                    '<span class="badge-status paid">✅ Confirmé</span>' :
+                    '<span class="badge-status pending">⏳ En attente</span>';
+                html += `
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:3px;padding:3px 0;border-bottom:1px solid #dce8e2;align-items:center;">
+                            <span>${formatDate(p.date)}</span>
+                            <span><strong>${p.nom}</strong></span>
+                            <span style="font-weight:600;color:#1a5e3a;">${p.montant} CFA</span>
+                            <span style="font-size:8px;">${methodLabel}</span>
+                            <span>${statutBadge}</span>
+                        </div>
+                    `;
+            });
+            html += '</div>';
+            $('paymentHistory').innerHTML = html;
         }
+
+        // ---- ONGLETS ----
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector(`.tab-btn[onclick="showTab('${tabId}')"]`).classList.add('active');
+            if (tabId === 'tab6') renderPaymentHistory();
+        }
+
+        function showSubTab(tabId) {
+            document.querySelectorAll('.sub-tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.sub-tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector(`.sub-tab-btn[onclick="showSubTab('${tabId}')"]`).classList.add('active');
+        }
+
+        // ---- ADMIN ----
+        function unlockAdmin() {
+            const pwd = $('adminPassword').value;
+            if (pwd === ADMIN_PASSWORD) {
+                isAdmin = true;
+                $('adminStatus').textContent = '✅ Déverrouillé';
+                $('adminStatus').className = 'status unlocked';
+                updateAdminUI();
+                alert('✅ Mode admin déverrouillé !');
+            } else {
+                alert('❌ Code incorrect. Le code par défaut est NTR2026');
+            }
+        }
+
+        function toggleAdmin() {
+            if (isAdmin) {
+                isAdmin = false;
+                $('adminStatus').textContent = '🔒 Verrouillé';
+                $('adminStatus').className = 'status';
+                updateAdminUI();
+            } else {
+                $('adminPassword').focus();
+            }
+        }
+
+        function updateAdminUI() {
+            const inputs = ['clientName', 'clientPhone', 'clientAdresse', 'clientStartDate', 'clientEndDate',
+                'clientAmount', 'paymentStatus', 'clientTripType',
+                'clientDepartMatinTime', 'clientDepartMatinArret',
+                'clientReturnSoirTime', 'clientReturnSoirArret',
+                'clientPhoto', 'addClientBtn'
+            ];
+            inputs.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.disabled = !isAdmin;
+            });
+            document.getElementById('addCard').style.opacity = isAdmin ? '1' : '0.6';
+        }
+
+        // ---- AJOUT CLIENT ----
+        function addClient() {
+            if (!isAdmin) { alert('🔒 Mode admin requis'); return; }
+
+            const name = $('clientName').value.trim();
+            const phone = $('clientPhone').value.trim();
+            const adresse = $('clientAdresse').value.trim();
+            const startDate = $('clientStartDate').value;
+            const endDate = $('clientEndDate').value;
+            const amount = $('clientAmount').value ? parseInt($('clientAmount').value) : null;
+            const payStatus = $('paymentStatus').value;
+            const tripType = $('clientTripType').value;
+            const departMatinTime = $('clientDepartMatinTime').value;
+            const departMatinArret = $('clientDepartMatinArret').value.trim();
+            const returnSoirTime = $('clientReturnSoirTime').value;
+            const returnSoirArret = $('clientReturnSoirArret').value.trim();
+
+            if (!name) { alert('Nom requis'); return; }
+            if (!startDate) { alert('Date début requise'); return; }
+            if (!endDate) { alert('Date fin requise'); return; }
+            if (startDate > endDate) { alert('La date de début doit être avant la date de fin'); return; }
+            if (!amount) { alert('Montant requis'); return; }
+
+            const numeroCarte = genererNumeroCarte();
+
+            const photoFile = $('clientPhoto').files[0];
+            const sauvegarder = function(photoData) {
+                const newClient = {
+                    id: generateId(),
+                    name,
+                    phone,
+                    adresse,
+                    startDate,
+                    endDate,
+                    amount,
+                    tripType,
+                    departMatinTime,
+                    departMatinArret,
+                    returnSoirTime,
+                    returnSoirArret,
+                    numeroCarte: numeroCarte,
+                    photo: photoData || ''
+                };
+                data.clients.push(newClient);
+                if (payStatus === 'paid') {
+                    data.paiements.push({ clientId: newClient.id, date: todayStr(), montant: amount });
+                }
+                saveData();
+
+                $('clientName').value = '';
+                $('clientPhone').value = '';
+                $('clientAdresse').value = '';
+                $('clientAmount').value = '';
+                $('clientDepartMatinArret').value = '';
+                $('clientReturnSoirArret').value = '';
+                $('clientPhoto').value = '';
+                $('photoPreview').src = '';
+
+                alert(`✅ Abonné ajouté ! Carte N° ${numeroCarte}`);
+                renderAll();
+            };
+
+            if (photoFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) { sauvegarder(e.target.result); };
+                reader.readAsDataURL(photoFile);
+            } else {
+                sauvegarder(null);
+            }
+        }
+
+        $('clientPhoto').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('photoPreview').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // ---- CARTES ----
+        function genererCarte() {
+            const clientId = $('carteSelect').value;
+            if (!clientId) { alert('Sélectionnez un abonné'); return; }
+            currentCarteClientId = clientId;
+
+            const carteData = genererCarteData(clientId);
+            if (!carteData) { alert('Erreur génération'); return; }
+
+            const carteHtml = afficherCarteHtml(carteData);
+            if (carteHtml) {
+                $('cartePreview').innerHTML = carteHtml;
+                setTimeout(() => genererQR('qrcode', carteData.qrData), 100);
+            }
+
+            renderPointageHistory(clientId);
+            renderPaiementHistory(clientId);
+        }
+
+        function renderPointageHistory(clientId) {
+            const client = getClientById(clientId);
+            if (!client) {
+                $('pointageHistory').innerHTML = '<p class="text-muted">Sélectionnez un abonné</p>';
+                return;
+            }
+
+            const pointages = data.pointages[clientId] || {};
+            const dates = Object.keys(pointages).sort().reverse();
+
+            if (dates.length === 0) {
+                $('pointageHistory').innerHTML = `<p class="text-muted">Aucun pointage pour ${client.name}</p>`;
+                return;
+            }
+
+            let html = `<div style="font-weight:600;margin-bottom:3px;">📋 ${client.name}</div>`;
+            dates.slice(0, 20).forEach(date => {
+                const type = pointages[date];
+                let typeLabel = '';
+                let badgeClass = '';
+                if (type === 'aller') { typeLabel = '🟢 Aller';
+                    badgeClass = 'aller'; } else if (type === 'retour') { typeLabel = '🔵 Retour';
+                    badgeClass = 'retour'; } else if (type === 'both') { typeLabel = '✅ Aller + Retour';
+                    badgeClass = 'both'; }
+                html += `
+                        <div class="pointage-item">
+                            <div class="info">
+                                <span>${formatDate(date)}</span>
+                                <span class="badge-type ${badgeClass}">${typeLabel}</span>
+                            </div>
+                            <span class="text-muted">${type === 'both' ? '✅ Complet' : type === 'aller' ? 'Départ' : 'Retour'}</span>
+                        </div>
+                    `;
+            });
+            $('pointageHistory').innerHTML = html;
+        }
+
+        function renderPaiementHistory(clientId) {
+            const client = getClientById(clientId);
+            if (!client) {
+                $('paiementHistory').innerHTML = '<p class="text-muted">Sélectionnez un abonné</p>';
+                return;
+            }
+
+            const paiements = data.paiements.filter(p => p.clientId === clientId).sort((a, b) => new Date(b.date) - new Date(
+                a.date));
+
+            if (paiements.length === 0) {
+                $('paiementHistory').innerHTML = `<p class="text-muted">Aucun paiement pour ${client.name}</p>`;
+                return;
+            }
+
+            let total = 0;
+            let html = `<div style="font-weight:600;margin-bottom:3px;">💰 ${client.name}</div>`;
+            paiements.slice(0, 20).forEach(p => {
+                total += p.montant || 0;
+                const method = p.method ? getMethodLabel(p.method) : '💳';
+                html += `
+                        <div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #dce8e2;font-size:9px;">
+                            <span>${formatDate(p.date)} ${method}</span>
+                            <span style="font-weight:600;color:#1a5e3a;">${(p.montant || 0).toLocaleString()} CFA</span>
+                        </div>
+                    `;
+            });
+            html +=
+                `<div style="margin-top:3px;padding-top:3px;border-top:2px solid #dce8e2;font-weight:600;color:#1a5e3a;">Total: ${total.toLocaleString()} CFA</div>`;
+            $('paiementHistory').innerHTML = html;
+        }
+
+        function partagerCarte() {
+            const clientId = $('carteSelect').value;
+            if (!clientId) { alert('Sélectionnez un abonné'); return; }
+
+            const carteData = genererCarteData(clientId);
+            if (!carteData) { alert('Erreur'); return; }
+
+            const shareText =
+                `🚌 YAOU TRANSPORT\n📋 ${carteData.client.name}\n📱 N° ${carteData.numeroCarte}\n📅 ${carteData.moisNom} ${carteData.annee}\n🔑 ${carteData.hash}`;
+
+            if (navigator.share) {
+                navigator.share({ title: 'Ma carte YAOU', text: shareText }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(shareText).then(() => {
+                    alert('✅ Copié !');
+                }).catch(() => {
+                    prompt('Copiez :', shareText);
+                });
+            }
+        }
+
+        // ---- SCANNER QR ----
+        let scannerActive = false;
+        let scannerStream = null;
+
+        function startScanner() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                $('scanResult').className = 'scan-result info';
+                $('scanResult').innerHTML = '📱 Sur PC, utilisez les boutons ci-dessous.';
+                $('scanResult').classList.remove('hidden');
+                return;
+            }
+
+            const clientId = $('carteSelect').value;
+            if (!clientId) {
+                $('scanResult').className = 'scan-result error';
+                $('scanResult').innerHTML = '⚠️ Sélectionnez d\'abord votre nom dans l\'onglet Carte';
+                $('scanResult').classList.remove('hidden');
+                setTimeout(function() { $('scanResult').classList.add('hidden'); }, 3000);
+                return;
+            }
+
+            if (scannerActive) {
+                $('scanResult').className = 'scan-result info';
+                $('scanResult').innerHTML = '📷 Scanner déjà actif';
+                $('scanResult').classList.remove('hidden');
+                setTimeout(function() { $('scanResult').classList.add('hidden'); }, 2000);
+                return;
+            }
+
+            navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment' }
+                })
+                .then(function(stream) {
+                    scannerStream = stream;
+                    const video = $('video');
+                    video.srcObject = stream;
+                    video.style.display = 'block';
+                    $('scannerPlaceholder').style.display = 'none';
+                    scannerActive = true;
+                    video.play().catch(function() {});
+
+                    if (!('BarcodeDetector' in window)) {
+                        $('scanResult').className = 'scan-result info';
+                        $('scanResult').innerHTML = '📱 Scannez avec votre téléphone.';
+                        $('scanResult').classList.remove('hidden');
+                        return;
+                    }
+
+                    const detector = new BarcodeDetector({ formats: ['qr_code'] });
+
+                    function scanLoop() {
+                        if (!scannerActive) return;
+                        if (video.readyState < 2) { setTimeout(scanLoop, 500); return; }
+
+                        try {
+                            detector.detect(video)
+                                .then(function(barcodes) {
+                                    if (barcodes.length > 0 && scannerActive) {
+                                        const qrData = barcodes[0].rawValue;
+                                        traiterQR(qrData);
+                                    }
+                                    if (scannerActive) setTimeout(scanLoop, 300);
+                                })
+                                .catch(function() {
+                                    if (scannerActive) setTimeout(scanLoop, 500);
+                                });
+                        } catch (e) {
+                            if (scannerActive) setTimeout(scanLoop, 500);
+                        }
+                    }
+                    setTimeout(scanLoop, 500);
+
+                })
+                .catch(function(err) {
+                    // Fallback caméra frontale
+                    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+                        .then(function(stream) {
+                            scannerStream = stream;
+                            const video = $('video');
+                            video.srcObject = stream;
+                            video.style.display = 'block';
+                            $('scannerPlaceholder').style.display = 'none';
+                            scannerActive = true;
+                            video.play().catch(function() {});
+                            $('scanResult').className = 'scan-result info';
+                            $('scanResult').innerHTML = '📷 Caméra frontale active.';
+                            $('scanResult').classList.remove('hidden');
+                        })
+                        .catch(function() {
+                            $('scanResult').className = 'scan-result info';
+                            $('scanResult').innerHTML = '📱 Utilisez les boutons ci-dessous.';
+                            $('scanResult').classList.remove('hidden');
+                        });
+                });
+        }
+
+        function stopScanner() {
+            scannerActive = false;
+            if (scannerStream) {
+                scannerStream.getTracks().forEach(function(t) { t.stop(); });
+                scannerStream = null;
+            }
+            $('video').style.display = 'none';
+            $('video').srcObject = null;
+            $('scannerPlaceholder').style.display = 'block';
+            $('scanResult').classList.add('hidden');
+        }
+
+        function traiterQR(qrData) {
+            try {
+                const dataQr = JSON.parse(qrData);
+                if (!dataQr.clientId) {
+                    if (dataQr.type && dataQr.source === 'car') {
+                        const clientId = $('carteSelect').value;
+                        if (!clientId) {
+                            $('scanResult').className = 'scan-result error';
+                            $('scanResult').innerHTML = '⚠️ Sélectionnez votre nom';
+                            $('scanResult').classList.remove('hidden');
+                            setTimeout(function() { $('scanResult').classList.add('hidden'); }, 3000);
+                            return;
+                        }
+                        const result = pointerParQR(clientId, dataQr.type);
+                        $('scanResult').className = `scan-result ${result.success ? 'success' : 'error'}`;
+                        $('scanResult').innerHTML = result.success ? `✅ ${result.message}` : `❌ ${result.message}`;
+                        $('scanResult').classList.remove('hidden');
+
+                        if (result.success) {
+                            if (navigator.vibrate) navigator.vibrate(200);
+                            renderAll();
+                            if (currentCarteClientId) {
+                                const carteData = genererCarteData(currentCarteClientId);
+                                if (carteData) {
+                                    const carteHtml = afficherCarteHtml(carteData);
+                                    if (carteHtml) {
+                                        $('cartePreview').innerHTML = carteHtml;
+                                        setTimeout(function() { genererQR('qrcode', carteData.qrData); }, 200);
+                                    }
+                                }
+                                renderPointageHistory(currentCarteClientId);
+                            }
+                        }
+                        setTimeout(function() { $('scanResult').classList.add('hidden'); }, 4000);
+                        return;
+                    }
+                    throw new Error('QR invalide');
+                }
+
+                $('scanResult').className = 'scan-result info';
+                $('scanResult').innerHTML = `👤 ${dataQr.nom || 'Abonné'} - Carte valide`;
+                $('scanResult').classList.remove('hidden');
+                setTimeout(function() { $('scanResult').classList.add('hidden'); }, 3000);
+
+            } catch (e) {
+                $('scanResult').className = 'scan-result error';
+                $('scanResult').innerHTML = '❌ QR invalide';
+                $('scanResult').classList.remove('hidden');
+                setTimeout(function() { $('scanResult').classList.add('hidden'); }, 3000);
+            }
+        }
+
+        function pointerManuel(type) {
+            const clientId = $('carteSelect').value;
+            if (!clientId) {
+                alert('⚠️ Sélectionnez d\'abord votre nom dans l\'onglet Carte');
+                return;
+            }
+            const result = pointerParQR(clientId, type);
+            $('scanResult').className = `scan-result ${result.success ? 'success' : 'error'}`;
+            $('scanResult').innerHTML = result.success ? `✅ ${result.message}` : `❌ ${result.message}`;
+            $('scanResult').classList.remove('hidden');
+            if (result.success) renderAll();
+            setTimeout(function() { $('scanResult').classList.add('hidden'); }, 3000);
+        }
+
+        // ---- DEPARTS ----
+        function renderPresenceMatin() {
+            const actifs = data.clients.filter(function(c) {
+                if (getClientStatus(c) !== 'actif') return false;
+                if (!c.departMatinTime) return false;
+                return parseInt(c.departMatinTime.split(':')[0]) < 12;
+            });
+            if (actifs.length === 0) {
+                $('presenceListMatin').innerHTML = '<p class="text-muted">Aucun</p>';
+                $('activeCountMatin').textContent = '0';
+                return;
+            }
+            actifs.forEach(function(c) { if (!(c.id in data.presenceMatin)) data.presenceMatin[c.id] = false; });
+            actifs.sort(function(a, b) { return (a.departMatinTime || '00:00').localeCompare(b.departMatinTime || '00:00'); });
+
+            let html = '';
+            actifs.forEach(function(c) {
+                const isPresent = data.presenceMatin[c.id] === true;
+                const photo = getPhotoHtml(c.id);
+                html += `<div class="depart-group">
+                        <div style="display:flex;align-items:center;gap:3px;flex-wrap:wrap;">
+                            <input type="checkbox" class="presence-check matin-check" data-id="${c.id}" ${isPresent ? 'checked' : ''} ${!isAdmin ? 'disabled' : ''}>
+                            ${photo}
+                            <span style="font-weight:500;font-size:9px;">${c.name}</span>
+                            <span class="client-tag">🌅 ${formatTime(c.departMatinTime)}</span>
+                            <span class="client-tag">${c.departMatinArret || '-'}</span>
+                            <span class="badge-status ${isPresent ? 'present' : 'absent'}">${isPresent ? '✅' : '❌'}</span>
+                        </div>
+                    </div>`;
+            });
+            $('presenceListMatin').innerHTML = html;
+            $('activeCountMatin').textContent = actifs.length;
+
+            document.querySelectorAll('.matin-check').forEach(function(cb) {
+                cb.addEventListener('change', function() {
+                    data.presenceMatin[this.dataset.id] = this.checked;
+                    saveData();
+                });
+            });
+            $('selectAllMatin').onchange = function() {
+                document.querySelectorAll('.matin-check').forEach(function(cb) {
+                    if (!cb.disabled) { cb.checked = this.checked;
+                        data.presenceMatin[cb.dataset.id] = this.checked; }
+                });
+                saveData();
+            };
+        }
+
+        function renderPresenceSoir() {
+            const actifs = data.clients.filter(function(c) {
+                if (getClientStatus(c) !== 'actif') return false;
+                if (!c.returnSoirTime) return false;
+                return parseInt(c.returnSoirTime.split(':')[0]) >= 12;
+            });
+            if (actifs.length === 0) {
+                $('presenceListSoir').innerHTML = '<p class="text-muted">Aucun</p>';
+                $('activeCountSoir').textContent = '0';
+                return;
+            }
+            actifs.forEach(function(c) { if (!(c.id in data.presenceSoir)) data.presenceSoir[c.id] = false; });
+            actifs.sort(function(a, b) { return (a.returnSoirTime || '00:00').localeCompare(b.returnSoirTime || '00:00'); });
+
+            let html = '';
+            actifs.forEach(function(c) {
+                const isPresent = data.presenceSoir[c.id] === true;
+                const photo = getPhotoHtml(c.id);
+                html += `<div class="depart-group">
+                        <div style="display:flex;align-items:center;gap:3px;flex-wrap:wrap;">
+                            <input type="checkbox" class="presence-check soir-check" data-id="${c.id}" ${isPresent ? 'checked' : ''} ${!isAdmin ? 'disabled' : ''}>
+                            ${photo}
+                            <span style="font-weight:500;font-size:9px;">${c.name}</span>
+                            <span class="client-tag">🌙 ${formatTime(c.returnSoirTime)}</span>
+                            <span class="client-tag">${c.returnSoirArret || '-'}</span>
+                            <span class="badge-status ${isPresent ? 'present' : 'absent'}">${isPresent ? '✅' : '❌'}</span>
+                        </div>
+                    </div>`;
+            });
+            $('presenceListSoir').innerHTML = html;
+            $('activeCountSoir').textContent = actifs.length;
+
+            document.querySelectorAll('.soir-check').forEach(function(cb) {
+                cb.addEventListener('change', function() {
+                    data.presenceSoir[this.dataset.id] = this.checked;
+                    saveData();
+                });
+            });
+            $('selectAllSoir').onchange = function() {
+                document.querySelectorAll('.soir-check').forEach(function(cb) {
+                    if (!cb.disabled) { cb.checked = this.checked;
+                        data.presenceSoir[cb.dataset.id] = this.checked; }
+                });
+                saveData();
+            };
+        }
+
+        function validateMatin() {
+            if (!isAdmin) { alert('Mode admin requis'); return; }
+            const selected = data.clients.filter(function(c) { return data.presenceMatin[c.id] === true; });
+            if (selected.length === 0) { alert('Aucun signalé'); return; }
+            departMatinValide = selected;
+            const mois = getCurrentMonth(),
+                annee = getCurrentYear();
+            selected.forEach(function(c) {
+                if (!isRenewedForMonth(c.id)) {
+                    data.renouvellements.push({ clientId: c.id, dateRenouvellement: todayStr(), mois, annee,
+                        montant: c.amount || 0 });
+                }
+            });
+            saveData();
+            renderDepartMatin();
+            alert('✅ ' + selected.length + ' voyageur(s) validé(s) !');
+        }
+
+        function validateSoir() {
+            if (!isAdmin) { alert('Mode admin requis'); return; }
+            const selected = data.clients.filter(function(c) { return data.presenceSoir[c.id] === true; });
+            if (selected.length === 0) { alert('Aucun signalé'); return; }
+            departSoirValide = selected;
+            const mois = getCurrentMonth(),
+                annee = getCurrentYear();
+            selected.forEach(function(c) {
+                if (!isRenewedForMonth(c.id)) {
+                    data.renouvellements.push({ clientId: c.id, dateRenouvellement: todayStr(), mois, annee,
+                        montant: c.amount || 0 });
+                }
+            });
+            saveData();
+            renderDepartSoir();
+            alert('✅ ' + selected.length + ' voyageur(s) validé(s) !');
+        }
+
+        function renderDepartMatin() {
+            if (departMatinValide.length === 0) {
+                $('departMatinList').innerHTML = '<p class="text-muted">Aucun</p>';
+                $('departMatinCount').textContent = '0';
+                return;
+            }
+            const groups = {};
+            departMatinValide.forEach(function(c) {
+                const key = c.departMatinArret || 'Sans arrêt';
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(c);
+            });
+            let html =
+                `<div style="margin-bottom:3px;">Total: <strong style="color:#d4a017;">${departMatinValide.length}</strong></div>`;
+            Object.keys(groups).sort().forEach(function(arret) {
+                const clients = groups[arret];
+                clients.sort(function(a, b) { return (a.departMatinTime || '00:00').localeCompare(b.departMatinTime ||
+                        '00:00'); });
+                html +=
+                    `<div class="depart-section" style="border-left-color:#d4a017;margin-top:3px;"><div class="header"><h3 style="color:#d4a017;">📍 ${arret}</h3><span class="count">${clients.length}</span></div><div>`;
+                clients.forEach(function(c) {
+                    html +=
+                        `<span class="client-tag" style="border-color:#d4a017;background:#fff8e1;">${c.name} <span style="color:#999;font-size:7px;">🌅 ${formatTime(c.departMatinTime)}</span></span>`;
+                });
+                html += `</div></div>`;
+            });
+            $('departMatinList').innerHTML = html;
+            $('departMatinCount').textContent = departMatinValide.length;
+        }
+
+        function renderDepartSoir() {
+            if (departSoirValide.length === 0) {
+                $('departSoirList').innerHTML = '<p class="text-muted">Aucun</p>';
+                $('departSoirCount').textContent = '0';
+                return;
+            }
+            const groups = {};
+            departSoirValide.forEach(function(c) {
+                const key = c.returnSoirArret || 'Sans arrêt';
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(c);
+            });
+            let html =
+                `<div style="margin-bottom:3px;">Total: <strong style="color:#2c3e50;">${departSoirValide.length}</strong></div>`;
+            Object.keys(groups).sort().forEach(function(arret) {
+                const clients = groups[arret];
+                clients.sort(function(a, b) { return (a.returnSoirTime || '00:00').localeCompare(b.returnSoirTime ||
+                        '00:00'); });
+                html +=
+                    `<div class="depart-section" style="border-left-color:#2c3e50;margin-top:3px;"><div class="header"><h3 style="color:#2c3e50;">📍 ${arret}</h3><span class="count">${clients.length}</span></div><div>`;
+                clients.forEach(function(c) {
+                    html +=
+                        `<span class="client-tag" style="border-color:#2c3e50;background:#ecf0f1;">${c.name} <span style="color:#999;font-size:7px;">🌙 ${formatTime(c.returnSoirTime)}</span></span>`;
+                });
+                html += `</div></div>`;
+            });
+            $('departSoirList').innerHTML = html;
+            $('departSoirCount').textContent = departSoirValide.length;
+        }
+
+        function resetMatin() {
+            if (!isAdmin) { alert('Mode admin requis'); return; }
+            if (!confirm('Réinitialiser ?')) return;
+            data.presenceMatin = {};
+            departMatinValide = [];
+            saveData();
+        }
+
+        function resetSoir() {
+            if (!isAdmin) { alert('Mode admin requis'); return; }
+            if (!confirm('Réinitialiser ?')) return;
+            data.presenceSoir = {};
+            departSoirValide = [];
+            saveData();
+        }
+
+        function exportMatinPDF() { exportDepartPdf(departMatinValide, 'matin'); }
+
+        function exportSoirPDF() { exportDepartPdf(departSoirValide, 'soir'); }
 
         function exportDepartPdf(dataList, type) {
             if (dataList.length === 0) { alert('Aucune liste'); return; }
@@ -1556,735 +2383,6 @@
             URL.revokeObjectURL(url);
         }
 
-        // ---- ONGLETS ----
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            document.querySelector(`.tab-btn[onclick="showTab('${tabId}')"]`).classList.add('active');
-        }
-
-        function showSubTab(tabId) {
-            document.querySelectorAll('.sub-tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.sub-tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            document.querySelector(`.sub-tab-btn[onclick="showSubTab('${tabId}')"]`).classList.add('active');
-        }
-
-        // ---- ADMIN ----
-        function unlockAdmin() {
-            const pwd = document.getElementById('adminPassword').value;
-            if (pwd === ADMIN_PASSWORD) {
-                isAdmin = true;
-                document.getElementById('adminStatus').textContent = '✅ Déverrouillé';
-                document.getElementById('adminStatus').className = 'status unlocked';
-                updateAdminUI();
-                alert('✅ Mode admin déverrouillé !');
-            } else {
-                alert('❌ Code incorrect. Le code par défaut est NTR2026');
-            }
-        }
-
-        function toggleAdmin() {
-            if (isAdmin) {
-                isAdmin = false;
-                document.getElementById('adminStatus').textContent = '🔒 Verrouillé';
-                document.getElementById('adminStatus').className = 'status';
-                updateAdminUI();
-            } else {
-                document.getElementById('adminPassword').focus();
-            }
-        }
-
-        function updateAdminUI() {
-            const inputs = ['clientName', 'clientPhone', 'clientAdresse', 'clientStartDate', 'clientEndDate',
-                'clientAmount', 'paymentStatus', 'clientTripType',
-                'clientDepartMatinTime', 'clientDepartMatinArret',
-                'clientReturnSoirTime', 'clientReturnSoirArret',
-                'clientPhoto', 'addClientBtn'
-            ];
-            inputs.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.disabled = !isAdmin;
-            });
-            document.getElementById('addCard').style.opacity = isAdmin ? '1' : '0.6';
-        }
-
-        // ---- AJOUT CLIENT ----
-        function addClient() {
-            if (!isAdmin) { alert('🔒 Mode admin requis'); return; }
-
-            const name = document.getElementById('clientName').value.trim();
-            const phone = document.getElementById('clientPhone').value.trim();
-            const adresse = document.getElementById('clientAdresse').value.trim();
-            const startDate = document.getElementById('clientStartDate').value;
-            const endDate = document.getElementById('clientEndDate').value;
-            const amount = document.getElementById('clientAmount').value ? parseInt(document.getElementById('clientAmount')
-                .value) : null;
-            const payStatus = document.getElementById('paymentStatus').value;
-            const tripType = document.getElementById('clientTripType').value;
-            const departMatinTime = document.getElementById('clientDepartMatinTime').value;
-            const departMatinArret = document.getElementById('clientDepartMatinArret').value.trim();
-            const returnSoirTime = document.getElementById('clientReturnSoirTime').value;
-            const returnSoirArret = document.getElementById('clientReturnSoirArret').value.trim();
-
-            if (!name) { alert('Nom requis'); return; }
-            if (!startDate) { alert('Date début requise'); return; }
-            if (!endDate) { alert('Date fin requise'); return; }
-            if (startDate > endDate) { alert('La date de début doit être avant la date de fin'); return; }
-            if (!amount) { alert('Montant requis'); return; }
-
-            const numeroCarte = genererNumeroCarte();
-
-            const photoFile = document.getElementById('clientPhoto').files[0];
-            const sauvegarder = function(photoData) {
-                const newClient = {
-                    id: generateId(),
-                    name,
-                    phone,
-                    adresse,
-                    startDate,
-                    endDate,
-                    amount,
-                    tripType,
-                    departMatinTime,
-                    departMatinArret,
-                    returnSoirTime,
-                    returnSoirArret,
-                    numeroCarte: numeroCarte,
-                    photo: photoData || ''
-                };
-                data.clients.push(newClient);
-                if (payStatus === 'paid') {
-                    data.paiements.push({ clientId: newClient.id, date: todayStr(), montant: amount });
-                }
-                saveData();
-
-                document.getElementById('clientName').value = '';
-                document.getElementById('clientPhone').value = '';
-                document.getElementById('clientAdresse').value = '';
-                document.getElementById('clientAmount').value = '';
-                document.getElementById('clientDepartMatinArret').value = '';
-                document.getElementById('clientReturnSoirArret').value = '';
-                document.getElementById('clientPhoto').value = '';
-                document.getElementById('photoPreview').src = '';
-
-                alert(`✅ Abonné ajouté ! Carte N° ${numeroCarte}`);
-                renderAll();
-            };
-
-            if (photoFile) {
-                const reader = new FileReader();
-                reader.onload = function(e) { sauvegarder(e.target.result); };
-                reader.readAsDataURL(photoFile);
-            } else {
-                sauvegarder(null);
-            }
-        }
-
-        document.getElementById('clientPhoto').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('photoPreview').src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // ---- CARTES ----
-        function genererCarte() {
-            const clientId = document.getElementById('carteSelect').value;
-            if (!clientId) { alert('Sélectionnez un abonné'); return; }
-            currentCarteClientId = clientId;
-
-            const carteData = genererCarteData(clientId);
-            if (!carteData) { alert('Erreur génération'); return; }
-
-            const carteHtml = afficherCarteHtml(carteData);
-            if (carteHtml) {
-                document.getElementById('cartePreview').innerHTML = carteHtml;
-                setTimeout(() => genererQR('qrcode', carteData.qrData), 100);
-            }
-
-            renderPointageHistory(clientId);
-            renderPaiementHistory(clientId);
-        }
-
-        function renderPointageHistory(clientId) {
-            const client = getClientById(clientId);
-            if (!client) {
-                document.getElementById('pointageHistory').innerHTML = '<p class="text-muted">Sélectionnez un abonné</p>';
-                return;
-            }
-
-            const pointages = data.pointages[clientId] || {};
-            const dates = Object.keys(pointages).sort().reverse();
-
-            if (dates.length === 0) {
-                document.getElementById('pointageHistory').innerHTML =
-                    `<p class="text-muted">Aucun pointage pour ${client.name}</p>`;
-                return;
-            }
-
-            let html = `<div style="font-weight:600;margin-bottom:3px;">📋 ${client.name}</div>`;
-            dates.slice(0, 20).forEach(date => {
-                const type = pointages[date];
-                let typeLabel = '';
-                let badgeClass = '';
-                if (type === 'aller') { typeLabel = '🟢 Aller';
-                    badgeClass = 'aller'; } else if (type === 'retour') { typeLabel = '🔵 Retour';
-                    badgeClass = 'retour'; } else if (type === 'both') { typeLabel = '✅ Aller + Retour';
-                    badgeClass = 'both'; }
-                html += `
-                        <div class="pointage-item">
-                            <div class="info">
-                                <span>${formatDate(date)}</span>
-                                <span class="badge-type ${badgeClass}">${typeLabel}</span>
-                            </div>
-                            <span class="text-muted">${type === 'both' ? '✅ Complet' : type === 'aller' ? 'Départ' : 'Retour'}</span>
-                        </div>
-                    `;
-            });
-            document.getElementById('pointageHistory').innerHTML = html;
-        }
-
-        function renderPaiementHistory(clientId) {
-            const client = getClientById(clientId);
-            if (!client) {
-                document.getElementById('paiementHistory').innerHTML = '<p class="text-muted">Sélectionnez un abonné</p>';
-                return;
-            }
-
-            const paiements = data.paiements.filter(p => p.clientId === clientId).sort((a, b) => new Date(b.date) - new Date(
-                a.date));
-
-            if (paiements.length === 0) {
-                document.getElementById('paiementHistory').innerHTML =
-                    `<p class="text-muted">Aucun paiement pour ${client.name}</p>`;
-                return;
-            }
-
-            let total = 0;
-            let html = `<div style="font-weight:600;margin-bottom:3px;">💰 ${client.name}</div>`;
-            paiements.slice(0, 20).forEach(p => {
-                total += p.montant || 0;
-                html += `
-                        <div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #dce8e2;font-size:9px;">
-                            <span>${formatDate(p.date)}</span>
-                            <span style="font-weight:600;color:#1a5e3a;">${(p.montant || 0).toLocaleString()} CFA</span>
-                        </div>
-                    `;
-            });
-            html +=
-                `<div style="margin-top:3px;padding-top:3px;border-top:2px solid #dce8e2;font-weight:600;color:#1a5e3a;">Total: ${total.toLocaleString()} CFA</div>`;
-            document.getElementById('paiementHistory').innerHTML = html;
-        }
-
-        function exporterCartePDF() {
-            const clientId = document.getElementById('carteSelect').value;
-            if (!clientId) { alert('Sélectionnez un abonné'); return; }
-
-            const carteData = genererCarteData(clientId);
-            if (!carteData) { alert('Erreur'); return; }
-
-            const carteHtml = afficherCarteHtml(carteData);
-            document.getElementById('cartePreview').innerHTML = carteHtml;
-
-            // Attendre que le QR soit généré
-            setTimeout(() => {
-                genererQR('qrcode', carteData.qrData);
-                setTimeout(() => {
-                    const element = document.getElementById('carteAImprimer');
-                    if (element) {
-                        exportPdf('carteAImprimer', `carte_${todayStr()}.pdf`);
-                    } else {
-                        alert('Carte non trouvée');
-                    }
-                }, 500);
-            }, 200);
-        }
-
-        function partagerCarte() {
-            const clientId = document.getElementById('carteSelect').value;
-            if (!clientId) { alert('Sélectionnez un abonné'); return; }
-
-            const carteData = genererCarteData(clientId);
-            if (!carteData) { alert('Erreur'); return; }
-
-            const shareText =
-                `🚌 YAOU TRANSPORT\n📋 ${carteData.client.name}\n📱 N° ${carteData.numeroCarte}\n📅 ${carteData.moisNom} ${carteData.annee}\n🔑 ${carteData.hash}`;
-
-            if (navigator.share) {
-                navigator.share({ title: 'Ma carte YAOU', text: shareText }).catch(() => {});
-            } else {
-                navigator.clipboard.writeText(shareText).then(() => {
-                    alert('✅ Copié !');
-                }).catch(() => {
-                    prompt('Copiez :', shareText);
-                });
-            }
-        }
-
-        // ---- SCANNER QR (CORRIGÉ) ----
-        let scannerActive = false;
-        let scannerStream = null;
-
-        function startScanner() {
-            // Vérifier si le navigateur supporte la caméra
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                document.getElementById('scanResult').className = 'scan-result info';
-                document.getElementById('scanResult').innerHTML =
-                    '📱 Sur PC, utilisez les boutons "Pointer ALLER" ou "Pointer RETOUR" ci-dessous.';
-                document.getElementById('scanResult').classList.remove('hidden');
-                return;
-            }
-
-            const clientId = document.getElementById('carteSelect').value;
-            if (!clientId) {
-                document.getElementById('scanResult').className = 'scan-result error';
-                document.getElementById('scanResult').innerHTML =
-                    '⚠️ Sélectionnez d\'abord votre nom dans l\'onglet Carte';
-                document.getElementById('scanResult').classList.remove('hidden');
-                setTimeout(function() { document.getElementById('scanResult').classList.add('hidden'); }, 3000);
-                return;
-            }
-
-            // Vérifier si l'appareil photo est déjà utilisé
-            if (scannerActive) {
-                document.getElementById('scanResult').className = 'scan-result info';
-                document.getElementById('scanResult').innerHTML = '📷 Scanner déjà actif';
-                document.getElementById('scanResult').classList.remove('hidden');
-                setTimeout(function() { document.getElementById('scanResult').classList.add('hidden'); }, 2000);
-                return;
-            }
-
-            // Essayer d'abord la caméra arrière, puis fallback
-            navigator.mediaDevices.getUserMedia({
-                    video: {
-                        facingMode: { ideal: 'environment' },
-                        width: { ideal: 640 },
-                        height: { ideal: 480 }
-                    }
-                })
-                .then(function(stream) {
-                    scannerStream = stream;
-                    const video = document.getElementById('video');
-                    video.srcObject = stream;
-                    video.style.display = 'block';
-                    document.getElementById('scannerPlaceholder').style.display = 'none';
-                    scannerActive = true;
-
-                    // Démarrer la lecture vidéo
-                    video.play().catch(function(e) {
-                        console.warn('Erreur lecture vidéo:', e);
-                    });
-
-                    // Vérifier si BarcodeDetector est supporté
-                    if (!('BarcodeDetector' in window)) {
-                        document.getElementById('scanResult').className = 'scan-result info';
-                        document.getElementById('scanResult').innerHTML =
-                            '📱 Scannez avec votre téléphone ou utilisez les boutons ci-dessous.';
-                        document.getElementById('scanResult').classList.remove('hidden');
-                        // Continuer à montrer la vidéo même sans détection
-                        return;
-                    }
-
-                    const detector = new BarcodeDetector({ formats: ['qr_code'] });
-
-                    function scanLoop() {
-                        if (!scannerActive) {
-                            // Nettoyer si le scanner est arrêté
-                            if (video.srcObject) {
-                                video.srcObject.getTracks().forEach(t => t.stop());
-                                video.srcObject = null;
-                            }
-                            return;
-                        }
-
-                        if (video.readyState < 2) {
-                            setTimeout(scanLoop, 500);
-                            return;
-                        }
-
-                        try {
-                            detector.detect(video)
-                                .then(function(barcodes) {
-                                    if (barcodes.length > 0 && scannerActive) {
-                                        const qrData = barcodes[0].rawValue;
-                                        traiterQR(qrData);
-                                    }
-                                    // Continuer le scan
-                                    if (scannerActive) {
-                                        setTimeout(scanLoop, 300);
-                                    }
-                                })
-                                .catch(function(err) {
-                                    // Erreur de détection, continuer
-                                    if (scannerActive) {
-                                        setTimeout(scanLoop, 500);
-                                    }
-                                });
-                        } catch (e) {
-                            if (scannerActive) {
-                                setTimeout(scanLoop, 500);
-                            }
-                        }
-                    }
-
-                    // Démarrer le scan après un court délai
-                    setTimeout(scanLoop, 500);
-
-                })
-                .catch(function(err) {
-                    console.warn('Erreur caméra:', err);
-                    // Fallback: essayer la caméra frontale
-                    navigator.mediaDevices.getUserMedia({
-                            video: { facingMode: 'user' }
-                        })
-                        .then(function(stream) {
-                            scannerStream = stream;
-                            const video = document.getElementById('video');
-                            video.srcObject = stream;
-                            video.style.display = 'block';
-                            document.getElementById('scannerPlaceholder').style.display = 'none';
-                            scannerActive = true;
-                            video.play().catch(function() {});
-
-                            document.getElementById('scanResult').className = 'scan-result info';
-                            document.getElementById('scanResult').innerHTML =
-                                '📷 Caméra frontale active. Scannez le QR code.';
-                            document.getElementById('scanResult').classList.remove('hidden');
-
-                            // Simple détection avec intervalle
-                            let scanCount = 0;
-
-                            function simpleScan() {
-                                if (!scannerActive) return;
-                                scanCount++;
-                                if (scanCount > 30) {
-                                    document.getElementById('scanResult').className = 'scan-result info';
-                                    document.getElementById('scanResult').innerHTML =
-                                        '📷 Scannez le QR code ou utilisez les boutons ci-dessous.';
-                                    document.getElementById('scanResult').classList.remove('hidden');
-                                }
-                                setTimeout(simpleScan, 1000);
-                            }
-                            setTimeout(simpleScan, 2000);
-
-                        })
-                        .catch(function(err2) {
-                            document.getElementById('scanResult').className = 'scan-result info';
-                            document.getElementById('scanResult').innerHTML =
-                                '📱 Utilisez les boutons "Pointer ALLER" ou "Pointer RETOUR" ci-dessous.';
-                            document.getElementById('scanResult').classList.remove('hidden');
-                        });
-                });
-        }
-
-        function stopScanner() {
-            scannerActive = false;
-            if (scannerStream) {
-                scannerStream.getTracks().forEach(function(t) { t.stop(); });
-                scannerStream = null;
-            }
-            const video = document.getElementById('video');
-            video.style.display = 'none';
-            video.srcObject = null;
-            document.getElementById('scannerPlaceholder').style.display = 'block';
-            document.getElementById('scanResult').classList.add('hidden');
-        }
-
-        function traiterQR(qrData) {
-            try {
-                const dataQr = JSON.parse(qrData);
-                if (!dataQr.clientId) {
-                    // Si c'est le QR du car
-                    if (dataQr.type && dataQr.source === 'car') {
-                        const clientId = document.getElementById('carteSelect').value;
-                        if (!clientId) {
-                            document.getElementById('scanResult').className = 'scan-result error';
-                            document.getElementById('scanResult').innerHTML =
-                                '⚠️ Sélectionnez votre nom dans l\'onglet Carte';
-                            document.getElementById('scanResult').classList.remove('hidden');
-                            setTimeout(function() { document.getElementById('scanResult').classList.add('hidden'); },
-                            3000);
-                            return;
-                        }
-                        const type = dataQr.type;
-                        const result = pointerParQR(clientId, type);
-                        document.getElementById('scanResult').className =
-                            `scan-result ${result.success ? 'success' : 'error'}`;
-                        document.getElementById('scanResult').innerHTML = result.success ?
-                            `✅ ${result.message}` :
-                            `❌ ${result.message}`;
-                        document.getElementById('scanResult').classList.remove('hidden');
-
-                        if (result.success) {
-                            if (navigator.vibrate) navigator.vibrate(200);
-                            renderAll();
-                            if (currentCarteClientId) {
-                                const carteData = genererCarteData(currentCarteClientId);
-                                if (carteData) {
-                                    const carteHtml = afficherCarteHtml(carteData);
-                                    if (carteHtml) {
-                                        document.getElementById('cartePreview').innerHTML = carteHtml;
-                                        setTimeout(function() { genererQR('qrcode', carteData.qrData); }, 200);
-                                    }
-                                }
-                                renderPointageHistory(currentCarteClientId);
-                            }
-                        }
-
-                        setTimeout(function() { document.getElementById('scanResult').classList.add('hidden'); },
-                        4000);
-                        return;
-                    }
-
-                    throw new Error('QR invalide');
-                }
-
-                // QR de la carte de l'abonné
-                document.getElementById('scanResult').className = 'scan-result info';
-                document.getElementById('scanResult').innerHTML = `👤 ${dataQr.nom || 'Abonné'} - Carte valide`;
-                document.getElementById('scanResult').classList.remove('hidden');
-                setTimeout(function() { document.getElementById('scanResult').classList.add('hidden'); }, 3000);
-
-            } catch (e) {
-                document.getElementById('scanResult').className = 'scan-result error';
-                document.getElementById('scanResult').innerHTML = '❌ QR invalide - Scannez le QR du car';
-                document.getElementById('scanResult').classList.remove('hidden');
-                setTimeout(function() { document.getElementById('scanResult').classList.add('hidden'); }, 3000);
-            }
-        }
-
-        function pointerManuel(type) {
-            const clientId = document.getElementById('carteSelect').value;
-            if (!clientId) {
-                alert('⚠️ Sélectionnez d\'abord votre nom dans l\'onglet Carte');
-                return;
-            }
-            const result = pointerParQR(clientId, type);
-            document.getElementById('scanResult').className = `scan-result ${result.success ? 'success' : 'error'}`;
-            document.getElementById('scanResult').innerHTML = result.success ? `✅ ${result.message}` :
-                `❌ ${result.message}`;
-            document.getElementById('scanResult').classList.remove('hidden');
-            if (result.success) renderAll();
-            setTimeout(function() { document.getElementById('scanResult').classList.add('hidden'); }, 3000);
-        }
-
-        // ---- DEPARTS ----
-        function renderPresenceMatin() {
-            const actifs = data.clients.filter(function(c) {
-                if (getClientStatus(c) !== 'actif') return false;
-                if (!c.departMatinTime) return false;
-                return parseInt(c.departMatinTime.split(':')[0]) < 12;
-            });
-            if (actifs.length === 0) {
-                document.getElementById('presenceListMatin').innerHTML = '<p class="text-muted">Aucun</p>';
-                document.getElementById('activeCountMatin').textContent = '0';
-                return;
-            }
-            actifs.forEach(function(c) { if (!(c.id in data.presenceMatin)) data.presenceMatin[c.id] = false; });
-            actifs.sort(function(a, b) { return (a.departMatinTime || '00:00').localeCompare(b.departMatinTime || '00:00'); });
-
-            let html = '';
-            actifs.forEach(function(c) {
-                const isPresent = data.presenceMatin[c.id] === true;
-                const photo = getPhotoHtml(c.id);
-                html += `<div class="depart-group">
-                        <div style="display:flex;align-items:center;gap:3px;flex-wrap:wrap;">
-                            <input type="checkbox" class="presence-check matin-check" data-id="${c.id}" ${isPresent ? 'checked' : ''} ${!isAdmin ? 'disabled' : ''}>
-                            ${photo}
-                            <span style="font-weight:500;font-size:9px;">${c.name}</span>
-                            <span class="client-tag">🌅 ${formatTime(c.departMatinTime)}</span>
-                            <span class="client-tag">${c.departMatinArret || '-'}</span>
-                            <span class="badge-status ${isPresent ? 'present' : 'absent'}">${isPresent ? '✅' : '❌'}</span>
-                        </div>
-                    </div>`;
-            });
-            document.getElementById('presenceListMatin').innerHTML = html;
-            document.getElementById('activeCountMatin').textContent = actifs.length;
-
-            document.querySelectorAll('.matin-check').forEach(function(cb) {
-                cb.addEventListener('change', function() {
-                    data.presenceMatin[this.dataset.id] = this.checked;
-                    saveData();
-                });
-            });
-            document.getElementById('selectAllMatin').onchange = function() {
-                document.querySelectorAll('.matin-check').forEach(function(cb) {
-                    if (!cb.disabled) { cb.checked = this.checked;
-                        data.presenceMatin[cb.dataset.id] = this.checked; }
-                });
-                saveData();
-            };
-        }
-
-        function renderPresenceSoir() {
-            const actifs = data.clients.filter(function(c) {
-                if (getClientStatus(c) !== 'actif') return false;
-                if (!c.returnSoirTime) return false;
-                return parseInt(c.returnSoirTime.split(':')[0]) >= 12;
-            });
-            if (actifs.length === 0) {
-                document.getElementById('presenceListSoir').innerHTML = '<p class="text-muted">Aucun</p>';
-                document.getElementById('activeCountSoir').textContent = '0';
-                return;
-            }
-            actifs.forEach(function(c) { if (!(c.id in data.presenceSoir)) data.presenceSoir[c.id] = false; });
-            actifs.sort(function(a, b) { return (a.returnSoirTime || '00:00').localeCompare(b.returnSoirTime || '00:00'); });
-
-            let html = '';
-            actifs.forEach(function(c) {
-                const isPresent = data.presenceSoir[c.id] === true;
-                const photo = getPhotoHtml(c.id);
-                html += `<div class="depart-group">
-                        <div style="display:flex;align-items:center;gap:3px;flex-wrap:wrap;">
-                            <input type="checkbox" class="presence-check soir-check" data-id="${c.id}" ${isPresent ? 'checked' : ''} ${!isAdmin ? 'disabled' : ''}>
-                            ${photo}
-                            <span style="font-weight:500;font-size:9px;">${c.name}</span>
-                            <span class="client-tag">🌙 ${formatTime(c.returnSoirTime)}</span>
-                            <span class="client-tag">${c.returnSoirArret || '-'}</span>
-                            <span class="badge-status ${isPresent ? 'present' : 'absent'}">${isPresent ? '✅' : '❌'}</span>
-                        </div>
-                    </div>`;
-            });
-            document.getElementById('presenceListSoir').innerHTML = html;
-            document.getElementById('activeCountSoir').textContent = actifs.length;
-
-            document.querySelectorAll('.soir-check').forEach(function(cb) {
-                cb.addEventListener('change', function() {
-                    data.presenceSoir[this.dataset.id] = this.checked;
-                    saveData();
-                });
-            });
-            document.getElementById('selectAllSoir').onchange = function() {
-                document.querySelectorAll('.soir-check').forEach(function(cb) {
-                    if (!cb.disabled) { cb.checked = this.checked;
-                        data.presenceSoir[cb.dataset.id] = this.checked; }
-                });
-                saveData();
-            };
-        }
-
-        function validateMatin() {
-            if (!isAdmin) { alert('Mode admin requis'); return; }
-            const selected = data.clients.filter(function(c) { return data.presenceMatin[c.id] === true; });
-            if (selected.length === 0) { alert('Aucun signalé'); return; }
-            departMatinValide = selected;
-            const mois = getCurrentMonth(),
-                annee = getCurrentYear();
-            selected.forEach(function(c) {
-                if (!isRenewedForMonth(c.id)) {
-                    data.renouvellements.push({ clientId: c.id, dateRenouvellement: todayStr(), mois, annee,
-                        montant: c.amount || 0 });
-                }
-            });
-            saveData();
-            renderDepartMatin();
-            alert('✅ ' + selected.length + ' voyageur(s) validé(s) !');
-        }
-
-        function validateSoir() {
-            if (!isAdmin) { alert('Mode admin requis'); return; }
-            const selected = data.clients.filter(function(c) { return data.presenceSoir[c.id] === true; });
-            if (selected.length === 0) { alert('Aucun signalé'); return; }
-            departSoirValide = selected;
-            const mois = getCurrentMonth(),
-                annee = getCurrentYear();
-            selected.forEach(function(c) {
-                if (!isRenewedForMonth(c.id)) {
-                    data.renouvellements.push({ clientId: c.id, dateRenouvellement: todayStr(), mois, annee,
-                        montant: c.amount || 0 });
-                }
-            });
-            saveData();
-            renderDepartSoir();
-            alert('✅ ' + selected.length + ' voyageur(s) validé(s) !');
-        }
-
-        function renderDepartMatin() {
-            if (departMatinValide.length === 0) {
-                document.getElementById('departMatinList').innerHTML = '<p class="text-muted">Aucun</p>';
-                document.getElementById('departMatinCount').textContent = '0';
-                return;
-            }
-            const groups = {};
-            departMatinValide.forEach(function(c) {
-                const key = c.departMatinArret || 'Sans arrêt';
-                if (!groups[key]) groups[key] = [];
-                groups[key].push(c);
-            });
-            let html =
-                `<div style="margin-bottom:3px;">Total: <strong style="color:#d4a017;">${departMatinValide.length}</strong></div>`;
-            Object.keys(groups).sort().forEach(function(arret) {
-                const clients = groups[arret];
-                clients.sort(function(a, b) { return (a.departMatinTime || '00:00').localeCompare(b.departMatinTime ||
-                        '00:00'); });
-                html +=
-                    `<div class="depart-section" style="border-left-color:#d4a017;margin-top:3px;"><div class="header"><h3 style="color:#d4a017;">📍 ${arret}</h3><span class="count">${clients.length}</span></div><div>`;
-                clients.forEach(function(c) {
-                    html +=
-                        `<span class="client-tag" style="border-color:#d4a017;background:#fff8e1;">${c.name} <span style="color:#999;font-size:7px;">🌅 ${formatTime(c.departMatinTime)}</span></span>`;
-                });
-                html += `</div></div>`;
-            });
-            document.getElementById('departMatinList').innerHTML = html;
-            document.getElementById('departMatinCount').textContent = departMatinValide.length;
-        }
-
-        function renderDepartSoir() {
-            if (departSoirValide.length === 0) {
-                document.getElementById('departSoirList').innerHTML = '<p class="text-muted">Aucun</p>';
-                document.getElementById('departSoirCount').textContent = '0';
-                return;
-            }
-            const groups = {};
-            departSoirValide.forEach(function(c) {
-                const key = c.returnSoirArret || 'Sans arrêt';
-                if (!groups[key]) groups[key] = [];
-                groups[key].push(c);
-            });
-            let html =
-                `<div style="margin-bottom:3px;">Total: <strong style="color:#2c3e50;">${departSoirValide.length}</strong></div>`;
-            Object.keys(groups).sort().forEach(function(arret) {
-                const clients = groups[arret];
-                clients.sort(function(a, b) { return (a.returnSoirTime || '00:00').localeCompare(b.returnSoirTime ||
-                        '00:00'); });
-                html +=
-                    `<div class="depart-section" style="border-left-color:#2c3e50;margin-top:3px;"><div class="header"><h3 style="color:#2c3e50;">📍 ${arret}</h3><span class="count">${clients.length}</span></div><div>`;
-                clients.forEach(function(c) {
-                    html +=
-                        `<span class="client-tag" style="border-color:#2c3e50;background:#ecf0f1;">${c.name} <span style="color:#999;font-size:7px;">🌙 ${formatTime(c.returnSoirTime)}</span></span>`;
-                });
-                html += `</div></div>`;
-            });
-            document.getElementById('departSoirList').innerHTML = html;
-            document.getElementById('departSoirCount').textContent = departSoirValide.length;
-        }
-
-        function resetMatin() {
-            if (!isAdmin) { alert('Mode admin requis'); return; }
-            if (!confirm('Réinitialiser ?')) return;
-            data.presenceMatin = {};
-            departMatinValide = [];
-            saveData();
-        }
-
-        function resetSoir() {
-            if (!isAdmin) { alert('Mode admin requis'); return; }
-            if (!confirm('Réinitialiser ?')) return;
-            data.presenceSoir = {};
-            departSoirValide = [];
-            saveData();
-        }
-
-        function exportMatinPDF() { exportDepartPdf(departMatinValide, 'matin'); }
-
-        function exportSoirPDF() { exportDepartPdf(departSoirValide, 'soir'); }
-
         // ---- RENOUVELLEMENT ----
         function renderRenewSelect() {
             const actifs = data.clients.filter(function(c) { return getClientStatus(c) === 'actif'; });
@@ -2293,10 +2391,9 @@
             let html = '';
             if (aRenouveler.length === 0) {
                 html = '<p class="text-muted">Tous renouvelés</p>';
-                document.getElementById('renewSummary').innerHTML = '✅ Tous renouvelés';
+                $('renewSummary').innerHTML = '✅ Tous renouvelés';
             } else {
-                document.getElementById('renewSummary').innerHTML =
-                    `<span class="badge badge-warning">⏳ ${aRenouveler.length} à renouveler</span>`;
+                $('renewSummary').innerHTML = `<span class="badge badge-warning">⏳ ${aRenouveler.length} à renouveler</span>`;
                 aRenouveler.forEach(function(c) {
                     html += `
                             <div class="renew-item">
@@ -2309,8 +2406,8 @@
                         `;
                 });
             }
-            document.getElementById('renewSelectList').innerHTML = html;
-            document.getElementById('renewMonthDisplay').textContent = getCurrentMonth() + '/' + getCurrentYear();
+            $('renewSelectList').innerHTML = html;
+            $('renewMonthDisplay').textContent = getCurrentMonth() + '/' + getCurrentYear();
         }
 
         function renewSelected() {
@@ -2355,21 +2452,21 @@
 
         // ---- RENDU CLIENTS ----
         function filterClients() {
-            document.getElementById('filterPayment').value = '';
-            document.getElementById('filterStatus').value = '';
+            $('filterPayment').value = '';
+            $('filterStatus').value = '';
             renderClients();
         }
 
         function renderClients() {
-            const filterPayment = document.getElementById('filterPayment').value;
-            const filterStatus = document.getElementById('filterStatus').value;
+            const filterPayment = $('filterPayment').value;
+            const filterStatus = $('filterStatus').value;
 
             let filtered = data.clients;
             if (filterPayment) filtered = filtered.filter(function(c) { return getPaymentStatus(c) === filterPayment; });
             if (filterStatus) filtered = filtered.filter(function(c) { return getClientStatus(c) === filterStatus; });
 
             if (filtered.length === 0) {
-                document.getElementById('clientTable').innerHTML =
+                $('clientTable').innerHTML =
                     '<tr><td colspan="8" class="text-center text-muted">Aucun</td></tr>';
                 return;
             }
@@ -2390,9 +2487,9 @@
                         </tr>
                     `;
             });
-            document.getElementById('clientTable').innerHTML = html;
+            $('clientTable').innerHTML = html;
 
-            const select = document.getElementById('carteSelect');
+            const select = $('carteSelect');
             const currentVal = select.value;
             select.innerHTML = '<option value="">-- Choisir --</option>';
             data.clients.forEach(function(c) {
@@ -2402,6 +2499,18 @@
                 select.appendChild(opt);
             });
             if (currentVal && getClientById(currentVal)) select.value = currentVal;
+
+            // Mettre à jour le select des paiements
+            const pSelect = $('paymentClientSelect');
+            const pVal = pSelect.value;
+            pSelect.innerHTML = '<option value="">-- Choisir --</option>';
+            data.clients.forEach(function(c) {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = c.name + ' (' + (c.amount || 0) + ' CFA)';
+                pSelect.appendChild(opt);
+            });
+            if (pVal && getClientById(pVal)) pSelect.value = pVal;
         }
 
         function deleteClient(id) {
@@ -2410,6 +2519,7 @@
             data.clients = data.clients.filter(function(c) { return c.id !== id; });
             data.paiements = data.paiements.filter(function(p) { return p.clientId !== id; });
             data.renouvellements = data.renouvellements.filter(function(r) { return r.clientId !== id; });
+            data.mobilePayments = data.mobilePayments.filter(function(p) { return p.clientId !== id; });
             delete data.presenceMatin[id];
             delete data.presenceSoir[id];
             delete data.pointages[id];
@@ -2423,10 +2533,10 @@
             const impayes = getNbImpayes();
             const encaisse = getTotalEncaisse();
 
-            document.getElementById('nbClients').textContent = total;
-            document.getElementById('nbActifs').textContent = actifs;
-            document.getElementById('nbImpayes').textContent = impayes;
-            document.getElementById('totalMois').textContent = encaisse.toLocaleString() + ' CFA';
+            $('nbClients').textContent = total;
+            $('nbActifs').textContent = actifs;
+            $('nbImpayes').textContent = impayes;
+            $('totalMois').textContent = encaisse.toLocaleString() + ' CFA';
         }
 
         // ---- ALERTES ----
@@ -2436,7 +2546,7 @@
             if (impayes.length > 0) {
                 html += `<div class="alert alert-danger"><span><strong>⚠️ ${impayes.length} impayé(s)</strong></span><span style="font-size:8px;">${impayes.map(function(c){return c.name}).join(', ')}</span></div>`;
             }
-            document.getElementById('alerts').innerHTML = html;
+            $('alerts').innerHTML = html;
         }
 
         // ---- RAPPORT ----
@@ -2446,6 +2556,7 @@
             const inactifs = data.clients.filter(function(c) { return getClientStatus(c) === 'inactif'; }).length;
             const impayes = getNbImpayes();
             const encaisse = getTotalEncaisse();
+            const totalMobile = data.mobilePayments.reduce(function(sum, p) { return sum + (p.montant || 0); }, 0);
 
             let html = `
                     <div style="background:#e8f5ed;border-radius:6px;padding:8px;border:1px solid #d4e8dc;">
@@ -2456,9 +2567,27 @@
                             <div><span style="color:#666;">Inactifs:</span> <strong>${inactifs}</strong></div>
                             <div><span style="color:#666;">Impayés:</span> <strong style="color:#c0392b;">${impayes}</strong></div>
                             <div style="grid-column:span 2;"><span style="color:#666;">Encaissé:</span> <strong style="color:#1a7e3a;">${encaisse.toLocaleString()} CFA</strong></div>
+                            <div style="grid-column:span 2;"><span style="color:#666;">Mobile Money:</span> <strong style="color:#1a7e3a;">${totalMobile.toLocaleString()} CFA</strong></div>
                         </div>
                     </div>
                 `;
+
+            // Mobile Money récap
+            if (data.mobilePayments.length > 0) {
+                const byMethod = {};
+                data.mobilePayments.forEach(function(p) {
+                    if (!byMethod[p.method]) byMethod[p.method] = 0;
+                    byMethod[p.method] += p.montant || 0;
+                });
+                html += `
+                        <div style="background:#e8f5ed;border-radius:6px;padding:8px;margin-top:4px;border:1px solid #d4e8dc;">
+                            <div style="font-weight:600;color:#1a5e3a;margin-bottom:3px;">💳 Paiements Mobile Money</div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;font-size:10px;">
+                                ${Object.keys(byMethod).map(function(m){return '<div><span style="color:#666;">'+getMethodLabel(m)+':</span> <strong>'+(byMethod[m]||0).toLocaleString()+' CFA</strong></div>'}).join('')}
+                            </div>
+                        </div>
+                    `;
+            }
 
             const listImpayes = data.clients.filter(function(c) { return getPaymentStatus(c) === 'unpaid'; });
             if (listImpayes.length > 0) {
@@ -2470,7 +2599,7 @@
                     `;
             }
 
-            document.getElementById('reportContent').innerHTML = html;
+            $('reportContent').innerHTML = html;
         }
 
         // ---- SCAN HISTORY ----
@@ -2492,7 +2621,7 @@
             pointages.sort(function(a, b) { return b.date.localeCompare(a.date); });
 
             if (pointages.length === 0) {
-                document.getElementById('scanHistory').innerHTML = '<p class="text-muted">Aucun pointage</p>';
+                $('scanHistory').innerHTML = '<p class="text-muted">Aucun pointage</p>';
                 return;
             }
 
@@ -2514,7 +2643,7 @@
                         </div>
                     `;
             });
-            document.getElementById('scanHistory').innerHTML = html;
+            $('scanHistory').innerHTML = html;
         }
 
         // ---- EXPORT ----
@@ -2545,6 +2674,7 @@
                             if (!data.presenceSoir) data.presenceSoir = {};
                             if (!data.pointages) data.pointages = {};
                             if (!data.lastCarteNum) data.lastCarteNum = 0;
+                            if (!data.mobilePayments) data.mobilePayments = [];
                             saveData();
                             alert('✅ Import réussi');
                         }
@@ -2586,17 +2716,17 @@
             if (gpsWatchId) return;
             gpsWatchId = navigator.geolocation.watchPosition(
                 function(pos) {
-                    document.getElementById('gpsCoords').textContent = 'Lat: ' + pos.coords.latitude.toFixed(6) +
+                    $('gpsCoords').textContent = 'Lat: ' + pos.coords.latitude.toFixed(6) +
                         ' • Lng: ' + pos.coords.longitude.toFixed(6);
-                    document.getElementById('gpsStatus').textContent = '📡 En direct';
-                    document.getElementById('gpsDot').style.background = '#1e7e34';
-                    document.getElementById('whatsappShareBtn').href =
+                    $('gpsStatus').textContent = '📡 En direct';
+                    $('gpsDot').style.background = '#1e7e34';
+                    $('whatsappShareBtn').href =
                         'https://wa.me/?text=🚌 Le car YAOU est à : https://www.google.com/maps?q=' + pos.coords
                         .latitude + ',' + pos.coords.longitude;
                 },
                 function(err) {
-                    document.getElementById('gpsStatus').textContent = '⚠️ ' + err.message;
-                    document.getElementById('gpsDot').style.background = '#dc3545';
+                    $('gpsStatus').textContent = '⚠️ ' + err.message;
+                    $('gpsDot').style.background = '#dc3545';
                 }, { enableHighAccuracy: true, timeout: 15000 }
             );
         }
@@ -2604,8 +2734,8 @@
         function stopGps() {
             if (gpsWatchId) { navigator.geolocation.clearWatch(gpsWatchId);
                 gpsWatchId = null; }
-            document.getElementById('gpsStatus').textContent = '⏹️ Arrêté';
-            document.getElementById('gpsDot').style.background = '#dc3545';
+            $('gpsStatus').textContent = '⏹️ Arrêté';
+            $('gpsDot').style.background = '#dc3545';
         }
 
         // ---- RENDU GLOBAL ----
@@ -2620,31 +2750,32 @@
             renderClients();
             renderReport();
             renderScanHistory();
+            renderPaymentHistory();
             updateAdminUI();
-            document.getElementById('departDateDisplay').textContent = formatDate(todayStr());
+            $('departDateDisplay').textContent = formatDate(todayStr());
 
-            if (document.getElementById('carteSelect').value && currentCarteClientId) {
-                const carteData = genererCarteData(document.getElementById('carteSelect').value);
+            if ($('carteSelect').value && currentCarteClientId) {
+                const carteData = genererCarteData($('carteSelect').value);
                 if (carteData) {
                     const carteHtml = afficherCarteHtml(carteData);
                     if (carteHtml) {
-                        document.getElementById('cartePreview').innerHTML = carteHtml;
+                        $('cartePreview').innerHTML = carteHtml;
                         setTimeout(function() { genererQR('qrcode', carteData.qrData); }, 100);
                     }
-                    renderPointageHistory(document.getElementById('carteSelect').value);
-                    renderPaiementHistory(document.getElementById('carteSelect').value);
+                    renderPointageHistory($('carteSelect').value);
+                    renderPaiementHistory($('carteSelect').value);
                 }
             }
         }
 
         // ---- INIT ----
         const today = todayStr();
-        document.getElementById('clientStartDate').value = today;
+        $('clientStartDate').value = today;
         const future = new Date();
         future.setMonth(future.getMonth() + 1);
-        document.getElementById('clientEndDate').value = future.toISOString().split('T')[0];
-        document.getElementById('clientDepartMatinTime').value = '07:00';
-        document.getElementById('clientReturnSoirTime').value = '18:00';
+        $('clientEndDate').value = future.toISOString().split('T')[0];
+        $('clientDepartMatinTime').value = '07:00';
+        $('clientReturnSoirTime').value = '18:00';
 
         renderAll();
 
@@ -2654,9 +2785,9 @@
 
         console.log('🚀 YT Transport Pro démarrée');
         console.log('🔑 Code admin: NTR2026');
-        console.log('✅ Application stable');
-        console.log('✅ Pointage: ALLER et RETOUR affichés');
-        console.log('✅ PDF carte: corrigé');
+        console.log('✅ Application complète');
+        console.log('💳 Mobile Money intégré');
+        console.log('📱 QR + Pointage fonctionnels');
 
         setInterval(function() {
             renderStats();
